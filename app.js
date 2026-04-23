@@ -304,29 +304,21 @@ const Lab = {
       this.outputTypes = spec.out.slice();
 
       const geometry = Block._geometryFor(type);
-      // PBR with iridescence + clearcoat + sheen. Colors / shapes are
-      // unchanged — those are the pedagogical anchors students learn
-      // ("pink torus = TOKENIZE"). Only the rendering upgrades.
-      const sheenCol = new THREE.Color(spec.color).multiplyScalar(0.6);
-      const material = new THREE.MeshPhysicalMaterial({
+      // Performance: MeshStandardMaterial instead of MeshPhysicalMaterial.
+      // Drops the clearcoat + iridescence + sheen + transmission shaders
+      // that made each block a fragment-heavy beast. Keeps metalness +
+      // roughness + emissive so blocks still read glossy under the aurora
+      // rig. Colors / shapes unchanged (pedagogical anchors preserved).
+      const material = new THREE.MeshStandardMaterial({
         color: spec.color,
         emissive: spec.color,
-        emissiveIntensity: 0.22,            // dialed down — aurora lights carry the scene
-        roughness: 0.18,
-        metalness: 0.35,
-        clearcoat: 0.8,
-        clearcoatRoughness: 0.12,
-        iridescence: 1.0,
-        iridescenceIOR: 1.35,
-        iridescenceThicknessRange: [120, 820],
-        sheen: 0.4,
-        sheenColor: sheenCol,
-        // Keep a touch of transmission so the blocks read as glassy crystals
-        transmission: 0.25,
-        thickness: 1.4,
-        ior: 1.45
+        emissiveIntensity: 0.32,      // bumped slightly — no clearcoat to bounce light
+        roughness: 0.32,
+        metalness: 0.55
       });
       this.mesh = new THREE.Mesh(geometry, material);
+      this.mesh.castShadow = false;
+      this.mesh.receiveShadow = false;
       this.mesh.userData.block = this;
     }
 
@@ -825,10 +817,16 @@ const Lab = {
     this._camera.lookAt(this._cameraTarget);
 
     // Renderer — antialias, deep-violet clear, ACES Filmic tone mapping
-    // for cinematic highlight roll-off (same curve Apple Vision / Runway use).
-    this._renderer = new THREE.WebGLRenderer({ antialias: true });
+    // for cinematic highlight roll-off. powerPreference hints at the
+    // discrete GPU on dual-GPU machines. DPR clamped to 1.5 — full 2x
+    // on Retina quadruples fragment work for zero pedagogical gain.
+    this._renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      powerPreference: 'high-performance'
+    });
     this._renderer.setSize(width, height);
-    this._renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    this._renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    this._renderer.shadowMap.enabled = false;   // aurora rig provides depth
     this._renderer.setClearColor(0x07041a, 1);
     this._renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this._renderer.toneMappingExposure = 1.15;
@@ -839,15 +837,14 @@ const Lab = {
     // dissolves into the background instead of hitting a hard edge.
     this._scene.fog = new THREE.Fog(0x07041a, 10, 32);
 
-    // Reflective floor — MeshPhysicalMaterial with clearcoat gives the
-    // aurora lights a soft glossy bounce (replaces the flat 1995 plane).
+    // Reflective floor — MeshStandardMaterial (perf fallback). Still
+    // picks up the aurora rig glossy, just without the clearcoat
+    // second-pass shader.
     const planeGeo = new THREE.PlaneGeometry(20, 20);
-    const planeMat = new THREE.MeshPhysicalMaterial({
+    const planeMat = new THREE.MeshStandardMaterial({
       color: 0x0a051c,
       roughness: 0.55,
-      metalness: 0.2,
-      clearcoat: 0.35,
-      clearcoatRoughness: 0.4
+      metalness: 0.3
     });
     const plane = new THREE.Mesh(planeGeo, planeMat);
     plane.rotation.x = -Math.PI / 2;
@@ -891,9 +888,10 @@ const Lab = {
     ];
     this._auroraLights.forEach(spec => this._scene.add(spec.light));
 
-    // 400-point aurora dust cloud — additive-blended so it brightens edges,
-    // gives volumetric depth without post-processing.
-    const DUST = 400;
+    // Aurora dust cloud — reduced from 400 → 120 points. Still
+    // volumetric-feeling because additive blending makes each point
+    // read brighter than its individual alpha.
+    const DUST = 120;
     const dustGeo = new THREE.BufferGeometry();
     const dustPos = new Float32Array(DUST * 3);
     const dustCol = new Float32Array(DUST * 3);

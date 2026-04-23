@@ -7,8 +7,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<!-- Three.js + GSAP deferred so the sidebar + lecture text stay interactive
+     while the 3D lab engine loads in the background. They execute before
+     DOMContentLoaded but after HTML parse, preserving document-order
+     so app.js (also deferred) sees both globals. -->
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
 
 <!-- Apply saved theme before paint to prevent flash of unstyled content -->
 <script>
@@ -176,30 +180,20 @@
 .aurora-bg .orb.o1 {
   width: 48vmax; height: 48vmax; top: -14vmax; left: -12vmax;
   background: radial-gradient(circle, var(--aurora-1) 0%, transparent 65%);
-  animation: drift1 22s ease-in-out infinite alternate;
+  animation: drift1 44s ease-in-out infinite alternate;   /* slowed 50% */
 }
 .aurora-bg .orb.o2 {
   width: 52vmax; height: 52vmax; bottom: -18vmax; right: -14vmax;
   background: radial-gradient(circle, var(--aurora-4) 0%, transparent 65%);
-  animation: drift2 28s ease-in-out infinite alternate;
+  animation: drift2 56s ease-in-out infinite alternate;   /* slowed 50% */
 }
-.aurora-bg .orb.o3 {
-  width: 42vmax; height: 42vmax; top: 18%; right: -8vmax;
-  background: radial-gradient(circle, var(--aurora-3) 0%, transparent 65%);
-  animation: drift3 26s ease-in-out infinite alternate;
-}
-.aurora-bg .orb.o4 {
-  width: 38vmax; height: 38vmax; bottom: 12%; left: -6vmax;
-  background: radial-gradient(circle, var(--aurora-2) 0%, transparent 70%);
-  animation: drift4 24s ease-in-out infinite alternate;
-  opacity: 0.42;
-}
-.aurora-bg .orb.o5 {
-  width: 30vmax; height: 30vmax; top: 40%; left: 35%;
-  background: radial-gradient(circle, var(--aurora-6) 0%, transparent 70%);
-  animation: drift5 32s ease-in-out infinite alternate;
-  opacity: 0.28;
-}
+/* Orbs 3-5 disabled by default — only o1 + o2 paint. Keeps the HTML
+   structure but removes 3 of the 5 "paint storms" that thrash the GPU
+   during 3D animations. Re-enabled if the user explicitly wants
+   richer aurora (no UI for that — leave as dev toggle). */
+.aurora-bg .orb.o3,
+.aurora-bg .orb.o4,
+.aurora-bg .orb.o5 { display: none; }
 .aurora-bg::after {
   /* noise + vignette overlay */
   content: "";
@@ -267,6 +261,125 @@
 @media (prefers-reduced-motion: reduce) {
   .aurora-bg .orb { animation: none !important; }
   .shine { animation: none !important; }
+}
+
+/* ============================================================
+   ⚡ PERFORMANCE SPRINT — default-off blurs, hover re-enable,
+   GPU-accelerated UI surfaces, .perf-mode "Turbo" toggle.
+   backdrop-filter: blur() is the single biggest FPS tax on
+   standard hardware. This block neutralizes it globally in the
+   default state and re-enables it only on user hover, where the
+   one-off cost is worth the visual richness.
+   ============================================================ */
+/* 1. Neutralize every blur that previously ran on every paint */
+.navbar, .sidebar, .sidebar-overlay, .lab-hud, .lab-mission,
+.surgical-tray, .lab-hologram, .hero-dossier, .module-card,
+.section, .quiz-item, .search-results, #search-input, .theme-toggle,
+.info-box, .warning-box, .cv-labeler, .code-block, .try-in-lab,
+.lab-prediction-label, .xray-label, .lab-telemetry, .example-box,
+.section-body pre, .section-body code {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* 2. Re-enable blur on hover for critical-feel surfaces (cheap because
+      only one element blurs at a time) */
+[data-theme='dark'] .navbar:hover,
+[data-theme='dark'] .module-card:hover,
+[data-theme='dark'] .sidebar:hover,
+[data-theme='dark'] .search-results:hover,
+[data-theme='dark'] .lab-hud:hover,
+[data-theme='dark'] .hero-dossier:hover {
+  backdrop-filter: blur(22px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(160%) !important;
+}
+
+/* 3. Solid-ish backgrounds replace the look blur was giving us */
+[data-theme='dark'] .navbar,
+[data-theme='dark'] .lab-hud,
+[data-theme='dark'] .lab-mission,
+[data-theme='dark'] .surgical-tray,
+[data-theme='dark'] .search-results,
+[data-theme='dark'] .sidebar {
+  background: rgba(11, 7, 34, 0.92) !important;
+}
+
+/* 4. Force GPU compositing on the moving/sticky surfaces */
+.navbar, .sidebar, .lab-hud, .lab-mission, .surgical-tray,
+.lab-hologram, .theme-toggle, .aurora-bg .orb {
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+/* Preserve centering for elements that legitimately use transform */
+.lab-mission { transform: translate3d(-50%, 0, 0) !important; }
+.surgical-tray { transform: translate3d(-50%, 0, 0) !important; }
+.navbar { transform: translate3d(-50%, 0, 0) !important; }
+
+/* 5. ⚡ Turbo Mode — body.perf-mode disables every decorative animation
+      and replaces the aurora background with the deep-violet solid */
+body.perf-mode .aurora-bg,
+body.perf-mode .aurora-bg::before,
+body.perf-mode .aurora-bg::after { display: none !important; }
+body.perf-mode { background: var(--bg-deep) !important; }
+body.perf-mode .shine,
+body.perf-mode .aurora-shimmer {
+  animation: none !important;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  color: var(--aurora-3) !important;
+}
+body.perf-mode .module-progress-fill,
+body.perf-mode .lab-telemetry,
+body.perf-mode .module-card-ring { animation: none !important; }
+body.perf-mode .module-card:hover,
+body.perf-mode .navbar:hover,
+body.perf-mode .sidebar:hover,
+body.perf-mode .search-results:hover,
+body.perf-mode .lab-hud:hover,
+body.perf-mode .hero-dossier:hover {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* 6. The "Turbo" toggle itself — lives in the nav pill */
+.perf-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  margin-left: 6px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-edge);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.perf-toggle:hover {
+  color: var(--aurora-1);
+  border-color: rgba(94, 234, 212, 0.55);
+}
+.perf-toggle .perf-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--text-muted);
+  transition: all 0.2s ease;
+}
+body.perf-mode .perf-toggle {
+  color: var(--aurora-1);
+  border-color: rgba(94, 234, 212, 0.55);
+  background: rgba(94, 234, 212, 0.12);
+}
+body.perf-mode .perf-toggle .perf-dot {
+  background: var(--aurora-1);
+  box-shadow: 0 0 8px var(--aurora-1);
 }
 
 /* Ensure content sits above aurora bg */
@@ -3559,8 +3672,26 @@ body.lab-presenting.has-sidebar .main { padding-left: 0 !important; }
     <button id="present-toggle" class="theme-toggle" aria-label="Toggle presentation mode" title="Presentation mode (Esc to exit)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
     </button>
+    <button id="perf-toggle" class="perf-toggle" aria-label="Toggle performance mode" title="Performance (Turbo) mode">
+      <span class="perf-dot" aria-hidden="true"></span><span>Turbo</span>
+    </button>
   </div>
 </nav>
+
+<script>
+  (function () {
+    // Restore last Turbo preference before first paint
+    try {
+      if (localStorage.getItem('aiml-perf') === '1') document.body.classList.add('perf-mode');
+    } catch {}
+    document.addEventListener('click', function (e) {
+      const btn = e.target.closest('#perf-toggle');
+      if (!btn) return;
+      const on = document.body.classList.toggle('perf-mode');
+      try { localStorage.setItem('aiml-perf', on ? '1' : '0'); } catch {}
+    });
+  })();
+</script>
 
 <aside id="sidebar" class="sidebar" aria-label="Course modules">
   <div class="sidebar-inner">
@@ -3577,9 +3708,9 @@ body.lab-presenting.has-sidebar .main { padding-left: 0 !important; }
 
 <button id="present-exit" class="present-exit" aria-label="Exit presentation mode" title="Exit (Esc)">&times;</button>
 
-<script src="courseData.js"></script>
-<script src="env.js" onerror="window.ENV={};console.warn('env.js missing — run: python3 make_env_js.py');"></script>
-<script src="RemoteComputeService.js"></script>
-<script src="app.js"></script>
+<script src="courseData.js" defer></script>
+<script src="env.js" defer onerror="window.ENV={};console.warn('env.js missing — run: python3 make_env_js.py');"></script>
+<script src="RemoteComputeService.js" defer></script>
+<script src="app.js" defer></script>
 </body>
 </html>
