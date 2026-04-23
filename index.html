@@ -1294,17 +1294,20 @@ a:hover { color: var(--accent-hover); }
 .cv-labeler-samples { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
 .cv-sample { display: flex; flex-direction: column; gap: 6px; transition: opacity 0.3s ease; }
 .cv-thumb {
-  width: 100%; aspect-ratio: 1 / 1;
+  width: 100%;
+  min-height: 110px;                            /* safety net if aspect-ratio fails */
+  aspect-ratio: 1 / 1;
   border-radius: 10px;
-  background: rgba(11, 7, 34, 0.35);
+  background: rgba(94, 234, 212, 0.08);
+  border: 1px solid rgba(94, 234, 212, 0.22);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  font-size: 3rem;                              /* 48px — big, no clamp fallback weirdness */
   line-height: 1;
   user-select: none;
   filter: grayscale(1) contrast(1.1);           /* grayscale until recalibrated */
-  transition: filter 0.6s ease, transform 0.3s ease, background 0.3s ease;
+  transition: filter 0.6s ease, background 0.3s ease;
 }
 [data-theme='dark'] .cv-sample.is-right .cv-thumb { background: rgba(94, 234, 212, 0.12); }
 [data-theme='dark'] .cv-sample.is-wrong .cv-thumb { background: rgba(244, 114, 182, 0.12); }
