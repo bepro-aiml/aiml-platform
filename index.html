@@ -271,8 +271,11 @@
    default state and re-enables it only on user hover, where the
    one-off cost is worth the visual richness.
    ============================================================ */
-/* 1. Neutralize every blur that previously ran on every paint */
-.navbar, .sidebar, .sidebar-overlay, .lab-hud, .lab-mission,
+/* 1. Neutralize every blur that previously ran on every paint.
+   EXCLUDES .navbar — the navbar is small (~60px × 1180px) so the blur
+   cost is trivial, and content scrolling under it needs the blur to stay
+   readable (92% opaque isn't enough to hide bright white H1 underneath). */
+.sidebar, .sidebar-overlay, .lab-hud, .lab-mission,
 .surgical-tray, .lab-hologram, .hero-dossier, .module-card,
 .section, .quiz-item, .search-results, #search-input, .theme-toggle,
 .info-box, .warning-box, .cv-labeler, .code-block, .try-in-lab,
