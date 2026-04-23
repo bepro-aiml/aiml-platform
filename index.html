@@ -2122,10 +2122,19 @@ body.has-sidebar .sidebar { transform: translateX(0); }
 }
 body.has-sidebar .sidebar-overlay { opacity: 1; pointer-events: auto; }
 
-/* Desktop: sidebar pushes the main column and hides the scrim */
+/* Desktop: sidebar pushes the main column and hides the scrim.
+   Padding-left must clear the sidebar's full footprint:
+     20px (left offset) + 300px (width) + 20px (right gap) = 340px.
+   Navbar is position:fixed + translateX(-50%), centered on the whole
+   viewport by default — push it right by half the sidebar's footprint
+   so it doesn't overlap the sidebar on wide screens. */
 @media (min-width: 1024px) {
-  body.has-sidebar .main { padding-left: 288px; transition: padding-left 0.3s ease; }
+  body.has-sidebar .main { padding-left: 340px; transition: padding-left 0.3s ease; }
   body.has-sidebar .sidebar-overlay { display: none; }
+  [data-theme='dark'] body.has-sidebar .navbar {
+    left: calc(50% + 170px);
+    max-width: min(1180px, calc(100vw - 380px));
+  }
 }
 @media (max-width: 1023px) {
   /* On mobile the sidebar always overlays — never push content */
