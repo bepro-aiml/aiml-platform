@@ -199,31 +199,66 @@ prices_usd = {k: v / 12500 for k, v in prices.items()}</pre></div>
 <div class="quiz-q">1. <code>[1, 2, 3][-1]</code> is:</div>
 <ol class="quiz-options" type="A"><li>1</li><li>3</li><li>-1</li><li>IndexError</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> 3 — negative indices count from the end.</div>
+<div class="quiz-answer">
+<p><strong>✅ B. 3.</strong> Python supports negative indices — <code>-1</code> is the last element, <code>-2</code> the second-to-last, and so on. You'll use this constantly for "give me the newest record" patterns.</p>
+<ul class="quiz-why">
+<li><strong>A. 1</strong> — no. That is <code>list[0]</code>, the first element. Python indexes from 0, not 1.</li>
+<li><strong>C. -1</strong> — no. The <code>-1</code> inside the brackets is an index, not a value. Python looks up position <code>-1</code> and returns what is stored there.</li>
+<li><strong>D. IndexError</strong> — no. <code>IndexError</code> only fires when the index is out of range (e.g. <code>list[10]</code> on a 3-item list). Any index between <code>-len(list)</code> and <code>len(list) - 1</code> is valid.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">2. Which is immutable?</div>
 <ol class="quiz-options" type="A"><li>list</li><li>dict</li><li>set</li><li>tuple</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>D.</strong> tuple.</div>
+<div class="quiz-answer">
+<p><strong>✅ D. tuple.</strong> A tuple is ordered and <strong>frozen at creation</strong> — you cannot add, remove, or replace items after. This is exactly what makes tuples hashable, which is why they can serve as dictionary keys and set members.</p>
+<ul class="quiz-why">
+<li><strong>A. list</strong> — no. Lists are the canonical mutable sequence in Python. <code>x.append()</code>, <code>x[0] = y</code>, <code>x.pop()</code> all mutate in place.</li>
+<li><strong>B. dict</strong> — no. Dicts are mutable too. <code>d[k] = v</code> assigns; <code>d.pop(k)</code> removes. Only the keys must be immutable — the dict itself is not.</li>
+<li><strong>C. set</strong> — no. Sets are mutable (<code>s.add()</code>, <code>s.discard()</code>). The "frozen" variant is <code>frozenset</code>, which is immutable and hashable.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">3. <code>{1, 2, 2, 3, 1}</code> evaluates to:</div>
 <ol class="quiz-options" type="A"><li><code>{1, 2, 2, 3, 1}</code></li><li><code>{1, 2, 3}</code></li><li><code>[1, 2, 3]</code></li><li>SyntaxError</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> Sets dedupe automatically.</div>
+<div class="quiz-answer">
+<p><strong>✅ B. <code>{1, 2, 3}</code>.</strong> Sets deduplicate automatically — a set is a mathematical set, and by definition cannot contain duplicates. This is the idiomatic Python way to strip repeats from a list: <code>set(my_list)</code>.</p>
+<ul class="quiz-why">
+<li><strong>A</strong> — no. Sets never store duplicates, even in the literal syntax. Python silently drops them while constructing the set.</li>
+<li><strong>C</strong> — no. Square brackets <code>[]</code> create a list. Curly braces <code>{}</code> with comma-separated values create a set. Different data structures.</li>
+<li><strong>D</strong> — no. <code>{1, 2, 2, 3, 1}</code> is perfectly valid Python syntax — duplicates are allowed at parse time; they simply disappear at construction.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">4. Why avoid <code>def f(x=[])</code>?</div>
 <ol class="quiz-options" type="A"><li>Syntax error</li><li>The same list is shared across calls</li><li>Slower than None</li><li>Not allowed in Py3</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> Mutable defaults are evaluated once at definition time. Use <code>x=None</code>.</div>
+<div class="quiz-answer">
+<p><strong>✅ B. The same list is shared across calls.</strong> Default arguments are evaluated <em>once</em>, at function-definition time — not at each call. So every call to <code>f()</code> sees the same list object, carrying any mutations from previous calls. <strong>Classic Python bug source.</strong> Use <code>x=None</code> and <code>if x is None: x = []</code> inside the body.</p>
+<ul class="quiz-why">
+<li><strong>A</strong> — no. Syntactically valid. That is what makes this bug so dangerous — the interpreter accepts it silently.</li>
+<li><strong>C</strong> — no. Speed is not the issue; correctness is. Using <code>None</code> is about avoiding shared mutable state, not performance.</li>
+<li><strong>D</strong> — no. Still allowed in Python 3, still dangerous. The language keeps this behaviour for backward compatibility and because linters will flag it for you.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">5. Best way to test membership in 1M items queried thousands of times?</div>
 <ol class="quiz-options" type="A"><li>List <code>in</code></li><li>Manual loop</li><li>Convert to set, then test</li><li>Sort first</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>C.</strong> Sets use hashing — O(1) membership vs O(n) for lists.</div>
+<div class="quiz-answer">
+<p><strong>✅ C. Convert to set, then test.</strong> Sets use hashing — each <code>in</code> test is <strong>O(1) on average</strong> regardless of size. Converting costs O(n) once; every subsequent lookup is constant-time. For 1M items queried thousands of times, this is thousands of times faster than scanning a list.</p>
+<ul class="quiz-why">
+<li><strong>A. List <code>in</code></strong> — no. Python walks the list item-by-item until it finds a match. That is O(n) per query. 1M × 1000 queries = 10⁹ comparisons. Takes seconds or minutes.</li>
+<li><strong>B. Manual loop</strong> — no. That is what <code>list in</code> does already, just slower because you wrote the loop in Python instead of C.</li>
+<li><strong>D. Sort first</strong> — no. Sorted lists allow O(log n) binary search — better than O(n), but still worse than set's O(1). You would also pay O(n log n) for the sort up front.</li>
+</ul>
+</div>
 </div>
 ` }
       ]
@@ -281,31 +316,66 @@ np.sqrt(a)
 <div class="quiz-q">1. <code>np.arange(0, 10, 2)</code> produces:</div>
 <ol class="quiz-options" type="A"><li>[0..9]</li><li>[0 2 4 6 8]</li><li>[0 2 4 6 8 10]</li><li>[2 4 6 8]</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> Start inclusive, end exclusive, step 2.</div>
+<div class="quiz-answer">
+<p><strong>✅ B. [0 2 4 6 8].</strong> <code>np.arange(start, stop, step)</code> follows the same rule as Python's built-in <code>range</code>: <strong>start is inclusive, stop is exclusive</strong>. The walk is 0, 2, 4, 6, 8 — the next would be 10, which is equal to stop, so it's excluded.</p>
+<ul class="quiz-why">
+<li><strong>A. [0..9]</strong> — no. That would be <code>np.arange(0, 10)</code> with the default step of 1. The <code>2</code> argument makes this a stride-of-2 sequence.</li>
+<li><strong>C. [0 2 4 6 8 10]</strong> — no. Including 10 would require an <em>inclusive</em> stop. If you need endpoints on both sides, use <code>np.linspace(0, 10, 6)</code>.</li>
+<li><strong>D. [2 4 6 8]</strong> — no. Start is 0, not 2. Confusing start with the first non-zero element is the classic beginner slip.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">2. An array of shape (4, 3) has what size?</div>
 <ol class="quiz-options" type="A"><li>3</li><li>4</li><li>7</li><li>12</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>D.</strong> 4 × 3 = 12.</div>
+<div class="quiz-answer">
+<p><strong>✅ D. 12.</strong> The <code>size</code> of an ndarray is the <strong>product of its shape dimensions</strong> — the total element count. For shape <code>(4, 3)</code> that's 4 × 3 = 12. Use <code>arr.size</code> when you need total elements; use <code>arr.shape</code> when you need per-axis counts.</p>
+<ul class="quiz-why">
+<li><strong>A. 3</strong> — no. 3 is the number of <em>columns</em>, which is <code>arr.shape[1]</code>, not the total element count.</li>
+<li><strong>B. 4</strong> — no. 4 is the number of <em>rows</em>, which is <code>arr.shape[0]</code>. Again, not the total.</li>
+<li><strong>C. 7</strong> — no. Adding 4 + 3 never applies to array sizes. Memory allocation is by multiplication because storage is row-major.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">3. Why is NumPy faster than a Python loop?</div>
 <ol class="quiz-options" type="A"><li>Runs on GPU</li><li>Uses less RAM</li><li>Vectorized ops execute in compiled C with no per-element overhead</li><li>Python is single-threaded</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>C.</strong> C-level iteration avoids the per-iteration interpreter overhead.</div>
+<div class="quiz-answer">
+<p><strong>✅ C. Vectorized ops execute in compiled C with no per-element overhead.</strong> A Python <code>for</code> loop pays interpreter cost for every iteration: type-checking, bytecode dispatch, reference counting. NumPy pushes the whole loop into a single C call, so you pay that overhead <em>once</em> for the whole operation. <strong>Typical speedup: 50×–200×.</strong></p>
+<ul class="quiz-why">
+<li><strong>A. Runs on GPU</strong> — no. Standard NumPy runs on CPU only. For GPU execution you use CuPy, PyTorch, or JAX — which all mimic NumPy's API for this reason.</li>
+<li><strong>B. Uses less RAM</strong> — no. NumPy often uses <em>more</em> RAM than a Python list because it preallocates contiguous memory for the whole array. The speed comes from that layout, not from size.</li>
+<li><strong>D. Python is single-threaded</strong> — no. That's a real limitation (the GIL), but it's not why NumPy is fast. NumPy sidesteps the GIL by running in C; that's a consequence of vectorization, not the cause.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">4. Shape (5, 3) + shape (3,) =</div>
 <ol class="quiz-options" type="A"><li>(5, 3)</li><li>(3,)</li><li>(5,)</li><li>ValueError</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>A.</strong> Broadcasting stretches (3,) across every row.</div>
+<div class="quiz-answer">
+<p><strong>✅ A. (5, 3).</strong> Broadcasting aligns shapes <em>from the right</em>. The <code>(3,)</code> array matches the trailing dimension of <code>(5, 3)</code>, so NumPy stretches it along the leading axis — the same 3-element row is added to each of the 5 rows. Output stays <code>(5, 3)</code>.</p>
+<ul class="quiz-why">
+<li><strong>B. (3,)</strong> — no. The result always takes the <em>broadcast shape</em>, never one of the operands' smaller shapes. Only a reduction (like <code>sum(axis=0)</code>) would collapse a dimension.</li>
+<li><strong>C. (5,)</strong> — no. This would require collapsing the column axis, which broadcasting never does. Broadcasting stretches; only reductions shrink.</li>
+<li><strong>D. ValueError</strong> — no. Shapes are compatible because the trailing dims match (both are 3). You'd only get a ValueError if the trailing dims disagreed, like <code>(5, 3) + (4,)</code>.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">5. Reshape a 12-elem array into 3 cols without computing rows:</div>
 <ol class="quiz-options" type="A"><li><code>reshape(4, 3)</code></li><li><code>reshape(-1, 3)</code></li><li><code>reshape(3, auto)</code></li><li><code>reshape(?, 3)</code></li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> <code>-1</code> means "compute automatically."</div>
+<div class="quiz-answer">
+<p><strong>✅ B. <code>reshape(-1, 3)</code>.</strong> NumPy treats <code>-1</code> as "<strong>infer this axis from the total element count</strong>". Here NumPy knows the total is 12 and the other axis is 3, so it computes 12 / 3 = 4 and returns shape <code>(4, 3)</code>. <strong>Use <code>-1</code> whenever your row count depends on runtime data.</strong></p>
+<ul class="quiz-why">
+<li><strong>A. <code>reshape(4, 3)</code></strong> — no. Works for this exact 12-element case, but breaks the moment your data changes size. <code>-1</code> is the more maintainable pattern.</li>
+<li><strong>C. <code>reshape(3, auto)</code></strong> — no. <code>auto</code> is not a NumPy keyword. The placeholder is specifically the integer <code>-1</code>.</li>
+<li><strong>D. <code>reshape(?, 3)</code></strong> — no. Question marks are not valid in Python. You'll get a SyntaxError before NumPy sees the call.</li>
+</ul>
+</div>
 </div>
 ` }
       ]
@@ -361,31 +431,66 @@ df.groupby("city").agg({"age": "mean", "name": "count"})</pre>
 <div class="quiz-q">1. <code>loc</code> vs <code>iloc</code>?</div>
 <ol class="quiz-options" type="A"><li>Identical</li><li><code>loc</code> by label, <code>iloc</code> by position</li><li><code>loc</code> faster</li><li><code>iloc</code> is columns-only</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> Labels vs integer positions.</div>
+<div class="quiz-answer">
+<p><strong>✅ B. <code>loc</code> by label, <code>iloc</code> by integer position.</strong> <code>df.loc["customer_123"]</code> finds the row whose index label is that string; <code>df.iloc[0]</code> finds the first row regardless of label. <strong>Pick <code>loc</code> when your index carries meaning, <code>iloc</code> when you want positional slicing.</strong></p>
+<ul class="quiz-why">
+<li><strong>A. Identical</strong> — no. They behave identically only when your index happens to be <code>0, 1, 2, …</code>. The moment you set a meaningful index (date, customer ID), they diverge sharply.</li>
+<li><strong>C. <code>loc</code> faster</strong> — no. Speed is roughly the same for both. Pick based on semantics, not performance.</li>
+<li><strong>D. <code>iloc</code> is columns-only</strong> — no. Both work for rows AND columns: <code>df.iloc[0, 2]</code> is row 0, column 2. Both accept slices on either axis.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">2. Correct filter for adults in Tashkent?</div>
 <ol class="quiz-options" type="A"><li><code>df[df.age &gt;= 18 and df.city == "T"]</code></li><li><code>df[(df.age &gt;= 18) &amp; (df.city == "T")]</code></li><li><code>df[df.age &gt;= 18 &amp;&amp; df.city == "T"]</code></li><li><code>df.filter(...)</code></li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> <code>&amp;</code> with parentheses.</div>
+<div class="quiz-answer">
+<p><strong>✅ B. <code>(df.age &gt;= 18) &amp; (df.city == "T")</code>.</strong> Pandas requires <strong><code>&amp;</code> for element-wise AND</strong> (and <code>|</code> for OR) on boolean Series, plus <strong>parentheses around each condition</strong> — because <code>&amp;</code> has higher operator precedence than <code>&gt;=</code>, so without parens Python evaluates it wrong.</p>
+<ul class="quiz-why">
+<li><strong>A. <code>and</code></strong> — no. Python's <code>and</code> evaluates Series truthiness, which raises <code>ValueError: The truth value of a Series is ambiguous</code>. A Series is an array, not a single True/False.</li>
+<li><strong>C. <code>&amp;&amp;</code></strong> — no. That is JavaScript/C/Java syntax. Python has no <code>&amp;&amp;</code> operator — it's a SyntaxError before the code even runs.</li>
+<li><strong>D. <code>df.filter(...)</code></strong> — no. <code>df.filter</code> selects by column/index <em>name</em>, not by row predicate. For row-level filtering you always use boolean indexing.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">3. <code>df.groupby("city")["age"].mean()</code> returns:</div>
 <ol class="quiz-options" type="A"><li>DataFrame</li><li>Series indexed by city</li><li>List</li><li>Scalar</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> One agg on one column → Series keyed by group.</div>
+<div class="quiz-answer">
+<p><strong>✅ B. Series indexed by city.</strong> <code>groupby("city")</code> buckets rows by city; <code>["age"]</code> selects one column; <code>.mean()</code> reduces to a single number per bucket. The result is a <strong>Series whose index is the unique city values</strong> and whose values are the per-city mean ages.</p>
+<ul class="quiz-why">
+<li><strong>A. DataFrame</strong> — no. You'd get a DataFrame only if you applied the reduction to <em>multiple</em> columns, e.g. <code>df.groupby("city")[["age", "income"]].mean()</code> or passed a dict to <code>.agg()</code>.</li>
+<li><strong>C. List</strong> — no. Pandas never returns a raw Python list from <code>groupby().agg()</code>. You could call <code>.tolist()</code> on the Series to convert, but you'd lose the city labels.</li>
+<li><strong>D. Scalar</strong> — no. A scalar would be the result of <code>df["age"].mean()</code> (no groupby). The groupby call adds a per-group dimension, giving a Series.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">4. Left join: unmatched left rows become:</div>
 <ol class="quiz-options" type="A"><li>Dropped</li><li>Kept with NaN on right</li><li>Error</li><li>Duplicated</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> Left join keeps all left rows.</div>
+<div class="quiz-answer">
+<p><strong>✅ B. Kept with NaN on the right.</strong> A left join guarantees <strong>every row from the left DataFrame appears in the output</strong>. When no matching key exists on the right, the right-side columns fill with <code>NaN</code>. Use this when the left table is your "source of truth" (e.g., every customer must appear, even those with no orders).</p>
+<ul class="quiz-why">
+<li><strong>A. Dropped</strong> — no. That is an <em>inner</em> join, which only keeps rows with matches on BOTH sides.</li>
+<li><strong>C. Error</strong> — no. Merges with unmatched keys are normal and expected. Pandas never errors on missing matches.</li>
+<li><strong>D. Duplicated</strong> — no. Rows duplicate only when the key is non-unique on the <em>right</em> side (one-to-many join). That's a separate concern from left-vs-inner.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">5. 5GB CSV crashes your laptop. First move?</div>
 <ol class="quiz-options" type="A"><li>Buy RAM</li><li><code>chunksize=</code> or Parquet</li><li>Ignore</li><li>Split in Excel</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> Chunked iteration or columnar format.</div>
+<div class="quiz-answer">
+<p><strong>✅ B. <code>chunksize=</code> or switch to Parquet.</strong> <code>pd.read_csv(path, chunksize=100_000)</code> returns an iterator that processes the file in chunks, so you never hold the whole 5GB in RAM. Better: convert once to <strong>Parquet</strong> (columnar + compressed), and subsequent reads are 10–50× faster and load only the columns you need.</p>
+<ul class="quiz-why">
+<li><strong>A. Buy RAM</strong> — no. Scaling hardware is the last resort. The skill you want is making the software fit the hardware — chunking and columnar formats work on any machine.</li>
+<li><strong>C. Ignore</strong> — no. Real datasets in Uzbek telecom / fintech routinely hit GB scale. If you can't handle them, you can't work there.</li>
+<li><strong>D. Split in Excel</strong> — no. Excel can't open files above its row limit, and manual splitting loses row integrity across the seams.</li>
+</ul>
+</div>
 </div>
 ` }
       ]
@@ -438,31 +543,66 @@ fig.savefig("out.png", dpi=150)</pre>
 <div class="quiz-q">1. Distribution of a numeric column — best chart?</div>
 <ol class="quiz-options" type="A"><li>Bar</li><li>Pie</li><li>Histogram</li><li>Scatter</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>C.</strong> Histogram.</div>
+<div class="quiz-answer">
+<p><strong>✅ C. Histogram.</strong> A histogram <strong>buckets continuous values into bins</strong> and shows how many fall in each — the clearest way to read a distribution's shape, centre, and tails. First plot before training: <code>sns.histplot(df, x="age", kde=True)</code>.</p>
+<ul class="quiz-why">
+<li><strong>A. Bar</strong> — no. Bar charts are for <em>categorical</em> data (one bar per category). For continuous numeric data, a bar chart would either collapse too many values or create one bar per unique number — unreadable.</li>
+<li><strong>B. Pie</strong> — no. Pie charts show <em>parts of a whole</em> for a few discrete categories. They are almost never the right answer for ML work, and never for a continuous variable.</li>
+<li><strong>D. Scatter</strong> — no. Scatter plots show the relationship between <em>two</em> variables. For one variable you lose half the axis.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">2. What does Seaborn add over Matplotlib?</div>
 <ol class="quiz-options" type="A"><li>Different engine</li><li>Shorter syntax, DataFrame-native stat plots</li><li>Interactive</li><li>3D</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> Higher-level wrapper for statistical plots.</div>
+<div class="quiz-answer">
+<p><strong>✅ B. Shorter syntax and DataFrame-native statistical plots.</strong> Seaborn is a <strong>high-level wrapper over Matplotlib</strong> — one line of Seaborn does what 5–10 lines of Matplotlib would. It understands DataFrames natively (<code>sns.boxplot(df, x="group", y="value")</code>) and includes statistical overlays (KDE, regression lines, confidence bands) out of the box.</p>
+<ul class="quiz-why">
+<li><strong>A. Different engine</strong> — no. Every Seaborn plot IS a Matplotlib figure underneath. You can grab the axis with <code>plt.gca()</code> and customize with Matplotlib commands.</li>
+<li><strong>C. Interactive</strong> — no. Seaborn is static. For interactivity (zoom, hover, click), you'd use Plotly, Bokeh, or Altair.</li>
+<li><strong>D. 3D</strong> — no. Neither Matplotlib nor Seaborn is primarily for 3D. 3D is rarely useful for data viz anyway — it obscures more than it reveals.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">3. Compare age distribution between churned and non-churned customers:</div>
 <ol class="quiz-options" type="A"><li>Line</li><li>Pie</li><li>Box plot split by churn</li><li>Heatmap</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>C.</strong> Box/violin plots show distribution shape per group.</div>
+<div class="quiz-answer">
+<p><strong>✅ C. Box (or violin) plot split by churn.</strong> You need to see two distributions <em>side-by-side</em>. A box plot per group shows median, quartiles, and outliers at a glance — you can tell in one second whether churners skew younger or older. Violin plots add distribution shape on top.</p>
+<ul class="quiz-why">
+<li><strong>A. Line</strong> — no. Line charts are for a value changing over an ordered axis (typically time). They don't work for comparing two independent distributions.</li>
+<li><strong>B. Pie</strong> — no. Pies show composition, not distribution shape. You'd lose every statistical property of the data.</li>
+<li><strong>D. Heatmap</strong> — no. Heatmaps visualize a 2D matrix (typically correlations or 2D histograms). For a 1D distribution comparison, it's overkill and hard to read.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">4. Anscombe's quartet teaches:</div>
 <ol class="quiz-options" type="A"><li>Stats are always enough</li><li>Identical summary stats can hide different shapes — always plot</li><li>Four is the minimum</li><li>Correlation = causation</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> Always plot.</div>
+<div class="quiz-answer">
+<p><strong>✅ B. Identical summary stats can hide completely different shapes — always plot.</strong> Anscombe constructed four datasets with identical mean, variance, correlation, and regression line. Plotted, they are wildly different (one is a clean line, one is a curve, one has an outlier, one is a vertical line). <strong>Summary statistics lie. Charts don't.</strong></p>
+<ul class="quiz-why">
+<li><strong>A. Stats are always enough</strong> — no. That is exactly the belief Anscombe's quartet was designed to destroy. Anyone trusting only the summary would draw identical conclusions from four very different datasets.</li>
+<li><strong>C. Four is the minimum</strong> — no. The "four" is just how many datasets Anscombe created to demonstrate the point. There is no magical minimum — you could illustrate the same lesson with two.</li>
+<li><strong>D. Correlation = causation</strong> — no. That is a different (also true) statistical caution, but Anscombe's quartet specifically attacks <em>summary-stat reliance</em>, not causal inference.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">5. When to use log scale on y-axis?</div>
 <ol class="quiz-options" type="A"><li>Always</li><li>When data spans orders of magnitude</li><li>Only time series</li><li>Never</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> When linear compresses most points.</div>
+<div class="quiz-answer">
+<p><strong>✅ B. When data spans orders of magnitude.</strong> A linear y-axis assigns equal visual space to equal <em>differences</em>. When values range from 1 to 1,000,000, that squashes small values into invisibility. A log axis assigns equal space to equal <em>ratios</em>, so 1 → 10 occupies the same visual distance as 100,000 → 1,000,000.</p>
+<ul class="quiz-why">
+<li><strong>A. Always</strong> — no. For bounded or roughly-linear data (e.g., percentages, temperatures), log scale <em>distorts</em> the shape and confuses readers.</li>
+<li><strong>C. Only time series</strong> — no. Log scale has nothing to do with whether the x-axis is time. It's about the y-axis value range, regardless of x.</li>
+<li><strong>D. Never</strong> — no. It is the correct call for population counts, income distributions, compute/memory scaling, or anything growing exponentially.</li>
+</ul>
+</div>
 </div>
 ` }
       ]
@@ -509,31 +649,66 @@ fig.savefig("out.png", dpi=150)</pre>
 <div class="quiz-q">1. A column where 99% of rows have the same value is:</div>
 <ol class="quiz-options" type="A"><li>Highly predictive</li><li>Near-zero variance, almost useless</li><li>The target</li><li>A bug</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> Nothing to learn from. Drop or inspect.</div>
+<div class="quiz-answer">
+<p><strong>✅ B. Near-zero variance — almost useless for modelling.</strong> A feature that's constant (or near-constant) carries <strong>no information to distinguish one sample from another</strong>. A model cannot learn "when this is high, the target is X" if the value is never different. Drop it, or check whether the non-majority 1% is meaningful data leakage.</p>
+<ul class="quiz-why">
+<li><strong>A. Highly predictive</strong> — no. The opposite. Predictive power requires the feature's value to <em>co-vary</em> with the target. If the feature barely varies, it cannot explain variation in the target.</li>
+<li><strong>C. The target</strong> — no. The target could be imbalanced, but that's about the target itself. A 99% constant <em>feature</em> is just a near-zero-variance feature — and should be flagged in EDA.</li>
+<li><strong>D. A bug</strong> — sometimes yes, but usually not. It could be a legitimate rare event indicator, a default value, or a legacy column. You investigate — you don't assume.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">2. Two features correlate 0.97. What do you do?</div>
 <ol class="quiz-options" type="A"><li>Keep both</li><li>Drop one</li><li>Add them</li><li>Ignore</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> Redundant information. Keep the more interpretable or higher-quality one.</div>
+<div class="quiz-answer">
+<p><strong>✅ B. Drop one.</strong> Correlation that high means the two features carry <strong>redundant information</strong>. Linear models suffer <em>multicollinearity</em> (unstable coefficients, inflated standard errors); tree models don't crash but still split on both inefficiently. Keep whichever is more <strong>interpretable</strong>, <strong>higher quality</strong>, or <strong>earlier in the data pipeline</strong>.</p>
+<ul class="quiz-why">
+<li><strong>A. Keep both</strong> — no. Beyond the multicollinearity issue, you pay double on memory, feature-engineering effort, and on the final model's inference latency — for zero additional signal.</li>
+<li><strong>C. Add them</strong> — no. Adding two near-identical features gives you a scaled version of one, not a new feature. It doesn't solve redundancy.</li>
+<li><strong>D. Ignore</strong> — no. Ignoring is the junior-engineer move that passes CI but fails code review. EDA exists specifically to catch this before training.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">3. Target is 0.2% positive. A model predicting "no" always gets 99.8% accuracy. This shows:</div>
 <ol class="quiz-options" type="A"><li>The model is great</li><li>Accuracy is wrong metric for imbalanced data</li><li>Data is broken</li><li>Need more data</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> Use precision/recall/F1/AUC.</div>
+<div class="quiz-answer">
+<p><strong>✅ B. Accuracy is the wrong metric for imbalanced data.</strong> A model that never predicts the minority class can hit 99.8% accuracy while being <strong>completely useless</strong> — it misses 100% of the fraud / churn / disease cases that actually matter. Use <strong>precision, recall, F1, PR-AUC</strong> — metrics that account for the imbalance explicitly.</p>
+<ul class="quiz-why">
+<li><strong>A. The model is great</strong> — no. The model has <strong>zero recall on the positive class</strong>. In fraud detection that means zero fraud caught. In triage that means zero emergencies flagged.</li>
+<li><strong>C. Data is broken</strong> — no. Imbalanced data is normal in the real world (fraud, rare diseases, defects). The broken thing is the evaluation metric, not the dataset.</li>
+<li><strong>D. Need more data</strong> — no. Even infinite data won't fix the fact that accuracy is the wrong yardstick for this problem. Fix the metric first, then worry about data.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">4. Column is 60% missing. First move?</div>
 <ol class="quiz-options" type="A"><li>Drop</li><li>Fill with 0</li><li>Investigate whether missingness carries signal</li><li>Fill with mean</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>C.</strong> Missingness often encodes information.</div>
+<div class="quiz-answer">
+<p><strong>✅ C. Investigate whether missingness carries signal.</strong> Missing values are often <strong>not random</strong> — "Missing Not At Random" (MNAR) means the fact that a value is missing is itself informative. Example: a "<code>last_credit_score</code>" being missing may strongly predict "never had credit, likely younger customer." <strong>Create a boolean <code>col_is_missing</code> indicator</strong> before imputing, then train on both.</p>
+<ul class="quiz-why">
+<li><strong>A. Drop</strong> — no. Dropping a 60%-missing column throws away what's often your strongest feature (the missingness pattern itself). Drop only after you've confirmed it's MCAR — missing completely at random.</li>
+<li><strong>B. Fill with 0</strong> — no. 0 is a specific numeric value that the model will interpret as real. If 0 has meaning elsewhere (e.g., "zero topups"), you've now conflated "missing" with "zero topups" — a silent bug.</li>
+<li><strong>D. Fill with mean</strong> — no. Mean imputation is a default, not an investigation. It hides the missingness signal and distorts variance downward. Same mistake as option B, just subtler.</li>
+</ul>
+</div>
 </div>
 <div class="quiz-item">
 <div class="quiz-q">5. You find <code>churn_recorded_at</code> in a dataset predicting <code>churned</code>. Do what?</div>
 <ol class="quiz-options" type="A"><li>Use as feature</li><li>Drop — data leakage</li><li>Convert to Unix</li><li>Fill "unknown"</li></ol>
 <button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> Only exists after the label is known — perfect leakage.</div>
+<div class="quiz-answer">
+<p><strong>✅ B. Drop — it's data leakage.</strong> <code>churn_recorded_at</code> only has a value <em>after</em> the customer has already churned. Using it as a feature tells the model "the answer is known" — so training accuracy shoots to 99%+ and production accuracy collapses, because at inference time that column is empty. <strong>Any feature derived from the label is leakage.</strong></p>
+<ul class="quiz-why">
+<li><strong>A. Use as feature</strong> — no. This is the most common cause of "amazing validation score that collapses in production." The model learned a shortcut that doesn't exist at prediction time.</li>
+<li><strong>C. Convert to Unix</strong> — no. The leakage is semantic, not syntactic. Converting the format doesn't change the fact that the feature is only populated post-churn.</li>
+<li><strong>D. Fill "unknown"</strong> — no. You'd still have the same leakage for all the rows where the value IS filled — i.e., all the positive cases. Imputation doesn't fix a fundamentally leaky column.</li>
+</ul>
+</div>
 </div>
 ` }
       ]
