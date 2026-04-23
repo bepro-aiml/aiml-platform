@@ -3821,7 +3821,7 @@ function pyHighlight(line) {
   const placeholders = [];
   const ph = (cls, text) => {
     placeholders.push(`<span class="tok ${cls}">${text}</span>`);
-    return `\u0000${placeholders.length - 1}\u0000`;
+    return ` x${placeholders.length - 1}x `;
   };
   // Order matters: comments > strings > numbers > keywords > builtins
   s = s.replace(/#.*$/g, (m) => ph('cmt', m));
@@ -3830,7 +3830,7 @@ function pyHighlight(line) {
   s = s.replace(PY_KEYWORDS, (m) => ph('kw', m));
   s = s.replace(PY_BUILTINS, (m) => ph('bi', m));
   // Restore placeholders.
-  return s.replace(/\u0000(\d+)\u0000/g, (_, i) => placeholders[Number(i)]);
+  return s.replace(/ x(\d+)x /g, (_, i) => placeholders[Number(i)]);
 }
 
 function enhanceClassContent(root) {
