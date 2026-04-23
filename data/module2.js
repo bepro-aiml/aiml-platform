@@ -148,13 +148,13 @@ while balance &gt; 0:
     <div class="cv-labeler-progress"><b class="cv-done">0</b>/5 labelled</div>
   </div>
   <div class="cv-labeler-samples">
-    <div class="cv-sample" data-truth="cat">   <div class="cv-thumb" style="background: linear-gradient(135deg, #f472b6, #a78bfa);"></div> <div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
-    <div class="cv-sample" data-truth="dog">   <div class="cv-thumb" style="background: linear-gradient(135deg, #5eead4, #60a5fa);"></div> <div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
-    <div class="cv-sample" data-truth="cat">   <div class="cv-thumb" style="background: linear-gradient(135deg, #fbbf24, #f472b6);"></div> <div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
-    <div class="cv-sample" data-truth="dog">   <div class="cv-thumb" style="background: linear-gradient(135deg, #a78bfa, #5eead4);"></div> <div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
-    <div class="cv-sample" data-truth="dog">   <div class="cv-thumb" style="background: linear-gradient(135deg, #60a5fa, #fbbf24);"></div> <div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
+    <div class="cv-sample" data-truth="cat"><div class="cv-thumb">🐱</div><div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
+    <div class="cv-sample" data-truth="dog"><div class="cv-thumb">🐶</div><div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
+    <div class="cv-sample" data-truth="cat"><div class="cv-thumb">🐈</div><div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
+    <div class="cv-sample" data-truth="dog"><div class="cv-thumb">🐕</div><div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
+    <div class="cv-sample" data-truth="dog"><div class="cv-thumb">🐩</div><div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
   </div>
-  <div class="cv-labeler-status">Label every sample to restore color to the Lab.</div>
+  <div class="cv-labeler-status">The sensors see only grayscale. Label every sample to restore color to the Lab.</div>
 </div>
 ` },
         { icon: "🔧", title: "Functions", content: `

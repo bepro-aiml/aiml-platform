@@ -1296,9 +1296,18 @@ a:hover { color: var(--accent-hover); }
 .cv-thumb {
   width: 100%; aspect-ratio: 1 / 1;
   border-radius: 10px;
+  background: rgba(11, 7, 34, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  line-height: 1;
+  user-select: none;
   filter: grayscale(1) contrast(1.1);           /* grayscale until recalibrated */
-  transition: filter 0.6s ease, transform 0.3s ease;
+  transition: filter 0.6s ease, transform 0.3s ease, background 0.3s ease;
 }
+[data-theme='dark'] .cv-sample.is-right .cv-thumb { background: rgba(94, 234, 212, 0.12); }
+[data-theme='dark'] .cv-sample.is-wrong .cv-thumb { background: rgba(244, 114, 182, 0.12); }
 [data-theme='dark'] .cv-labeler.is-complete .cv-thumb {
   filter: grayscale(0) contrast(1);             /* colour returns on success */
 }
