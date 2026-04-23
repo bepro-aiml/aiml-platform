@@ -139,7 +139,7 @@ while balance &gt; 0:
       brokenState: { type: 'vision', grayscale: true, description: 'Sensor blindness — the Foundry cameras see only grayscale. Re-label the data stream to recalibrate.' },
       sections: [
         { icon: "👁️", title: "Scenario — The Broken Eye", content: `
-<div class="warning-box"><strong>The Foundry is offline.</strong>Open the Lab right now: every block is rendering in grayscale. The Foundry's visual sensors can't tell a <code>cat</code> from a <code>dog</code>, because no one labelled the training images. Functions and data structures are how you feed labelled examples back into the pipeline.</div>
+<div class="warning-box"><strong>The Foundry is offline.</strong>The Foundry's visual sensors can't tell a <code>cat</code> from a <code>dog</code>, because no one labelled the training images. Functions and data structures are how you feed labelled examples back into the pipeline.</div>
 <p>In the real world, 80% of ML engineering is moving data between <em>structures</em> (lists, dicts) using <em>functions</em> (tiny, reusable, pure). By the end of this class you'll build the re-calibration routine — a function that takes a raw image batch and returns a list of labelled observations.</p>
 
 <div class="cv-labeler" data-task="2-2-recalibrate">
@@ -154,7 +154,7 @@ while balance &gt; 0:
     <div class="cv-sample" data-truth="dog"><div class="cv-thumb"><img src="assets/img/cv-samples/cv-sample-4-dog.webp" alt="dog" loading="lazy"></div><div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
     <div class="cv-sample" data-truth="dog"><div class="cv-thumb"><img src="assets/img/cv-samples/cv-sample-5-dog.webp" alt="dog" loading="lazy"></div><div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
   </div>
-  <div class="cv-labeler-status">The sensors see only grayscale. Label every sample to restore color to the Lab.</div>
+  <div class="cv-labeler-status">The sensors see only grayscale. Label every sample to recalibrate them.</div>
 </div>
 ` },
         { icon: "🔧", title: "Functions", content: `

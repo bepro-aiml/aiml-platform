@@ -1236,31 +1236,9 @@ a:hover { color: var(--accent-hover); }
 [data-theme='dark'] .tok.num { color: var(--aurora-6); }                   /* numbers → gold */
 [data-theme='dark'] .tok.cmt { color: var(--text-muted); font-style: italic; }
 
-/* Try-in-Lab handoff button — sits below each code block */
-.code-actions { display: flex; justify-content: flex-end; margin: -4px 0 14px; }
-[data-theme='dark'] .try-in-lab {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  padding: 7px 16px;
-  border-radius: 999px;
-  background: rgba(167, 139, 250, 0.12);
-  border: 1px solid rgba(167, 139, 250, 0.38);
-  color: var(--aurora-3);
-  cursor: pointer;
-  transition: all 0.25s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-[data-theme='dark'] .try-in-lab:hover {
-  background: rgba(167, 139, 250, 0.22);
-  border-color: rgba(167, 139, 250, 0.6);
-  color: var(--text-main);
-  box-shadow: 0 0 22px rgba(167, 139, 250, 0.4);
-  transform: translateY(-1px);
-}
+/* Try-in-Lab button CSS removed — feature disabled. Nuke any stale
+   elements still in cached DOM from before the code-path was dropped. */
+.code-actions, .try-in-lab { display: none !important; }
 
 /* CV Labeler — "Re-calibrate the sensors" interactive task */
 [data-theme='dark'] .cv-labeler {

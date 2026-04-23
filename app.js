@@ -3868,7 +3868,7 @@ function enhanceClassContent(root) {
       const done = wrap.querySelectorAll('.cv-sample.is-done').length;
       if (doneEl) doneEl.textContent = String(done);
       if (done === wrap.querySelectorAll('.cv-sample').length) {
-        if (statusEl) statusEl.textContent = '✓ Sensors recalibrated — colour will return when you re-enter the Lab.';
+        if (statusEl) statusEl.textContent = '✓ Sensors recalibrated — colour restored.';
         wrap.classList.add('is-complete');
         // Clear any active grayscale scenario right now if the lab is open,
         // and wipe the pending-scenario key so future Lab.enter() starts clean.
