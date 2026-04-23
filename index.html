@@ -298,13 +298,17 @@
 }
 
 /* 3. Solid-ish backgrounds replace the look blur was giving us */
-[data-theme='dark'] .navbar,
 [data-theme='dark'] .lab-hud,
 [data-theme='dark'] .lab-mission,
 [data-theme='dark'] .surgical-tray,
 [data-theme='dark'] .search-results,
 [data-theme='dark'] .sidebar {
   background: rgba(11, 7, 34, 0.92) !important;
+}
+/* Navbar — fully solid so huge bright H1s scrolling underneath don't
+   ghost through. Border + hover-glow keep the glass aesthetic. */
+[data-theme='dark'] .navbar {
+  background: var(--bg-body) !important;
 }
 
 /* 4. Force GPU compositing on the moving/sticky surfaces */
