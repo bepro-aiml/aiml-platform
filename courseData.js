@@ -25,6 +25,19 @@ const COURSE_DATA = {
   // ==========================================================
   modules: [
   {
+    id: 0, title: "The Toolkit", classes: 3, weeks: "Setup",
+    status: "available",
+    description: "Terminal, Git, and GitHub — the tools every engineer uses every day. Start here if you're new. If you already know Git, skip to Module 1.",
+    classList: [
+      { id: 1, title: "The Terminal", desc: "Your direct line to the computer", status: "available",
+        keywords: ["terminal", "command line", "shell", "bash", "pwd", "ls", "cd", "mkdir", "powershell", "git bash"] },
+      { id: 2, title: "Git — your project's memory", desc: "Version control on your laptop: init, add, commit", status: "available",
+        keywords: ["git", "version control", "commit", "repository", "init", "add", "snapshot"] },
+      { id: 3, title: "GitHub, Branches & Pull Requests", desc: "Remote hosting, teamwork, and your submission flow", status: "available",
+        keywords: ["github", "pull request", "pr", "branch", "fork", "collaborator", "merge", "push", "pull", "workflow"] }
+    ]
+  },
+  {
     id: 1, title: "Introduction to AI and ML", classes: 5, weeks: "1-2",
     status: "available",
     description: "What is AI? History, key concepts, real-world applications, ethics, and your first hands-on lab. No prerequisites.",
