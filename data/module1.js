@@ -785,7 +785,14 @@ Why the gap? A small number of high earners (executives, IT specialists, busines
 <li>The tool used random selection</li>
 </ol>
 <button class="quiz-reveal" onclick="toggleAnswer(this)">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> The model learned from 10 years of hiring data where most hires were male. It reflected historical patterns, not truth. The data was biased, so the model was biased.</div>
+<div class="quiz-answer">
+<p><strong>✅ B.</strong> A model learns patterns from the data you feed it. Amazon trained on 10 years of résumés where most successful hires had been men, so the model learned "male candidate" as a signal of success. It was pattern-matching history, not judging merit. <strong>Bias in the training data becomes bias in the model.</strong></p>
+<ul class="quiz-why">
+<li><strong>A</strong> — no. No engineer types <code>if gender == "female": reject</code>. The bias emerges from the data, never from an explicit rule. This is precisely what makes ML bias harder to detect than traditional discrimination.</li>
+<li><strong>C</strong> — no. This is the false conclusion Amazon's model would have pushed into production. The bias is in the historical hiring pipeline, not in the candidates themselves.</li>
+<li><strong>D</strong> — no. Random selection would actually be less biased than the trained model — but Amazon used a supervised classifier, not a lottery.</li>
+</ul>
+</div>
 </div>
 
 <div class="quiz-item">
@@ -797,7 +804,14 @@ Why the gap? A small number of high earners (executives, IT specialists, busines
 <li>Racial bias in AI is impossible to measure</li>
 </ol>
 <button class="quiz-reveal" onclick="toggleAnswer(this)">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> COMPAS had similar overall accuracy across races, but the types of errors were distributed unequally — Black defendants were more likely to be falsely flagged as high-risk.</div>
+<div class="quiz-answer">
+<p><strong>✅ B.</strong> COMPAS predicted reoffense with roughly the same overall accuracy for Black and white defendants. <strong>But the errors were not distributed equally:</strong> Black defendants were much more likely to be flagged high-risk <em>and never reoffend</em> (false positive); white defendants were more likely to be flagged low-risk <em>and actually reoffend</em> (false negative). "Accurate on average" can still be deeply unfair on individuals.</p>
+<ul class="quiz-why">
+<li><strong>A</strong> — no. COMPAS is a cautionary tale, not a blanket ban. Well-designed tools with auditable error distributions can still add value; the lesson is that "accuracy" is not enough as a single metric.</li>
+<li><strong>C</strong> — no. ProPublica's analysis showed COMPAS performed about on par with random people from Mechanical Turk. Human judges weren't part of the study in a way that would have supported this claim.</li>
+<li><strong>D</strong> — no. The whole point of the ProPublica investigation was that bias was measurable — they computed false positive rates by race and proved the disparity.</li>
+</ul>
+</div>
 </div>
 
 <div class="quiz-item">
@@ -809,7 +823,14 @@ Why the gap? A small number of high earners (executives, IT specialists, busines
 <li>Fairness only matters in criminal justice</li>
 </ol>
 <button class="quiz-reveal" onclick="toggleAnswer(this)">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> Equal accuracy, equal error rates, and demographic parity cannot all be achieved at the same time (except in trivial cases). This means choosing a fairness definition is a human value judgment.</div>
+<div class="quiz-answer">
+<p><strong>✅ B.</strong> Three common fairness criteria — <strong>calibration</strong> (equal accuracy across groups), <strong>equal false positive rate</strong>, and <strong>equal false negative rate</strong> — have been mathematically proven to be incompatible in any non-trivial scenario where base rates differ between groups. You pick one, you lose the others. <strong>This forces fairness to become a policy choice, not a technical one.</strong></p>
+<ul class="quiz-why">
+<li><strong>A</strong> — no. The result is not that fairness is impossible; it is that you must consciously choose <em>which</em> kind of fairness matters for your use case. Engineers who understand this are more careful; engineers who don't, ship broken systems.</li>
+<li><strong>C</strong> — no. At least a dozen distinct formal fairness definitions exist in the literature (demographic parity, equalized odds, predictive parity, individual fairness, …). The abundance of definitions is precisely why the impossibility result matters.</li>
+<li><strong>D</strong> — no. The same tension shows up in lending, insurance, healthcare, hiring, education, and content moderation. Criminal justice is just where it was first named publicly.</li>
+</ul>
+</div>
 </div>
 
 <div class="quiz-item">
@@ -821,7 +842,14 @@ Why the gap? A small number of high earners (executives, IT specialists, busines
 <li>Only problematic for non-human faces</li>
 </ol>
 <button class="quiz-reveal" onclick="toggleAnswer(this)">Show Answer</button>
-<div class="quiz-answer"><strong>C.</strong> The error rate gap was massive — approximately 35x difference — because training data was dominated by lighter-skinned faces.</div>
+<div class="quiz-answer">
+<p><strong>✅ C.</strong> Joy Buolamwini and Timnit Gebru benchmarked three commercial face-classifiers (IBM, Microsoft, Face++) and found error rates near 1% for lighter-skinned men and up to ~35% for darker-skinned women — <strong>a ~35× gap driven by training data that was overwhelmingly light-skinned and male</strong>. The paper forced all three vendors to publicly retrain their models.</p>
+<ul class="quiz-why">
+<li><strong>A</strong> — no. That is the opposite of the finding. "Equal error across demographics" is exactly what the study proved was <em>not</em> happening in production systems being sold to police forces.</li>
+<li><strong>B</strong> — no. The best-served group was lighter-skinned men. The worst-served was darker-skinned women. Inverting that would mis-teach the whole lesson.</li>
+<li><strong>D</strong> — no. The study was specifically about human face classification — that is what makes the findings serious. Non-human-face performance was never the question.</li>
+</ul>
+</div>
 </div>
 
 <div class="quiz-item">
@@ -833,7 +861,14 @@ Why the gap? A small number of high earners (executives, IT specialists, busines
 <li>Human oversight</li>
 </ol>
 <button class="quiz-reveal" onclick="toggleAnswer(this)">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> The five principles are: Transparency, Accountability, Fairness, Privacy, and Human Oversight. Profitability is a business goal, not an ethical principle.</div>
+<div class="quiz-answer">
+<p><strong>✅ B.</strong> The five responsible-AI principles covered in this class are <strong>Transparency, Accountability, Fairness, Privacy, and Human Oversight.</strong> Profitability is a business outcome — a legitimate one — but not an ethical principle. Ethics frameworks exist to constrain profitability when the two conflict.</p>
+<ul class="quiz-why">
+<li><strong>A</strong> — no. Transparency (can we explain what the model did and why?) is principle #1 across every major AI-ethics framework: EU AI Act, NIST AI RMF, OECD AI Principles.</li>
+<li><strong>C</strong> — no. Fairness is the central principle that ties this entire class together — Amazon, COMPAS, and Gender Shades are all fairness case studies.</li>
+<li><strong>D</strong> — no. Human oversight (keep a person in the loop on high-stakes decisions) is the principle most directly relevant to COMPAS-style systems. Never confuse it with a business metric.</li>
+</ul>
+</div>
 </div>
 `
       },
