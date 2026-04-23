@@ -277,7 +277,7 @@
 .section, .quiz-item, .search-results, #search-input, .theme-toggle,
 .info-box, .warning-box, .cv-labeler, .code-block, .try-in-lab,
 .lab-prediction-label, .xray-label, .lab-telemetry, .example-box,
-.section-body pre, .section-body code {
+.section-body pre, .section-body code, .lab-templates, .lab-nested-panel {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
@@ -2421,9 +2421,20 @@ body.presentation-mode #app-container::after {
 
 /* Re-anchor formerly-viewport-relative overlays to the cockpit frame.
    They kept absolute positioning; the cockpit is their new parent. */
-#ui-cockpit .lab-hud      { top: 0;   left: 0;   }
-#ui-cockpit .lab-mission  { top: 0;   left: 50%; transform: translateX(-50%); }
+#ui-cockpit .lab-hud       { top: 0;   left: 0;   }
+#ui-cockpit .lab-mission   { top: 0;   left: 50%; transform: translateX(-50%); }
 #ui-cockpit .surgical-tray { bottom: 0; left: 50%; transform: translateX(-50%); }
+/* Templates panel — moved out of the top-left (was overlapping HUD)
+   to bottom-left above the tray. */
+#ui-cockpit .lab-templates {
+  top: auto;
+  bottom: 120px;
+  left: 0;
+  background: rgba(11, 7, 34, 0.92) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  pointer-events: auto;
+}
 
 /* Telemetry stream — faint scrolling log at right-middle, bridges
    the vertical gap between HUD and tray. Opacity 0.1, no input. */

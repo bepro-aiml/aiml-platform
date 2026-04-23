@@ -1187,7 +1187,9 @@ const Lab = {
     const cockpit = document.createElement('div');
     cockpit.id = 'ui-cockpit';
     container.appendChild(cockpit);
-    ['.lab-hud', '.lab-mission', '.surgical-tray', '.lab-hologram', '.lab-prediction-label', '.xray-label', '.lab-data-lake', '.lab-labeler']
+    ['.lab-hud', '.lab-mission', '.surgical-tray', '.lab-hologram',
+     '.lab-prediction-label', '.xray-label', '.lab-data-lake', '.lab-labeler',
+     '.lab-templates', '.lab-nested-panel']
       .forEach(sel => {
         const el = container.querySelector(sel);
         if (el && el.parentElement === container) cockpit.appendChild(el);
