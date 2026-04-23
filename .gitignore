@@ -1,0 +1,10 @@
+# Local secrets — never commit
+.env
+env.js
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
