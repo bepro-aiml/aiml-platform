@@ -1295,19 +1295,23 @@ a:hover { color: var(--accent-hover); }
 .cv-sample { display: flex; flex-direction: column; gap: 6px; transition: opacity 0.3s ease; }
 .cv-thumb {
   width: 100%;
-  min-height: 110px;                            /* safety net if aspect-ratio fails */
+  min-height: 110px;
   aspect-ratio: 1 / 1;
   border-radius: 10px;
-  background: rgba(94, 234, 212, 0.08);
   border: 1px solid rgba(94, 234, 212, 0.22);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3rem;                              /* 48px — big, no clamp fallback weirdness */
-  line-height: 1;
-  user-select: none;
+  background: rgba(94, 234, 212, 0.06);
+  overflow: hidden;                             /* clip img to the rounded corners */
+  position: relative;
   filter: grayscale(1) contrast(1.1);           /* grayscale until recalibrated */
   transition: filter 0.6s ease, background 0.3s ease;
+}
+.cv-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;                            /* fill the square, crop to edges */
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 [data-theme='dark'] .cv-sample.is-right .cv-thumb { background: rgba(94, 234, 212, 0.12); }
 [data-theme='dark'] .cv-sample.is-wrong .cv-thumb { background: rgba(244, 114, 182, 0.12); }

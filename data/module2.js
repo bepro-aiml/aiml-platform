@@ -148,11 +148,11 @@ while balance &gt; 0:
     <div class="cv-labeler-progress"><b class="cv-done">0</b>/5 labelled</div>
   </div>
   <div class="cv-labeler-samples">
-    <div class="cv-sample" data-truth="cat"><div class="cv-thumb">🐱</div><div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
-    <div class="cv-sample" data-truth="dog"><div class="cv-thumb">🐶</div><div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
-    <div class="cv-sample" data-truth="cat"><div class="cv-thumb">🐈</div><div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
-    <div class="cv-sample" data-truth="dog"><div class="cv-thumb">🐕</div><div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
-    <div class="cv-sample" data-truth="dog"><div class="cv-thumb">🐩</div><div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
+    <div class="cv-sample" data-truth="cat"><div class="cv-thumb"><img src="assets/img/cv-samples/cv-sample-1-cat.webp" alt="cat" loading="lazy"></div><div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
+    <div class="cv-sample" data-truth="dog"><div class="cv-thumb"><img src="assets/img/cv-samples/cv-sample-2-dog.webp" alt="dog" loading="lazy"></div><div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
+    <div class="cv-sample" data-truth="cat"><div class="cv-thumb"><img src="assets/img/cv-samples/cv-sample-3-cat.webp" alt="cat" loading="lazy"></div><div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
+    <div class="cv-sample" data-truth="dog"><div class="cv-thumb"><img src="assets/img/cv-samples/cv-sample-4-dog.webp" alt="dog" loading="lazy"></div><div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
+    <div class="cv-sample" data-truth="dog"><div class="cv-thumb"><img src="assets/img/cv-samples/cv-sample-5-dog.webp" alt="dog" loading="lazy"></div><div class="cv-choices"><button data-pick="cat">cat</button><button data-pick="dog">dog</button></div></div>
   </div>
   <div class="cv-labeler-status">The sensors see only grayscale. Label every sample to restore color to the Lab.</div>
 </div>
