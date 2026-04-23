@@ -3715,10 +3715,13 @@ async function renderContent() {
     return;
   }
 
-  // Lab route: hand off the viewport to the 3D scene and stop here.
+  // Lab route: DISABLED in production. The 3D Foundry isn't shipped to
+  // students yet. Redirect any direct hit on #/lab back to home and make
+  // sure the scene is torn down.
   if (route.page === 'lab') {
-    if (bc) bc.innerHTML = `<a href="#/">Home</a><span class="sep">/</span><span>Lab</span>`;
-    Lab.enter();
+    if (Lab._active) Lab.exit();
+    try { sessionStorage.removeItem('lab-scenario'); sessionStorage.removeItem('lab-playground-code'); } catch {}
+    navigate('/');
     return;
   }
   // Any other route: ensure the lab is torn down before rendering course content.
@@ -3841,22 +3844,9 @@ function enhanceClassContent(root) {
     ).join('\n');
     pre.dataset.hl = '1';
     pre.classList.add('code-block');
-
-    // Try-in-Lab handoff: stash the code in sessionStorage, navigate to the lab.
-    // The Lab can later read `lab-playground-code` to pre-populate its own
-    // inference prompt. For now the pipe exists even if the Lab ignores it.
-    const wrap = document.createElement('div');
-    wrap.className = 'code-actions';
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'try-in-lab';
-    btn.innerHTML = 'Try in Lab <span aria-hidden="true">→</span>';
-    btn.addEventListener('click', () => {
-      try { sessionStorage.setItem('lab-playground-code', raw); } catch {}
-      window.location.hash = '#/lab';
-    });
-    wrap.appendChild(btn);
-    pre.insertAdjacentElement('afterend', wrap);
+    // NOTE: Try-in-Lab button disabled while the 3D Foundry is not in
+    // production. When the lab is ready, re-enable by restoring the
+    // button wiring here.
   });
 
   // CV Labeler task (Module 2 Class 2 scenario recovery): student labels
