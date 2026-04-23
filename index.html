@@ -382,8 +382,12 @@ body.perf-mode .perf-toggle .perf-dot {
   box-shadow: 0 0 8px var(--aurora-1);
 }
 
-/* Ensure content sits above aurora bg */
-body > :not(.aurora-bg) { position: relative; z-index: 1; }
+/* (Earlier version had `body > :not(.aurora-bg) { position: relative }`
+   here to force content above aurora-bg. That rule had specificity
+   0,1,1 and silently overrode the position:fixed on .navbar / .sidebar,
+   forcing them into document flow — which pushed .main (and the whole
+   homepage hero) way down below the sidebar. Removed. Each element
+   that needs to sit above aurora-bg sets its own z-index explicitly.) */
 
 html { scroll-behavior: smooth; }
 
