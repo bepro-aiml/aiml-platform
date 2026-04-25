@@ -3663,6 +3663,26 @@ body.lab-presenting.has-sidebar .main { padding-left: 0 !important; }
   .class-nav a { width: 100%; justify-content: center; }
   .principle-grid, .tool-grid { grid-template-columns: 1fr; }
 }
+
+/* ============================================================
+   INTERACTIVITY FIX — ensure nav chrome always sits above
+   the lab cockpit (z-index 100) and is never blocked by it.
+   pointer-events: auto !important overrides any accidental
+   inheritance from the body > :not() stacking rule.
+   ============================================================ */
+.navbar {
+  pointer-events: auto !important;
+  z-index: 1000 !important;
+}
+.sidebar {
+  pointer-events: auto !important;
+  z-index: 1000 !important;
+}
+.search-box,
+#search-input,
+.search-results {
+  pointer-events: auto !important;
+}
 </style>
 </head>
 <body>

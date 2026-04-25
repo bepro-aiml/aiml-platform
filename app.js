@@ -3715,12 +3715,12 @@ async function renderContent() {
     return;
   }
 
-  // Lab route: DISABLED in production. The 3D Foundry isn't shipped to
-  // students yet. Redirect any direct hit on #/lab back to home and make
-  // sure the scene is torn down.
+  // Lab route: opens the standalone lab in a new tab and stays on the
+  // current platform page. The 3D Foundry lives at lab.html (separate project).
   if (route.page === 'lab') {
     if (Lab._active) Lab.exit();
     try { sessionStorage.removeItem('lab-scenario'); sessionStorage.removeItem('lab-playground-code'); } catch {}
+    window.open('lab.html', '_blank');
     navigate('/');
     return;
   }
