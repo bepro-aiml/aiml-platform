@@ -719,21 +719,23 @@ fig.savefig("out.png", dpi=150)</pre>
 <p style="margin: 12px 0;">📖 <strong>Click any scenario below to read its full brief.</strong> Each one expands to show the business problem, dataset spec, hygiene rules, and deliverable. Three buttons at the bottom of each scenario take you to the dataset, Doc 1 template, and Doc 2 template.</p>
 
 <style>
-  details.scenario { border: 1px solid #d0d7de; border-radius: 8px; padding: 12px 16px; margin: 10px 0; background: #fafbfc; }
-  details.scenario[open] { background: #fff; border-color: #2c5282; }
-  details.scenario summary { cursor: pointer; font-weight: 600; padding: 6px 0; list-style: none; outline: none; }
+  /* Theme-agnostic — inherit text color from the site, only style borders + accents */
+  details.scenario { border: 1px solid rgba(128,128,128,0.35); border-radius: 8px; padding: 12px 16px; margin: 10px 0; background: rgba(128,128,128,0.05); }
+  details.scenario[open] { border-color: #4a90e2; background: rgba(74,144,226,0.06); }
+  details.scenario summary { cursor: pointer; font-weight: 600; padding: 6px 0; list-style: none; outline: none; color: inherit; }
   details.scenario summary::-webkit-details-marker { display: none; }
-  details.scenario summary::before { content: "▶  "; color: #555; }
+  details.scenario summary::before { content: "▶  "; opacity: 0.7; }
   details.scenario[open] summary::before { content: "▼  "; }
-  details.scenario .meta { color: #666; font-weight: 400; font-size: 0.92em; }
-  details.scenario .scenario-body { padding: 8px 0; line-height: 1.55; }
-  details.scenario h6 { margin: 14px 0 4px; color: #2c5282; font-size: 1em; }
-  details.scenario .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; padding-top: 12px; border-top: 1px solid #eee; }
-  details.scenario .actions a { display: inline-block; padding: 7px 12px; border-radius: 6px; text-decoration: none; font-size: 0.9em; font-weight: 500; }
-  details.scenario .actions .btn-data { background: #2c5282; color: #fff; }
-  details.scenario .actions .btn-doc1 { background: #d97706; color: #fff; }
-  details.scenario .actions .btn-doc2 { background: #059669; color: #fff; }
-  details.scenario .actions a:hover { opacity: 0.85; }
+  details.scenario summary .meta { font-weight: 400; font-size: 0.92em; opacity: 0.75; }
+  details.scenario .scenario-body { padding: 8px 0; line-height: 1.6; color: inherit; }
+  details.scenario .scenario-body p, details.scenario .scenario-body ul, details.scenario .scenario-body li { color: inherit; }
+  details.scenario h6 { margin: 14px 0 4px; color: #4a90e2; font-size: 1em; font-weight: 700; }
+  details.scenario .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(128,128,128,0.3); }
+  details.scenario .actions a { display: inline-block; padding: 7px 14px; border-radius: 6px; text-decoration: none; font-size: 0.9em; font-weight: 600; color: #fff !important; }
+  details.scenario .actions .btn-data { background: #2563eb; }
+  details.scenario .actions .btn-doc1 { background: #d97706; }
+  details.scenario .actions .btn-doc2 { background: #059669; }
+  details.scenario .actions a:hover { opacity: 0.88; }
 </style>
 
 <details class="scenario">
