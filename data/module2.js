@@ -761,8 +761,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>Recommend 3 regions that need backup capacity, with evidence (charts + tables) showing when shortfalls occur.</p>
 <div class="actions">
 <a class="btn-data" href="https://data.open-power-system-data.org/time_series/" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/01_renewable_energy_grid/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/01_renewable_energy_grid/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/01_renewable_energy_grid/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/01_renewable_energy_grid/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
@@ -781,8 +781,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>List the 3 worst routes with quantified late-rate, and a one-line recommendation per route.</p>
 <div class="actions">
 <a class="btn-data" href="https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/02_logistics_delivery_chain/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/02_logistics_delivery_chain/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/02_logistics_delivery_chain/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/02_logistics_delivery_chain/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
@@ -801,8 +801,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>Ranked list of 5 features most associated with 30-day readmission, each with a one-line clinical interpretation.</p>
 <div class="actions">
 <a class="btn-data" href="https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/03_hospital_readmission/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/03_hospital_readmission/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/03_hospital_readmission/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/03_hospital_readmission/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
@@ -821,8 +821,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>Trading-strategy report: sector regime, drawdown chart, Sharpe ratio, plus 3 sentences on what worked and what didn't.</p>
 <div class="actions">
 <a class="btn-data" href="https://www.kaggle.com/datasets/andrewmvd/sp-500-stocks" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/04_trading_backtest/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/04_trading_backtest/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/04_trading_backtest/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/04_trading_backtest/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
@@ -841,8 +841,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>Top 3 actionable network features for the retention team, with quantified evidence and a one-line action per feature.</p>
 <div class="actions">
 <a class="btn-data" href="https://www.kaggle.com/datasets/blastchar/telco-customer-churn" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/05_telco_churn_network/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/05_telco_churn_network/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/05_telco_churn_network/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/05_telco_churn_network/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
@@ -861,8 +861,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>Top 3 RFM cohorts ranked by reactivation potential, with a recommended marketing offer per cohort.</p>
 <div class="actions">
 <a class="btn-data" href="https://archive.ics.uci.edu/dataset/502/online+retail+ii" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/06_customer_lifetime_value/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/06_customer_lifetime_value/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/06_customer_lifetime_value/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/06_customer_lifetime_value/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
@@ -881,8 +881,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>Identify the road most predictive of which sensor's PM2.5, and the time lag in minutes. One paragraph for the city traffic department.</p>
 <div class="actions">
 <a class="btn-data" href="https://www.kaggle.com/datasets/sid321axn/beijing-multisite-airquality-data-set" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/07_smart_city_air_quality/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/07_smart_city_air_quality/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/07_smart_city_air_quality/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/07_smart_city_air_quality/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
@@ -901,8 +901,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>Name the team most over-performing this season, with a one-paragraph explanation backed by 2 charts.</p>
 <div class="actions">
 <a class="btn-data" href="https://www.kaggle.com/datasets/hugomathien/soccer" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/08_football_match_analytics/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/08_football_match_analytics/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/08_football_match_analytics/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/08_football_match_analytics/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
@@ -921,8 +921,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>Top 3 climate features per region driving yield, with charts and a one-paragraph policy implication.</p>
 <div class="actions">
 <a class="btn-data" href="https://www.kaggle.com/datasets/patelris/crop-yield-prediction-dataset" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/09_crop_yield_climate/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/09_crop_yield_climate/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/09_crop_yield_climate/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/09_crop_yield_climate/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
@@ -941,8 +941,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>Top 5 most delay-propagating airports, with a network chart and a one-paragraph recommendation.</p>
 <div class="actions">
 <a class="btn-data" href="https://www.kaggle.com/datasets/usdot/flight-delays" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/10_flight_delay_network/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/10_flight_delay_network/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/10_flight_delay_network/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/10_flight_delay_network/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
