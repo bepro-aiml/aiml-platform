@@ -712,102 +712,238 @@ fig.savefig("out.png", dpi=150)</pre>
 </div>
 ` },
         { icon: "🎯", title: "Final Lab — 10 Industry-Grade Scenarios", content: `
-<p>The Module 2 capstone is a <strong>3-developer team project</strong>. Today's task is to <strong>pick ONE scenario, download the dataset, clean it</strong> using the platform's hygiene rules, and write up two design documents — Phase 1 (<em>WHAT</em> tools/methods you propose) and Phase 2 (<em>WHY</em> each choice is right). Templates are in your group repo at <code>module-2/class_6/lab-scenarios/docs/</code>.</p>
+<p>The Module 2 capstone is a <strong>3-developer team project</strong>. Today's task is to <strong>pick ONE scenario, download the dataset, clean it</strong> using the platform's hygiene rules, and write up two design documents — Phase 1 (<em>WHAT</em> tools/methods you propose) and Phase 2 (<em>WHY</em> each choice is right).</p>
 
-<div class="info-box"><strong>Today, no code.</strong> Just dataset + cleaning + the two markdown docs. Mentor sign-off required before implementation.</div>
+<div class="info-box"><strong>Today, no code.</strong> Just dataset + cleaning + the two markdown docs. Mentor sign-off required before any implementation.</div>
 
-<div class="tool-grid">
+<p style="margin: 12px 0;">📖 <strong>Click any scenario below to read its full brief.</strong> Each one expands to show the business problem, dataset spec, hygiene rules, and deliverable. Three buttons at the bottom of each scenario take you to the dataset, Doc 1 template, and Doc 2 template.</p>
 
-<a class="tool-card" href="https://www.kaggle.com/datasets/berkeleyearth/climate-change-earth-surface-temperature-data" target="_blank" rel="noopener">
-<h5>1. Renewable Energy Grid Optimization</h5>
-<p><em>Energy / Smart Grid · ~7M rows</em></p>
-<p>A national grid operator runs 200+ wind &amp; solar plants. Output is volatile — operator must pre-dispatch coal backup. Find <strong>when</strong> and <strong>where</strong> renewables fall short.</p>
-<p><strong>Dataset:</strong> Open Power System Data — 15-min time series</p>
-<p><strong>Deliverable:</strong> Recommend 3 regions that need backup capacity, with evidence.</p>
-</a>
+<style>
+  details.scenario { border: 1px solid #d0d7de; border-radius: 8px; padding: 12px 16px; margin: 10px 0; background: #fafbfc; }
+  details.scenario[open] { background: #fff; border-color: #2c5282; }
+  details.scenario summary { cursor: pointer; font-weight: 600; padding: 6px 0; list-style: none; outline: none; }
+  details.scenario summary::-webkit-details-marker { display: none; }
+  details.scenario summary::before { content: "▶  "; color: #555; }
+  details.scenario[open] summary::before { content: "▼  "; }
+  details.scenario .meta { color: #666; font-weight: 400; font-size: 0.92em; }
+  details.scenario .scenario-body { padding: 8px 0; line-height: 1.55; }
+  details.scenario h6 { margin: 14px 0 4px; color: #2c5282; font-size: 1em; }
+  details.scenario .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; padding-top: 12px; border-top: 1px solid #eee; }
+  details.scenario .actions a { display: inline-block; padding: 7px 12px; border-radius: 6px; text-decoration: none; font-size: 0.9em; font-weight: 500; }
+  details.scenario .actions .btn-data { background: #2c5282; color: #fff; }
+  details.scenario .actions .btn-doc1 { background: #d97706; color: #fff; }
+  details.scenario .actions .btn-doc2 { background: #059669; color: #fff; }
+  details.scenario .actions a:hover { opacity: 0.85; }
+</style>
 
-<a class="tool-card" href="https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce" target="_blank" rel="noopener">
-<h5>2. Logistics &amp; Last-Mile Delivery</h5>
-<p><em>E-commerce / Logistics · 100k+ orders</em></p>
-<p>A regional courier handles 1.5M parcel events/year. Late deliveries cost reputation. Find the routes, hubs, and times of day driving late delivery.</p>
-<p><strong>Dataset:</strong> Olist Brazilian E-Commerce</p>
-<p><strong>Deliverable:</strong> 3 routes most worth re-engineering, with quantified late-rate.</p>
-</a>
-
-<a class="tool-card" href="https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008" target="_blank" rel="noopener">
-<h5>3. Hospital Readmission Risk</h5>
-<p><em>Healthcare · 101k admissions</em></p>
-<p>A hospital network wants to know which diabetes patients return within 30 days and what their treatment patterns look like.</p>
-<p><strong>Dataset:</strong> UCI Diabetes 130-US Hospitals</p>
-<p><strong>Deliverable:</strong> Top 5 features most associated with 30-day readmission.</p>
-</a>
-
-<a class="tool-card" href="https://www.kaggle.com/datasets/andrewmvd/sp-500-stocks" target="_blank" rel="noopener">
-<h5>4. Algorithmic Trading Backtest</h5>
-<p><em>Financial Markets · 1.2M rows</em></p>
-<p>Build the analytical layer of a momentum-trading backtester on 10 years of S&amp;P 500 daily OHLCV. Characterise factor returns and drawdowns.</p>
-<p><strong>Dataset:</strong> S&amp;P 500 Stocks (Daily Updated)</p>
-<p><strong>Deliverable:</strong> Sector regime, drawdown chart, Sharpe ratio of a chosen strategy.</p>
-</a>
-
-<a class="tool-card" href="https://www.kaggle.com/datasets/blastchar/telco-customer-churn" target="_blank" rel="noopener">
-<h5>5. Telecom Churn &amp; Network Quality</h5>
-<p><em>Telecommunications · 250k subscriber-days</em></p>
-<p>A national telecom (think Uztelecom) wants to find the network conditions that best predict churn. Combine call-detail records with daily customer status.</p>
-<p><strong>Dataset:</strong> Telco Customer Churn (IBM) + CDR synthetic</p>
-<p><strong>Deliverable:</strong> Top 3 actionable network features for the retention team.</p>
-</a>
-
-<a class="tool-card" href="https://archive.ics.uci.edu/dataset/502/online+retail+ii" target="_blank" rel="noopener">
-<h5>6. Customer Lifetime Value (RFM)</h5>
-<p><em>Retail / E-commerce · 1M+ transactions</em></p>
-<p>Segment 1M+ orders into RFM cohorts (Recency, Frequency, Monetary value). Visualise lifetime value by cohort.</p>
-<p><strong>Dataset:</strong> UCI Online Retail II</p>
-<p><strong>Deliverable:</strong> Top 3 cohorts to target with reactivation, with offer per cohort.</p>
-</a>
-
-<a class="tool-card" href="https://www.kaggle.com/datasets/sid321axn/beijing-multisite-airquality-data-set" target="_blank" rel="noopener">
-<h5>7. Smart City Air Quality &amp; Traffic</h5>
-<p><em>IoT / Public Sector · 420k+ readings</em></p>
-<p>50 air-quality sensors and 30 traffic counters across the city. Find which roads' traffic best predicts which sensors' air quality, and at what lag.</p>
-<p><strong>Dataset:</strong> Beijing PM2.5 Multi-Site</p>
-<p><strong>Deliverable:</strong> The most predictive road→sensor pair, with the time lag.</p>
-</a>
-
-<a class="tool-card" href="https://www.kaggle.com/datasets/hugomathien/soccer" target="_blank" rel="noopener">
-<h5>8. Football Match Performance</h5>
-<p><em>Sports Analytics · 25k matches</em></p>
-<p>Match-level events from a top European league across 5 seasons. Build a 'form curve' per team and find the events most correlated with winning streaks.</p>
-<p><strong>Dataset:</strong> European Soccer Database</p>
-<p><strong>Deliverable:</strong> Team most over-performing this season, with evidence.</p>
-</a>
-
-<a class="tool-card" href="https://www.kaggle.com/datasets/patelris/crop-yield-prediction-dataset" target="_blank" rel="noopener">
-<h5>9. Crop Yield from Soil &amp; Weather</h5>
-<p><em>AgriTech · 1.2M rows</em></p>
-<p>10 years of monthly soil moisture, temperature, and precipitation across 1,000 districts plus annual yield. Surface the climate factors most predictive of yield.</p>
-<p><strong>Dataset:</strong> FAOSTAT Crop &amp; Climate + NASA POWER</p>
-<p><strong>Deliverable:</strong> Top 3 climate features driving yield in each region.</p>
-</a>
-
-<a class="tool-card" href="https://www.kaggle.com/datasets/usdot/flight-delays" target="_blank" rel="noopener">
-<h5>10. U.S. Flight Delay Network</h5>
-<p><em>Aviation · 5.8M flights</em></p>
-<p>Build a network view of which airports propagate delay to which others. Quantify spillover and identify the most "infectious" airports.</p>
-<p><strong>Dataset:</strong> US Flights 2015 (BTS)</p>
-<p><strong>Deliverable:</strong> 5 most delay-propagating airports, with a recommendation paragraph.</p>
-</a>
-
+<details class="scenario">
+<summary>1. Renewable Energy Grid Optimization <span class="meta">— Energy / Smart Grid · ~7M rows</span></summary>
+<div class="scenario-body">
+<p><strong>Business problem.</strong> A national grid operator runs 200+ wind and solar plants. Power output is volatile (clouds, wind gusts), and the operator must pre-dispatch coal capacity to balance shortfalls. Analyse 1 year of 15-minute-interval generation data to find <em>when</em> and <em>where</em> renewables fall short.</p>
+<h6>Dataset</h6>
+<p>Open Power System Data — 15-min time series (or Kaggle's Wind Turbine SCADA Dataset). ~7M rows: 200 plants × 35,000 timesteps.</p>
+<h6>Keep / Drop</h6>
+<p><strong>Keep:</strong> timestamp, plant_id, region, tech (solar/wind), generation_mwh, capacity_mw, wind_speed, irradiance, temperature_c.<br/><strong>Drop:</strong> forecast columns, telemetry health flags, plant metadata strings.</p>
+<h6>Hygiene challenges</h6>
+<ul><li>Mixed timestamp formats</li><li>Negative generation values from sensor faults</li><li>NaN blocks during maintenance windows</li></ul>
+<h6>Deliverable</h6>
+<p>Recommend 3 regions that need backup capacity, with evidence (charts + tables) showing when shortfalls occur.</p>
+<div class="actions">
+<a class="btn-data" href="https://data.open-power-system-data.org/time_series/" target="_blank" rel="noopener">📥 Dataset</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/01_renewable_energy_grid/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/01_renewable_energy_grid/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
+</div>
+</details>
 
-<h4>Workflow today</h4>
+<details class="scenario">
+<summary>2. Logistics &amp; Last-Mile Delivery Chain <span class="meta">— E-commerce / Logistics · 100k+ orders</span></summary>
+<div class="scenario-body">
+<p><strong>Business problem.</strong> A regional courier handles 1.5M parcel events/year across 12 warehouses. Late deliveries cost reputation and refunds. Find the routes, hubs, and times of day that drive late delivery.</p>
+<h6>Dataset</h6>
+<p>Olist Brazilian E-Commerce — 6 tables, 100k+ orders.</p>
+<h6>Keep / Drop</h6>
+<p><strong>Keep:</strong> order_id, order_purchase_timestamp, order_delivered_customer_date, order_estimated_delivery_date, customer_state, seller_state, freight_value, product_weight_g, product_volume_cm3.<br/><strong>Drop:</strong> review text, raw lat/lon, product photo URLs.</p>
+<h6>Hygiene challenges</h6>
+<ul><li>~3% delivered date is NaN (parcel lost in transit)</li><li>Date columns stored as strings</li><li>Inconsistent state casing — must standardise</li></ul>
+<h6>Deliverable</h6>
+<p>List the 3 worst routes with quantified late-rate, and a one-line recommendation per route.</p>
+<div class="actions">
+<a class="btn-data" href="https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce" target="_blank" rel="noopener">📥 Dataset</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/02_logistics_delivery_chain/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/02_logistics_delivery_chain/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+</div>
+</div>
+</details>
+
+<details class="scenario">
+<summary>3. Health Informatics — Hospital Readmission Risk <span class="meta">— Healthcare · 101k admissions</span></summary>
+<div class="scenario-body">
+<p><strong>Business problem.</strong> A hospital network wants to know which diabetes patients return within 30 days and what their treatment patterns look like. 101k anonymised admissions across 130 US hospitals over 10 years.</p>
+<h6>Dataset</h6>
+<p>UCI Diabetes 130-US Hospitals — 101,766 rows × 50 columns.</p>
+<h6>Keep / Drop</h6>
+<p><strong>Keep:</strong> encounter_id, patient_nbr, age, gender, admission_type_id, time_in_hospital, num_lab_procedures, num_medications, diabetesMed, A1Cresult, readmitted.<br/><strong>Drop:</strong> weight (97% missing), payer_code (40% missing), free-text fields.</p>
+<h6>Hygiene challenges</h6>
+<ul><li>'?' placeholders for missing categorical values</li><li>age stored as ranges (e.g. '[70-80)')</li><li>ICD-9 diagnosis codes need decoding into disease groups</li></ul>
+<h6>Deliverable</h6>
+<p>Ranked list of 5 features most associated with 30-day readmission, each with a one-line clinical interpretation.</p>
+<div class="actions">
+<a class="btn-data" href="https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008" target="_blank" rel="noopener">📥 Dataset</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/03_hospital_readmission/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/03_hospital_readmission/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+</div>
+</div>
+</details>
+
+<details class="scenario">
+<summary>4. Algorithmic Trading Backtest (Equities) <span class="meta">— Financial Markets · 1.2M rows</span></summary>
+<div class="scenario-body">
+<p><strong>Business problem.</strong> Build the analytical layer of a momentum-trading backtester. Use 10 years of daily OHLCV for the S&amp;P 500 to characterise factor returns and drawdowns. Report best sector regime, worst drawdown, and Sharpe ratio.</p>
+<h6>Dataset</h6>
+<p>S&amp;P 500 Stocks (Daily Updated) on Kaggle — ~1.2M rows: 500 tickers × 10 years.</p>
+<h6>Keep / Drop</h6>
+<p><strong>Keep:</strong> Date, Symbol, Open, High, Low, Close, Volume, Sector.<br/><strong>Drop:</strong> adjusted-close (compute it yourself), share splits, dividends file.</p>
+<h6>Hygiene challenges</h6>
+<ul><li>Trading-day gaps (weekends, holidays)</li><li>De-listed tickers mid-period — drop survivorship bias cleanly</li></ul>
+<h6>Deliverable</h6>
+<p>Trading-strategy report: sector regime, drawdown chart, Sharpe ratio, plus 3 sentences on what worked and what didn't.</p>
+<div class="actions">
+<a class="btn-data" href="https://www.kaggle.com/datasets/andrewmvd/sp-500-stocks" target="_blank" rel="noopener">📥 Dataset</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/04_trading_backtest/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/04_trading_backtest/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+</div>
+</div>
+</details>
+
+<details class="scenario">
+<summary>5. Telecom Churn &amp; Network Quality <span class="meta">— Telecommunications · 250k subscriber-days</span></summary>
+<div class="scenario-body">
+<p><strong>Business problem.</strong> A national telecom (think Uztelecom) wants to find the network conditions that best predict churn. Combine call-detail records (CDR) with daily customer status to score 250k subscribers across 6 months.</p>
+<h6>Dataset</h6>
+<p>Telco Customer Churn (IBM) merged with CDR Synthetic Dataset — ~250k subscriber-days.</p>
+<h6>Keep / Drop</h6>
+<p><strong>Keep:</strong> customer_id, tenure, monthly_charges, total_charges, contract, payment_method, dropped_calls_per_day, data_throughput_mbps, avg_call_duration_sec, cell_handovers, Churn.<br/><strong>Drop:</strong> address strings, social ID, raw timestamps.</p>
+<h6>Hygiene challenges</h6>
+<ul><li>total_charges is a string with whitespace and blanks</li><li>Tenure 0 for new customers</li><li>Duplicates from system retries</li></ul>
+<h6>Deliverable</h6>
+<p>Top 3 actionable network features for the retention team, with quantified evidence and a one-line action per feature.</p>
+<div class="actions">
+<a class="btn-data" href="https://www.kaggle.com/datasets/blastchar/telco-customer-churn" target="_blank" rel="noopener">📥 Dataset</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/05_telco_churn_network/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/05_telco_churn_network/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+</div>
+</div>
+</details>
+
+<details class="scenario">
+<summary>6. E-commerce Customer Lifetime Value (RFM) <span class="meta">— Retail / E-commerce · 1M+ transactions</span></summary>
+<div class="scenario-body">
+<p><strong>Business problem.</strong> An online retailer wants to segment its 1M+ orders into RFM cohorts (Recency, Frequency, Monetary value) and visualise lifetime value by cohort. Pick the top 3 cohorts to target with reactivation.</p>
+<h6>Dataset</h6>
+<p>UCI Online Retail II — 1,067,371 transactions across 2 years.</p>
+<h6>Keep / Drop</h6>
+<p><strong>Keep:</strong> Invoice, StockCode, Description, Quantity, InvoiceDate, Price, Customer ID, Country.<br/><strong>Drop:</strong> rows with Customer ID NaN, refunds (negative quantity) — but report counts dropped.</p>
+<h6>Hygiene challenges</h6>
+<ul><li>Thousands of free-text product descriptions</li><li>Some prices are 0</li><li>Inconsistent UK/EU date formats</li></ul>
+<h6>Deliverable</h6>
+<p>Top 3 RFM cohorts ranked by reactivation potential, with a recommended marketing offer per cohort.</p>
+<div class="actions">
+<a class="btn-data" href="https://archive.ics.uci.edu/dataset/502/online+retail+ii" target="_blank" rel="noopener">📥 Dataset</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/06_customer_lifetime_value/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/06_customer_lifetime_value/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+</div>
+</div>
+</details>
+
+<details class="scenario">
+<summary>7. Smart City Air Quality &amp; Traffic <span class="meta">— IoT / Public Sector · 420k+ readings</span></summary>
+<div class="scenario-body">
+<p><strong>Business problem.</strong> A city deploys 50 air-quality sensors and 30 traffic counters. Find which roads' traffic best predicts which sensors' air quality, lagged by minutes — and the best lag value.</p>
+<h6>Dataset</h6>
+<p>Beijing PM2.5 Multi-Site (420k+ rows × 12 sites).</p>
+<h6>Keep / Drop</h6>
+<p><strong>Keep:</strong> datetime, station, PM2.5, PM10, NO2, CO, temp, wind_speed, traffic_count.<br/><strong>Drop:</strong> station metadata, columns >50% null.</p>
+<h6>Hygiene challenges</h6>
+<ul><li>Sensor outages create long NaN runs</li><li>One station in UTC, others in local time</li><li>Wind direction in degrees needs sin/cos encoding</li></ul>
+<h6>Deliverable</h6>
+<p>Identify the road most predictive of which sensor's PM2.5, and the time lag in minutes. One paragraph for the city traffic department.</p>
+<div class="actions">
+<a class="btn-data" href="https://www.kaggle.com/datasets/sid321axn/beijing-multisite-airquality-data-set" target="_blank" rel="noopener">📥 Dataset</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/07_smart_city_air_quality/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/07_smart_city_air_quality/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+</div>
+</div>
+</details>
+
+<details class="scenario">
+<summary>8. Sports Analytics — Football Match Performance <span class="meta">— Sports · 25k matches</span></summary>
+<div class="scenario-body">
+<p><strong>Business problem.</strong> Match-level events from a top European football league across 5 seasons. Build a 'form curve' per team and identify the events most correlated with winning streaks. Surface the team most over-performing this season.</p>
+<h6>Dataset</h6>
+<p>European Soccer Database (Kaggle) — 25k matches + 11k players (SQLite).</p>
+<h6>Keep / Drop</h6>
+<p><strong>Keep:</strong> match_api_id, date, home_team_api_id, away_team_api_id, home_team_goal, away_team_goal, B365H, B365D, B365A, plus the 50+ in-match event columns.<br/><strong>Drop:</strong> raw XML player attributes, unused odds providers.</p>
+<h6>Hygiene challenges</h6>
+<ul><li>SQL date strings</li><li>A few seasons missing odds</li><li>Team IDs change in some rows</li></ul>
+<h6>Deliverable</h6>
+<p>Name the team most over-performing this season, with a one-paragraph explanation backed by 2 charts.</p>
+<div class="actions">
+<a class="btn-data" href="https://www.kaggle.com/datasets/hugomathien/soccer" target="_blank" rel="noopener">📥 Dataset</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/08_football_match_analytics/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/08_football_match_analytics/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+</div>
+</div>
+</details>
+
+<details class="scenario">
+<summary>9. Agriculture — Crop Yield from Soil &amp; Weather <span class="meta">— AgriTech · 1.2M rows</span></summary>
+<div class="scenario-body">
+<p><strong>Business problem.</strong> 10 years of monthly soil moisture, temperature, and precipitation across 1,000 districts plus annual yield. Surface the climate factors most predictive of yield. Report top 3 climate features per region.</p>
+<h6>Dataset</h6>
+<p>FAOSTAT Crop &amp; Climate (Kaggle) + NASA POWER monthly time series.</p>
+<h6>Keep / Drop</h6>
+<p><strong>Keep:</strong> Year, Country, District, Crop, yield_hg_per_ha, avg_temp, precipitation, soil_moisture, pesticides_tonnes.<br/><strong>Drop:</strong> crops with &lt;100 observations; non-cereal exotic crops.</p>
+<h6>Hygiene challenges</h6>
+<ul><li>Mixed units (kg vs tonnes)</li><li>Some districts have 2 names (admin merger)</li><li>Precipitation has clear sensor-error spikes</li></ul>
+<h6>Deliverable</h6>
+<p>Top 3 climate features per region driving yield, with charts and a one-paragraph policy implication.</p>
+<div class="actions">
+<a class="btn-data" href="https://www.kaggle.com/datasets/patelris/crop-yield-prediction-dataset" target="_blank" rel="noopener">📥 Dataset</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/09_crop_yield_climate/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/09_crop_yield_climate/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+</div>
+</div>
+</details>
+
+<details class="scenario">
+<summary>10. Aviation — U.S. Flight Delay Network <span class="meta">— Aviation · 5.8M flights</span></summary>
+<div class="scenario-body">
+<p><strong>Business problem.</strong> 5.8M+ US flights for 1 year. Build a network view of which airports propagate delay to which others. Quantify spillover and name the 5 most "infectious" airports.</p>
+<h6>Dataset</h6>
+<p>US Flights 2015 (Kaggle / BTS) — 5,819,079 flights.</p>
+<h6>Keep / Drop</h6>
+<p><strong>Keep:</strong> YEAR, MONTH, DAY, AIRLINE, FLIGHT_NUMBER, TAIL_NUMBER, ORIGIN_AIRPORT, DESTINATION_AIRPORT, SCHEDULED_DEPARTURE, DEPARTURE_DELAY, ARRIVAL_DELAY, DISTANCE.<br/><strong>Drop:</strong> any column &gt;40% null.</p>
+<h6>Hygiene challenges</h6>
+<ul><li>Times stored as HHMM integer ('845' = 08:45)</li><li>Cancelled flights have negative delays</li><li>Tail numbers occasionally null</li></ul>
+<h6>Deliverable</h6>
+<p>Top 5 most delay-propagating airports, with a network chart and a one-paragraph recommendation.</p>
+<div class="actions">
+<a class="btn-data" href="https://www.kaggle.com/datasets/usdot/flight-delays" target="_blank" rel="noopener">📥 Dataset</a>
+<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/10_flight_delay_network/documentation_phase_1_what.md" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/10_flight_delay_network/documentation_phase_2_why.md" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+</div>
+</div>
+</details>
+
+<h4 style="margin-top: 22px;">Workflow today</h4>
 <ol>
 <li>Form a team of 3 (Logic, Data Engineering, Visualization).</li>
-<li>Pick one scenario together. Download its dataset.</li>
-<li>Clean the dataset using the platform's hygiene conventions (lowercase columns, ISO timestamps, explicit <code>NaN</code>).</li>
-<li>Open <code>module-2/class_6/lab-scenarios/docs/&lt;scenario&gt;/documentation_phase_1_what.md</code> and fill it in completely.</li>
-<li>Open <code>documentation_phase_2_why.md</code> and fill it in.</li>
-<li>Push both completed docs to your group repo. Request mentor sign-off.</li>
+<li>Read all 10 scenarios above. Pick ONE together.</li>
+<li>Click <strong>📥 Dataset</strong> to download. Clean it using the platform's hygiene conventions (lowercase columns, ISO timestamps, explicit <code>NaN</code>).</li>
+<li>Click <strong>📝 Doc 1: WHAT</strong> to open the Phase 1 template. Copy it, fill it in completely.</li>
+<li>Click <strong>📝 Doc 2: WHY</strong> to open the Phase 2 template. Copy it, fill it in.</li>
+<li>Push both completed docs to your group repo at <code>module-2/class_6/submissions/&lt;TeamName&gt;/</code>. Request mentor sign-off.</li>
 </ol>
 
 <div class="warning-box"><strong>No code today.</strong> The mentor will not approve any implementation until both phase docs are complete and signed off. The lab grade weighs <em>justification</em> at least as much as code.</div>
