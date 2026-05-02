@@ -613,104 +613,6 @@ fig.savefig("out.png", dpi=150)</pre>
       subtitle: "Module 2, Class 6 — Hands-on EDA on a real dataset",
       brokenState: { type: 'chaos', physicsDisabled: true, grayscale: true, description: 'Full system failure — physics AND vision down. EDA is how you diagnose both.' },
       sections: [
-        { icon: "🎯", title: "What is EDA?", content: `
-<p>Exploratory Data Analysis = deliberately poking at a dataset until you understand what's in it. Before training any model, answer:</p>
-<ul>
-<li>What columns exist? What types?</li>
-<li>How much data is missing, and where?</li>
-<li>What are the distributions? Any outliers?</li>
-<li>How do features relate to the target?</li>
-<li>Any duplicates, leakage, or encoding issues?</li>
-</ul>
-<div class="info-box"><strong>Budget:</strong> 90 minutes. Work in pairs or solo. Submit a Jupyter notebook with all findings.</div>
-` },
-        { icon: "📊", title: "Pick a Dataset", content: `
-<div class="tool-grid">
-<a class="tool-card" href="https://www.kaggle.com/datasets/blastchar/telco-customer-churn" target="_blank" rel="noopener">
-<h5>Option A — Telco Churn</h5><p>7,043 customers, 21 columns. Mix of categorical and numeric. Good for groupby and filtering practice.</p></a>
-<a class="tool-card" href="https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud" target="_blank" rel="noopener">
-<h5>Option B — Credit Card Fraud</h5><p>284k transactions, 0.17% fraud. Severe class imbalance. Good for distribution plots and learning why accuracy fails.</p></a>
-</div>
-` },
-        { icon: "📝", title: "Seven EDA Tasks", content: `
-<ol>
-<li><strong>Load and peek:</strong> <code>df.shape</code>, <code>df.dtypes</code>, <code>df.head()</code>.</li>
-<li><strong>Missing values:</strong> <code>df.isna().sum()</code>. Which columns, what fraction?</li>
-<li><strong>Target distribution:</strong> balanced or imbalanced? Plot it.</li>
-<li><strong>Numeric features:</strong> histograms for 3+ columns. Skew? Outliers? Log transform?</li>
-<li><strong>Categorical features:</strong> <code>value_counts()</code>. Rare categories to group into "other"?</li>
-<li><strong>Feature vs target:</strong> box/violin plot for 2+ features across target classes.</li>
-<li><strong>Correlation:</strong> heatmap of numeric columns. Any pairs with |r| &gt; 0.9?</li>
-</ol>
-<div class="info-box"><strong>Rule:</strong> after every plot, one sentence — what did you observe, what would you do differently when building a model?</div>
-` },
-        { icon: "📋", title: "Checkpoint Quiz", content: `
-<div class="quiz-item">
-<div class="quiz-q">1. A column where 99% of rows have the same value is:</div>
-<ol class="quiz-options" type="A"><li>Highly predictive</li><li>Near-zero variance, almost useless</li><li>The target</li><li>A bug</li></ol>
-<button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer">
-<p><strong>✅ B. Near-zero variance — almost useless for modelling.</strong> A feature that's constant (or near-constant) carries <strong>no information to distinguish one sample from another</strong>. A model cannot learn "when this is high, the target is X" if the value is never different. Drop it, or check whether the non-majority 1% is meaningful data leakage.</p>
-<ul class="quiz-why">
-<li><strong>A. Highly predictive</strong> — no. The opposite. Predictive power requires the feature's value to <em>co-vary</em> with the target. If the feature barely varies, it cannot explain variation in the target.</li>
-<li><strong>C. The target</strong> — no. The target could be imbalanced, but that's about the target itself. A 99% constant <em>feature</em> is just a near-zero-variance feature — and should be flagged in EDA.</li>
-<li><strong>D. A bug</strong> — sometimes yes, but usually not. It could be a legitimate rare event indicator, a default value, or a legacy column. You investigate — you don't assume.</li>
-</ul>
-</div>
-</div>
-<div class="quiz-item">
-<div class="quiz-q">2. Two features correlate 0.97. What do you do?</div>
-<ol class="quiz-options" type="A"><li>Keep both</li><li>Drop one</li><li>Add them</li><li>Ignore</li></ol>
-<button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer">
-<p><strong>✅ B. Drop one.</strong> Correlation that high means the two features carry <strong>redundant information</strong>. Linear models suffer <em>multicollinearity</em> (unstable coefficients, inflated standard errors); tree models don't crash but still split on both inefficiently. Keep whichever is more <strong>interpretable</strong>, <strong>higher quality</strong>, or <strong>earlier in the data pipeline</strong>.</p>
-<ul class="quiz-why">
-<li><strong>A. Keep both</strong> — no. Beyond the multicollinearity issue, you pay double on memory, feature-engineering effort, and on the final model's inference latency — for zero additional signal.</li>
-<li><strong>C. Add them</strong> — no. Adding two near-identical features gives you a scaled version of one, not a new feature. It doesn't solve redundancy.</li>
-<li><strong>D. Ignore</strong> — no. Ignoring is the junior-engineer move that passes CI but fails code review. EDA exists specifically to catch this before training.</li>
-</ul>
-</div>
-</div>
-<div class="quiz-item">
-<div class="quiz-q">3. Target is 0.2% positive. A model predicting "no" always gets 99.8% accuracy. This shows:</div>
-<ol class="quiz-options" type="A"><li>The model is great</li><li>Accuracy is wrong metric for imbalanced data</li><li>Data is broken</li><li>Need more data</li></ol>
-<button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer">
-<p><strong>✅ B. Accuracy is the wrong metric for imbalanced data.</strong> A model that never predicts the minority class can hit 99.8% accuracy while being <strong>completely useless</strong> — it misses 100% of the fraud / churn / disease cases that actually matter. Use <strong>precision, recall, F1, PR-AUC</strong> — metrics that account for the imbalance explicitly.</p>
-<ul class="quiz-why">
-<li><strong>A. The model is great</strong> — no. The model has <strong>zero recall on the positive class</strong>. In fraud detection that means zero fraud caught. In triage that means zero emergencies flagged.</li>
-<li><strong>C. Data is broken</strong> — no. Imbalanced data is normal in the real world (fraud, rare diseases, defects). The broken thing is the evaluation metric, not the dataset.</li>
-<li><strong>D. Need more data</strong> — no. Even infinite data won't fix the fact that accuracy is the wrong yardstick for this problem. Fix the metric first, then worry about data.</li>
-</ul>
-</div>
-</div>
-<div class="quiz-item">
-<div class="quiz-q">4. Column is 60% missing. First move?</div>
-<ol class="quiz-options" type="A"><li>Drop</li><li>Fill with 0</li><li>Investigate whether missingness carries signal</li><li>Fill with mean</li></ol>
-<button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer">
-<p><strong>✅ C. Investigate whether missingness carries signal.</strong> Missing values are often <strong>not random</strong> — "Missing Not At Random" (MNAR) means the fact that a value is missing is itself informative. Example: a "<code>last_credit_score</code>" being missing may strongly predict "never had credit, likely younger customer." <strong>Create a boolean <code>col_is_missing</code> indicator</strong> before imputing, then train on both.</p>
-<ul class="quiz-why">
-<li><strong>A. Drop</strong> — no. Dropping a 60%-missing column throws away what's often your strongest feature (the missingness pattern itself). Drop only after you've confirmed it's MCAR — missing completely at random.</li>
-<li><strong>B. Fill with 0</strong> — no. 0 is a specific numeric value that the model will interpret as real. If 0 has meaning elsewhere (e.g., "zero topups"), you've now conflated "missing" with "zero topups" — a silent bug.</li>
-<li><strong>D. Fill with mean</strong> — no. Mean imputation is a default, not an investigation. It hides the missingness signal and distorts variance downward. Same mistake as option B, just subtler.</li>
-</ul>
-</div>
-</div>
-<div class="quiz-item">
-<div class="quiz-q">5. You find <code>churn_recorded_at</code> in a dataset predicting <code>churned</code>. Do what?</div>
-<ol class="quiz-options" type="A"><li>Use as feature</li><li>Drop — data leakage</li><li>Convert to Unix</li><li>Fill "unknown"</li></ol>
-<button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer">
-<p><strong>✅ B. Drop — it's data leakage.</strong> <code>churn_recorded_at</code> only has a value <em>after</em> the customer has already churned. Using it as a feature tells the model "the answer is known" — so training accuracy shoots to 99%+ and production accuracy collapses, because at inference time that column is empty. <strong>Any feature derived from the label is leakage.</strong></p>
-<ul class="quiz-why">
-<li><strong>A. Use as feature</strong> — no. This is the most common cause of "amazing validation score that collapses in production." The model learned a shortcut that doesn't exist at prediction time.</li>
-<li><strong>C. Convert to Unix</strong> — no. The leakage is semantic, not syntactic. Converting the format doesn't change the fact that the feature is only populated post-churn.</li>
-<li><strong>D. Fill "unknown"</strong> — no. You'd still have the same leakage for all the rows where the value IS filled — i.e., all the positive cases. Imputation doesn't fix a fundamentally leaky column.</li>
-</ul>
-</div>
-</div>
-` },
         { icon: "🎯", title: "Final Lab — 10 Industry-Grade Scenarios", content: `
 <p>The Module 2 capstone is a <strong>3-developer team project</strong>. Today's task is to <strong>pick ONE scenario, download the dataset, clean it</strong> using the platform's hygiene rules, and write up two design documents — Phase 1 (<em>WHAT</em> tools/methods you propose) and Phase 2 (<em>WHY</em> each choice is right).</p>
 
@@ -761,8 +663,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>Recommend 3 regions that need backup capacity, with evidence (charts + tables) showing when shortfalls occur.</p>
 <div class="actions">
 <a class="btn-data" href="https://data.open-power-system-data.org/time_series/" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/01_renewable_energy_grid/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/01_renewable_energy_grid/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/01_renewable_energy_grid/documentation_phase_1_what.docx" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/01_renewable_energy_grid/documentation_phase_2_why.docx" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
@@ -781,8 +683,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>List the 3 worst routes with quantified late-rate, and a one-line recommendation per route.</p>
 <div class="actions">
 <a class="btn-data" href="https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/02_logistics_delivery_chain/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/02_logistics_delivery_chain/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/02_logistics_delivery_chain/documentation_phase_1_what.docx" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/02_logistics_delivery_chain/documentation_phase_2_why.docx" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
@@ -801,8 +703,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>Ranked list of 5 features most associated with 30-day readmission, each with a one-line clinical interpretation.</p>
 <div class="actions">
 <a class="btn-data" href="https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/03_hospital_readmission/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/03_hospital_readmission/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/03_hospital_readmission/documentation_phase_1_what.docx" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/03_hospital_readmission/documentation_phase_2_why.docx" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
@@ -821,8 +723,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>Trading-strategy report: sector regime, drawdown chart, Sharpe ratio, plus 3 sentences on what worked and what didn't.</p>
 <div class="actions">
 <a class="btn-data" href="https://www.kaggle.com/datasets/andrewmvd/sp-500-stocks" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/04_trading_backtest/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/04_trading_backtest/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/04_trading_backtest/documentation_phase_1_what.docx" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/04_trading_backtest/documentation_phase_2_why.docx" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
@@ -841,8 +743,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>Top 3 actionable network features for the retention team, with quantified evidence and a one-line action per feature.</p>
 <div class="actions">
 <a class="btn-data" href="https://www.kaggle.com/datasets/blastchar/telco-customer-churn" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/05_telco_churn_network/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/05_telco_churn_network/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/05_telco_churn_network/documentation_phase_1_what.docx" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/05_telco_churn_network/documentation_phase_2_why.docx" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
@@ -861,8 +763,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>Top 3 RFM cohorts ranked by reactivation potential, with a recommended marketing offer per cohort.</p>
 <div class="actions">
 <a class="btn-data" href="https://archive.ics.uci.edu/dataset/502/online+retail+ii" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/06_customer_lifetime_value/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/06_customer_lifetime_value/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/06_customer_lifetime_value/documentation_phase_1_what.docx" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/06_customer_lifetime_value/documentation_phase_2_why.docx" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
@@ -881,8 +783,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>Identify the road most predictive of which sensor's PM2.5, and the time lag in minutes. One paragraph for the city traffic department.</p>
 <div class="actions">
 <a class="btn-data" href="https://www.kaggle.com/datasets/sid321axn/beijing-multisite-airquality-data-set" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/07_smart_city_air_quality/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/07_smart_city_air_quality/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/07_smart_city_air_quality/documentation_phase_1_what.docx" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/07_smart_city_air_quality/documentation_phase_2_why.docx" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
@@ -901,8 +803,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>Name the team most over-performing this season, with a one-paragraph explanation backed by 2 charts.</p>
 <div class="actions">
 <a class="btn-data" href="https://www.kaggle.com/datasets/hugomathien/soccer" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/08_football_match_analytics/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/08_football_match_analytics/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/08_football_match_analytics/documentation_phase_1_what.docx" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/08_football_match_analytics/documentation_phase_2_why.docx" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
@@ -921,8 +823,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>Top 3 climate features per region driving yield, with charts and a one-paragraph policy implication.</p>
 <div class="actions">
 <a class="btn-data" href="https://www.kaggle.com/datasets/patelris/crop-yield-prediction-dataset" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/09_crop_yield_climate/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/09_crop_yield_climate/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/09_crop_yield_climate/documentation_phase_1_what.docx" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/09_crop_yield_climate/documentation_phase_2_why.docx" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
@@ -941,8 +843,8 @@ fig.savefig("out.png", dpi=150)</pre>
 <p>Top 5 most delay-propagating airports, with a network chart and a one-paragraph recommendation.</p>
 <div class="actions">
 <a class="btn-data" href="https://www.kaggle.com/datasets/usdot/flight-delays" target="_blank" rel="noopener">📥 Dataset</a>
-<a class="btn-doc1" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/10_flight_delay_network/documentation_phase_1_what.docx?raw=true" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
-<a class="btn-doc2" href="https://github.com/bepro-aiml/aiml-platform/blob/main/lab-scenarios/module-2/docs/10_flight_delay_network/documentation_phase_2_why.docx?raw=true" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
+<a class="btn-doc1" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/10_flight_delay_network/documentation_phase_1_what.docx" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
+<a class="btn-doc2" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/10_flight_delay_network/documentation_phase_2_why.docx" target="_blank" rel="noopener">📝 Doc 2: WHY</a>
 </div>
 </div>
 </details>
