@@ -710,6 +710,107 @@ fig.savefig("out.png", dpi=150)</pre>
 </ul>
 </div>
 </div>
+` },
+        { icon: "🎯", title: "Final Lab — 10 Industry-Grade Scenarios", content: `
+<p>The Module 2 capstone is a <strong>3-developer team project</strong>. Today's task is to <strong>pick ONE scenario, download the dataset, clean it</strong> using the platform's hygiene rules, and write up two design documents — Phase 1 (<em>WHAT</em> tools/methods you propose) and Phase 2 (<em>WHY</em> each choice is right). Templates are in your group repo at <code>module-2/class_6/lab-scenarios/docs/</code>.</p>
+
+<div class="info-box"><strong>Today, no code.</strong> Just dataset + cleaning + the two markdown docs. Mentor sign-off required before implementation.</div>
+
+<div class="tool-grid">
+
+<a class="tool-card" href="https://www.kaggle.com/datasets/berkeleyearth/climate-change-earth-surface-temperature-data" target="_blank" rel="noopener">
+<h5>1. Renewable Energy Grid Optimization</h5>
+<p><em>Energy / Smart Grid · ~7M rows</em></p>
+<p>A national grid operator runs 200+ wind &amp; solar plants. Output is volatile — operator must pre-dispatch coal backup. Find <strong>when</strong> and <strong>where</strong> renewables fall short.</p>
+<p><strong>Dataset:</strong> Open Power System Data — 15-min time series</p>
+<p><strong>Deliverable:</strong> Recommend 3 regions that need backup capacity, with evidence.</p>
+</a>
+
+<a class="tool-card" href="https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce" target="_blank" rel="noopener">
+<h5>2. Logistics &amp; Last-Mile Delivery</h5>
+<p><em>E-commerce / Logistics · 100k+ orders</em></p>
+<p>A regional courier handles 1.5M parcel events/year. Late deliveries cost reputation. Find the routes, hubs, and times of day driving late delivery.</p>
+<p><strong>Dataset:</strong> Olist Brazilian E-Commerce</p>
+<p><strong>Deliverable:</strong> 3 routes most worth re-engineering, with quantified late-rate.</p>
+</a>
+
+<a class="tool-card" href="https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008" target="_blank" rel="noopener">
+<h5>3. Hospital Readmission Risk</h5>
+<p><em>Healthcare · 101k admissions</em></p>
+<p>A hospital network wants to know which diabetes patients return within 30 days and what their treatment patterns look like.</p>
+<p><strong>Dataset:</strong> UCI Diabetes 130-US Hospitals</p>
+<p><strong>Deliverable:</strong> Top 5 features most associated with 30-day readmission.</p>
+</a>
+
+<a class="tool-card" href="https://www.kaggle.com/datasets/andrewmvd/sp-500-stocks" target="_blank" rel="noopener">
+<h5>4. Algorithmic Trading Backtest</h5>
+<p><em>Financial Markets · 1.2M rows</em></p>
+<p>Build the analytical layer of a momentum-trading backtester on 10 years of S&amp;P 500 daily OHLCV. Characterise factor returns and drawdowns.</p>
+<p><strong>Dataset:</strong> S&amp;P 500 Stocks (Daily Updated)</p>
+<p><strong>Deliverable:</strong> Sector regime, drawdown chart, Sharpe ratio of a chosen strategy.</p>
+</a>
+
+<a class="tool-card" href="https://www.kaggle.com/datasets/blastchar/telco-customer-churn" target="_blank" rel="noopener">
+<h5>5. Telecom Churn &amp; Network Quality</h5>
+<p><em>Telecommunications · 250k subscriber-days</em></p>
+<p>A national telecom (think Uztelecom) wants to find the network conditions that best predict churn. Combine call-detail records with daily customer status.</p>
+<p><strong>Dataset:</strong> Telco Customer Churn (IBM) + CDR synthetic</p>
+<p><strong>Deliverable:</strong> Top 3 actionable network features for the retention team.</p>
+</a>
+
+<a class="tool-card" href="https://archive.ics.uci.edu/dataset/502/online+retail+ii" target="_blank" rel="noopener">
+<h5>6. Customer Lifetime Value (RFM)</h5>
+<p><em>Retail / E-commerce · 1M+ transactions</em></p>
+<p>Segment 1M+ orders into RFM cohorts (Recency, Frequency, Monetary value). Visualise lifetime value by cohort.</p>
+<p><strong>Dataset:</strong> UCI Online Retail II</p>
+<p><strong>Deliverable:</strong> Top 3 cohorts to target with reactivation, with offer per cohort.</p>
+</a>
+
+<a class="tool-card" href="https://www.kaggle.com/datasets/sid321axn/beijing-multisite-airquality-data-set" target="_blank" rel="noopener">
+<h5>7. Smart City Air Quality &amp; Traffic</h5>
+<p><em>IoT / Public Sector · 420k+ readings</em></p>
+<p>50 air-quality sensors and 30 traffic counters across the city. Find which roads' traffic best predicts which sensors' air quality, and at what lag.</p>
+<p><strong>Dataset:</strong> Beijing PM2.5 Multi-Site</p>
+<p><strong>Deliverable:</strong> The most predictive road→sensor pair, with the time lag.</p>
+</a>
+
+<a class="tool-card" href="https://www.kaggle.com/datasets/hugomathien/soccer" target="_blank" rel="noopener">
+<h5>8. Football Match Performance</h5>
+<p><em>Sports Analytics · 25k matches</em></p>
+<p>Match-level events from a top European league across 5 seasons. Build a 'form curve' per team and find the events most correlated with winning streaks.</p>
+<p><strong>Dataset:</strong> European Soccer Database</p>
+<p><strong>Deliverable:</strong> Team most over-performing this season, with evidence.</p>
+</a>
+
+<a class="tool-card" href="https://www.kaggle.com/datasets/patelris/crop-yield-prediction-dataset" target="_blank" rel="noopener">
+<h5>9. Crop Yield from Soil &amp; Weather</h5>
+<p><em>AgriTech · 1.2M rows</em></p>
+<p>10 years of monthly soil moisture, temperature, and precipitation across 1,000 districts plus annual yield. Surface the climate factors most predictive of yield.</p>
+<p><strong>Dataset:</strong> FAOSTAT Crop &amp; Climate + NASA POWER</p>
+<p><strong>Deliverable:</strong> Top 3 climate features driving yield in each region.</p>
+</a>
+
+<a class="tool-card" href="https://www.kaggle.com/datasets/usdot/flight-delays" target="_blank" rel="noopener">
+<h5>10. U.S. Flight Delay Network</h5>
+<p><em>Aviation · 5.8M flights</em></p>
+<p>Build a network view of which airports propagate delay to which others. Quantify spillover and identify the most "infectious" airports.</p>
+<p><strong>Dataset:</strong> US Flights 2015 (BTS)</p>
+<p><strong>Deliverable:</strong> 5 most delay-propagating airports, with a recommendation paragraph.</p>
+</a>
+
+</div>
+
+<h4>Workflow today</h4>
+<ol>
+<li>Form a team of 3 (Logic, Data Engineering, Visualization).</li>
+<li>Pick one scenario together. Download its dataset.</li>
+<li>Clean the dataset using the platform's hygiene conventions (lowercase columns, ISO timestamps, explicit <code>NaN</code>).</li>
+<li>Open <code>module-2/class_6/lab-scenarios/docs/&lt;scenario&gt;/documentation_phase_1_what.md</code> and fill it in completely.</li>
+<li>Open <code>documentation_phase_2_why.md</code> and fill it in.</li>
+<li>Push both completed docs to your group repo. Request mentor sign-off.</li>
+</ol>
+
+<div class="warning-box"><strong>No code today.</strong> The mentor will not approve any implementation until both phase docs are complete and signed off. The lab grade weighs <em>justification</em> at least as much as code.</div>
 ` }
       ]
     }
