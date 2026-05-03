@@ -487,6 +487,24 @@ const Lab = {
     }
   },
 
+  // Lazy-load Three.js + GSAP. Returns a Promise that resolves once both
+  // libraries are on window. Cached after first call.
+  _loadLibs() {
+    if (this._libsLoaded) return Promise.resolve();
+    if (this._libsLoading) return this._libsLoading;
+    const urls = window.__LAB_LIBS || {};
+    const inject = (src) => new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = src; s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+    this._libsLoading = Promise.all([
+      typeof THREE === 'undefined' && urls.three ? inject(urls.three) : Promise.resolve(),
+      typeof gsap  === 'undefined' && urls.gsap  ? inject(urls.gsap)  : Promise.resolve()
+    ]).then(() => { this._libsLoaded = true; });
+    return this._libsLoading;
+  },
+
   enter() {
     if (this._active) return;
     const container = document.getElementById('lab-container');
@@ -496,6 +514,16 @@ const Lab = {
     if (appContainer) appContainer.style.display = 'none';
     container.style.display = 'block';
 
+    // Lazy-load Three.js + GSAP if not already cached, then build scene.
+    this._loadLibs().then(() => {
+      if (!this._active) return;  // user may have left the route mid-load
+      this._enterAfterLibs(container);
+    }).catch(err => {
+      console.error('Lab libs failed to load:', err);
+    });
+  },
+
+  _enterAfterLibs(container) {
     if (typeof THREE !== 'undefined') {
       this._buildScene(container);
       // Consume any code handed off from a class page's Try-in-Lab button.
