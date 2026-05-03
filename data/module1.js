@@ -121,6 +121,16 @@
         video: "4RixMPF4xis",
         videoTitle: "AI vs ML vs Deep Learning — Simplilearn",
         content: `
+<div class="visual-container">
+  <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="200" cy="150" r="140" fill="rgba(94, 234, 212, 0.05)" stroke="#5eead4" stroke-width="2"/>
+    <text x="200" y="40" text-anchor="middle" fill="#5eead4" font-family="JetBrains Mono, monospace" font-size="14">ARTIFICIAL INTELLIGENCE</text>
+    <circle cx="200" cy="170" r="100" fill="rgba(167, 139, 250, 0.1)" stroke="#a78bfa" stroke-width="2"/>
+    <text x="200" y="100" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono, monospace" font-size="14">MACHINE LEARNING</text>
+    <circle cx="200" cy="190" r="60" fill="rgba(244, 114, 182, 0.1)" stroke="#f472b6" stroke-width="2"/>
+    <text x="200" y="210" text-anchor="middle" fill="#f472b6" font-family="JetBrains Mono, monospace" font-size="14">DEEP LEARNING</text>
+  </svg>
+</div>
 <p>These three terms are often used interchangeably, but they are not the same. Think of them as nested circles:</p>
 <div class="info-box">
 <strong>AI</strong> (outermost circle) — Any system that performs tasks requiring human intelligence. Includes rule-based systems, search algorithms, robotics, and everything below.<br><br>
@@ -138,6 +148,24 @@
         video: "1rDNKIJdSaA",
         videoTitle: "Types of Machine Learning — StatQuest Intro",
         content: `
+<div class="visual-container">
+  <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow-l1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#5eead4"/>
+      </marker>
+    </defs>
+    <rect x="50" y="50" width="150" height="100" rx="10" fill="rgba(255,255,255,0.05)" stroke="#888" stroke-dasharray="4"/>
+    <text x="125" y="40" text-anchor="middle" fill="#aaa" font-family="JetBrains Mono, monospace" font-size="12">UNLABELED</text>
+    <text x="125" y="115" text-anchor="middle" fill="#aaa" font-size="36">?</text>
+    <path d="M210 100 L290 100" stroke="#5eead4" stroke-width="3" marker-end="url(#arrow-l1)"/>
+    <rect x="300" y="50" width="150" height="100" rx="10" fill="rgba(94, 234, 212, 0.1)" stroke="#5eead4" stroke-width="2"/>
+    <text x="375" y="40" text-anchor="middle" fill="#5eead4" font-family="JetBrains Mono, monospace" font-size="12">LABELED</text>
+    <rect x="320" y="115" width="110" height="22" rx="4" fill="#5eead4"/>
+    <text x="375" y="131" text-anchor="middle" fill="#0b0722" font-size="11" font-weight="bold">"CAT" ✓</text>
+  </svg>
+</div>
+<p><em>To the computer, a photo is just a pile of numbers. <strong>Unlabeled data</strong> is a mystery box; <strong>labeled data</strong> has a tag on it. Most ML needs thousands of these tags to learn patterns.</em></p>
 <p>All machine learning approaches fall into three categories, defined by the type of data they learn from and the feedback they receive:</p>
 
 <h4>1. Supervised Learning — Learning with a Teacher</h4>
@@ -199,6 +227,39 @@
 "Predict which Uztelecom customers will churn" → supervised (classification, you have historical labels).<br>
 "Group Uzum shoppers by purchasing behavior" → unsupervised (no predefined groups).<br>
 "Train a robot to navigate a warehouse" → reinforcement (environment + rewards).
+</div>
+`
+      },
+      {
+        icon: "📋",
+        title: "Quick Check — Visual Identification",
+        content: `
+<div class="quiz-item">
+<div class="quiz-q">1. Looking at the AI / ML / DL nested-circles diagram earlier in this class — which technology is a <em>subset</em> (lives inside) of Machine Learning?</div>
+<ol class="quiz-options" type="A"><li>Robotics</li><li>Deep Learning</li><li>General IT</li><li>Hardware</li></ol>
+<button class="quiz-reveal">Show Answer</button>
+<div class="quiz-answer">
+<p><strong>✅ B. Deep Learning</strong> — it is the inner-most circle in the diagram. Deep Learning is a specific type of Machine Learning that uses neural networks with many layers.</p>
+<ul class="quiz-why">
+<li><strong>A. Robotics</strong> — a separate field that often uses AI, but isn't strictly "inside" ML in our nested map.</li>
+<li><strong>C. General IT</strong> — the broad world of computers (databases, networking, infrastructure), not a subset of AI.</li>
+<li><strong>D. Hardware</strong> — the physical machine. Deep Learning is the software logic running on the hardware, not the hardware itself.</li>
+</ul>
+</div>
+</div>
+
+<div class="quiz-item">
+<div class="quiz-q">2. Looking at the labeled / unlabeled comparison diagram — which type of data has a clear answer attached to each example (like the <code>"CAT" ✓</code> tag)?</div>
+<ol class="quiz-options" type="A"><li>Unlabeled data</li><li>Labeled data</li><li>Both are the same</li><li>Neither — labels are added later</li></ol>
+<button class="quiz-reveal">Show Answer</button>
+<div class="quiz-answer">
+<p><strong>✅ B. Labeled data</strong> — each example carries its answer as a tag. Supervised learning needs labeled data to learn the mapping from input to answer.</p>
+<ul class="quiz-why">
+<li><strong>A. Unlabeled data</strong> — the mystery box with the <code>?</code>. Used for unsupervised learning, where the model has to discover patterns on its own.</li>
+<li><strong>C. Both are the same</strong> — no. The difference (whether the answer is attached) decides which family of ML methods you can use.</li>
+<li><strong>D. Neither — labels are added later</strong> — labelling does happen as a process, but at training time data is either labeled or it isn't, and that distinction matters.</li>
+</ul>
+</div>
 </div>
 `
       },
