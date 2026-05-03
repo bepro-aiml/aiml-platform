@@ -439,7 +439,7 @@ a:hover { color: var(--accent-hover); }
   left: 50%;
   transform: translateX(-50%);
   width: min(1180px, calc(100% - 48px));
-  z-index: 100;
+  z-index: 2000;
   background: var(--glass);
   backdrop-filter: saturate(170%) blur(24px);
   -webkit-backdrop-filter: saturate(170%) blur(24px);
@@ -2026,7 +2026,7 @@ body.presentation-mode .example-box pre {
   border-right: 1px solid var(--border);
   transform: translateX(-100%);
   transition: transform 0.3s ease, background 0.3s ease;
-  z-index: 90;
+  z-index: 2000;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -2408,13 +2408,17 @@ body.presentation-mode #app-container::after {
   pointer-events: none;
   z-index: 100;
 }
-/* Re-enable clicks/drags on interactive children */
+/* Re-enable clicks/drags on interactive children.
+   #ui-cockpit itself has pointer-events: none so the navbar/sidebar
+   underneath stay clickable; only the actual lab UI children opt back in. */
 #ui-cockpit .lab-hud,
+#ui-cockpit .lab-mission,
 #ui-cockpit .surgical-tray,
 #ui-cockpit .lab-hologram,
 #ui-cockpit .lab-data-lake,
 #ui-cockpit .lab-labeler,
 #ui-cockpit .lab-prediction-label,
+#ui-cockpit .lab-templates,
 #ui-cockpit .xray-label { pointer-events: auto; }
 
 /* Re-anchor formerly-viewport-relative overlays to the cockpit frame.
@@ -3662,26 +3666,6 @@ body.lab-presenting.has-sidebar .main { padding-left: 0 !important; }
   .class-nav { flex-direction: column; gap: 10px; }
   .class-nav a { width: 100%; justify-content: center; }
   .principle-grid, .tool-grid { grid-template-columns: 1fr; }
-}
-
-/* ============================================================
-   INTERACTIVITY FIX — ensure nav chrome always sits above
-   the lab cockpit (z-index 100) and is never blocked by it.
-   pointer-events: auto !important overrides any accidental
-   inheritance from the body > :not() stacking rule.
-   ============================================================ */
-.navbar {
-  pointer-events: auto !important;
-  z-index: 1000 !important;
-}
-.sidebar {
-  pointer-events: auto !important;
-  z-index: 1000 !important;
-}
-.search-box,
-#search-input,
-.search-results {
-  pointer-events: auto !important;
 }
 </style>
 </head>
