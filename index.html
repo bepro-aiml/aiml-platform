@@ -1076,6 +1076,28 @@ a:hover { color: var(--accent-hover); }
 .section-body { padding: 0 26px 26px; display: none; font-size: 1.1rem; line-height: 1.6; }
 .section.open .section-body { display: block; }
 
+/* Inline-SVG visual containers (used in beginner-friendly Module 1 / 2 visuals) */
+.visual-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 1.5rem auto;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+}
+:root:not([data-theme='dark']) .visual-container {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+.visual-container svg {
+  width: 100%;
+  height: auto;
+  max-height: 320px;
+}
+
 .section-body p { margin-bottom: 14px; }
 .section-body h4 {
   color: var(--accent-color); font-size: 0.95rem; margin: 22px 0 10px;
