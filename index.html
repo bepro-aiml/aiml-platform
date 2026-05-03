@@ -7,12 +7,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<!-- Three.js + GSAP deferred so the sidebar + lecture text stay interactive
-     while the 3D lab engine loads in the background. They execute before
-     DOMContentLoaded but after HTML parse, preserving document-order
-     so app.js (also deferred) sees both globals. -->
-<script src="https://unpkg.com/three@0.160.0/build/three.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+<!-- Three.js + GSAP are LAZY-LOADED on demand by app.js (Lab.enter()).
+     Loading them eagerly cost every visitor ~500KB even though Lab is
+     only used by a small fraction of users. Now we fetch them only when
+     someone navigates to #/lab. See Lab._loadLibs() in app.js. -->
+<script>window.__LAB_LIBS = {
+  three: 'https://unpkg.com/three@0.160.0/build/three.min.js',
+  gsap:  'https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js'
+};</script>
 
 <!-- Apply saved theme before paint to prevent flash of unstyled content -->
 <script>
@@ -30,6 +32,28 @@
 
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ============================================================
+   Z-INDEX MAP (single source of truth — keep this updated)
+   ------------------------------------------------------------
+        0  .aurora-bg, ::before     decorative full-bleed background
+        1  .main, body content      lecture text, cards, modals UNDER navbar
+        2  body > non-aurora        elements that paint above the aurora layer
+       50  bottom drawer            collapsed accessory drawer
+       85  .scroll-progress         thin progress bar across top
+      100  #ui-cockpit              lab HUD wrapper (pointer-events: none)
+      200  .toast / notifications   transient overlays
+     2000  .navbar, .sidebar        ALWAYS the topmost interactive surfaces
+                                    (also pointer-events: auto !important)
+   ------------------------------------------------------------
+   Rules of thumb:
+   - If you add a fixed/sticky element, give it an explicit z-index and
+     place it in the table above. Don't pick numbers ad-hoc.
+   - The cockpit MUST stay below the menus (100 < 2000) so its
+     pointer-events:none never blocks navbar/sidebar clicks.
+   - Avoid !important except on .navbar / .sidebar pointer-events,
+     which are load-bearing for click reachability.
+   ============================================================ */
 
 /* ------------------------------------------------------------
    ASSET PATH CONVENTION
@@ -1097,6 +1121,12 @@ a:hover { color: var(--accent-hover); }
   width: 100%;
   height: auto;
   max-height: 320px;
+}
+/* Light-mode adjustment: pastel SVG strokes are too washed out on white.
+   Slight contrast/saturation boost makes them legible without changing
+   the dark-mode appearance. */
+:root:not([data-theme='dark']) .visual-container svg {
+  filter: contrast(1.4) saturate(1.6) brightness(0.7);
 }
 
 .section-body p { margin-bottom: 14px; }
