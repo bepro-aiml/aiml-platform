@@ -3715,17 +3715,16 @@ async function renderContent() {
     return;
   }
 
-  // Lab route: opens the standalone lab in a new tab and stays on the
-  // current platform page. The 3D Foundry lives at lab.html (separate project).
+  // Lab route: kept as a standalone view. The Lab module manages its own
+  // 3D Foundry lifecycle via Lab.enter() / Lab.exit(). For non-lab routes
+  // we still tear down any active lab scene before rendering course content.
   if (route.page === 'lab') {
-    if (Lab._active) Lab.exit();
-    try { sessionStorage.removeItem('lab-scenario'); sessionStorage.removeItem('lab-playground-code'); } catch {}
-    window.open('lab.html', '_blank');
-    navigate('/');
+    if (typeof Lab !== 'undefined' && typeof Lab.enter === 'function' && !Lab._active) {
+      try { Lab.enter(); } catch (e) { console.error('Lab.enter() failed:', e); }
+    }
     return;
   }
-  // Any other route: ensure the lab is torn down before rendering course content.
-  if (Lab._active) Lab.exit();
+  if (typeof Lab !== 'undefined' && Lab._active) Lab.exit();
 
   window.scrollTo(0, 0);
 
