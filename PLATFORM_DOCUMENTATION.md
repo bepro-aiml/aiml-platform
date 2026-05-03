@@ -37,7 +37,7 @@ date: "2026"
 
 ## 1. What the platform is
 
-The **BePro AI/ML Mentorship Platform** is the technical infrastructure for a 16-week course teaching Artificial Intelligence and Machine Learning fundamentals to university students in Uzbekistan. It serves three jobs:
+The **BePro AI/ML Mentorship Platform** is a lightweight, visual-first AI/ML learning platform for beginners, focusing on clear diagrams and high-quality interactive quizzes. It serves three jobs:
 
 1. **Deliver lecture content.** A static website hosts every class — text, embedded YouTube videos, code examples, click-to-reveal quizzes, and final-lab scenarios.
 2. **Collect student work.** Each cohort has its own GitHub group repository. Students submit assignments via Pull Requests against a strictly enforced folder structure.
