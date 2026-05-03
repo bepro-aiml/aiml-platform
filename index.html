@@ -440,6 +440,7 @@ a:hover { color: var(--accent-hover); }
   transform: translateX(-50%);
   width: min(1180px, calc(100% - 48px));
   z-index: 2000;
+  pointer-events: auto !important;
   background: var(--glass);
   backdrop-filter: saturate(170%) blur(24px);
   -webkit-backdrop-filter: saturate(170%) blur(24px);
@@ -2049,6 +2050,7 @@ body.presentation-mode .example-box pre {
   transform: translateX(-100%);
   transition: transform 0.3s ease, background 0.3s ease;
   z-index: 2000;
+  pointer-events: auto !important;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
