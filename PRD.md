@@ -7,7 +7,7 @@ date: "2026-05-03"
 
 # BePro AI/ML Mentorship Platform — PRD v1.0
 
-> **One-line product summary.** A static-site course platform plus four GitHub cohort repos that delivers a 17-week AI/ML curriculum to university students in Uzbekistan, collects their assignments via Pull Requests, and gives the mentor a single integrated workflow for content authoring, submission review, and progress tracking.
+> **One-line product summary.** A lightweight, visual-first AI/ML learning platform for beginners, focusing on clear diagrams and high-quality interactive quizzes.
 
 ---
 
@@ -69,7 +69,7 @@ Junior university students in Uzbekistan want to learn AI / ML. Existing options
 - Plagiarism detection. Trust + small cohort make this unnecessary.
 - Mobile-first authoring (mentor edits on desktop only).
 - Multi-language UI (English only for the technical course; Uzbek/Russian context examples appear inline in content where useful).
-- A 3D-rendered "Lab" environment. Currently scaffolded but not v1 scope. *(Decision: keep scaffolding behind lazy-load; remove fully if not used by Module 6.)*
+- A 3D-rendered "Lab" environment. **Removed in v1.1 (2026-05-03)** — the platform is now lightweight and visual-first. Three.js, GSAP, and the entire `Lab` object (~3500 lines) are gone.
 
 ---
 
@@ -418,4 +418,5 @@ All checkboxes ticked → **v1 is considered shipped**.
 
 ## Changelog
 
+- **v1.1 (2026-05-03)** — pivoted to lightweight visual-first design. Removed 3D Lab/Foundry (Three.js + GSAP + ~3500 lines of `Lab` code); stripped cyber-heavy CSS (aurora orbs, backdrop-filter blurs); removed Turbo perf-toggle; navbar/sidebar `z-index: 100`. App.js shrank from 194KB to 48KB; index.html from 130KB to 93KB.
 - **v1.0 (2026-05-03)** — initial PRD authored by Saidazam after the post-Module-2 platform audit. Ratifies what is already live and locks the v1.1 / v1.2 / v2.0 roadmap.
