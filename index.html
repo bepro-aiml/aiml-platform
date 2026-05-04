@@ -25,6 +25,32 @@
 
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ============================================================
+   Z-INDEX MAP (single source of truth — keep this updated)
+   ------------------------------------------------------------
+        0  .aurora-bg, ::before     decorative full-bleed background
+        1  .main, body content      lecture text, cards, modals UNDER navbar
+        2  body > non-aurora        elements that paint above the aurora layer
+       50  bottom drawer            collapsed accessory drawer
+       85  .scroll-progress         thin progress bar across top
+      100  #ui-cockpit              lab HUD wrapper (pointer-events: none)
+      200  .toast / notifications   transient overlays
+     2000  .navbar, .sidebar        ALWAYS the topmost interactive surfaces
+                                    (also pointer-events: auto !important)
+   ------------------------------------------------------------
+   Rules of thumb:
+   - If you add a fixed/sticky element, give it an explicit z-index and
+     place it in the table above. Don't pick numbers ad-hoc.
+   - The cockpit MUST stay below the menus (100 < 2000) so its
+     pointer-events:none never blocks navbar/sidebar clicks.
+   - Avoid !important except on .navbar / .sidebar pointer-events,
+     which are load-bearing for click reachability.
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   ASSET PATH CONVENTION
+   - Files: /assets/{img,docs,icons}
    - CSS:   background-image: url('assets/img/foo.png');
    - JS:    asset('img', 'foo.png')
    ------------------------------------------------------------ */
@@ -118,7 +144,107 @@
 }
 
 [data-theme='dark'] {
+  /* Dark = Aurora. Legacy names remap to Aurora layers so the rest
+     of the stylesheet inherits the new palette without rewrites. */
+  --bg-color:        var(--bg-body);
+  --bg-mesh:         none;               /* aurora-bg element handles background */
+  --surface:         var(--glass);
+  --surface-raised:  var(--glass-hover);
+  --surface-hover:   var(--glass-hover);
+  --border:          var(--glass-edge);
+  --border-strong:   var(--glass-edge-br);
+  --text-main:       #f3eeff;
+  --text-muted:      #8b869e;
+  --text-heading:    #f3eeff;
+  --accent-color:    var(--aurora-3);
+  --accent-hover:    var(--aurora-4);
+  --accent-soft:     rgba(167, 139, 250, 0.14);
+  --accent-glow:     rgba(167, 139, 250, 0.55);
+  --link-color:      var(--aurora-3);
+  --success-color:   var(--aurora-1);
+  --success-soft:    rgba(94, 234, 212, 0.14);
+  --success-glow:    rgba(94, 234, 212, 0.55);
+  --danger-color:    var(--aurora-4);
+  --danger-soft:     rgba(244, 114, 182, 0.14);
+  --info-soft:       rgba(96, 165, 250, 0.14);
+  --shadow-sm:       0 1px 2px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.25);
+  --shadow-md:       0 4px 6px rgba(0, 0, 0, 0.40), 0 2px 4px rgba(0, 0, 0, 0.30);
+  --shadow-lg:       0 20px 50px rgba(0, 0, 0, 0.55);
+  --shadow-accent:   0 8px 28px rgba(167, 139, 250, 0.35);
+}
 
+/* ============================================================
+   AURORA BACKGROUND — five drifting blurred color orbs + noise
+   + vignette. Sits behind everything on dark theme only.
+   Add <div class="aurora-bg"><span class="orb o1..o5"></span>…</div>
+   as the first child of <body>. Hidden in light mode.
+   ============================================================ */
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  background: var(--bg-deep);
+}
+.aurora-bg .orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.55;
+  will-change: transform;
+}
+.aurora-bg .orb.o1 {
+  width: 48vmax; height: 48vmax; top: -14vmax; left: -12vmax;
+  background: radial-gradient(circle, var(--aurora-1) 0%, transparent 65%);
+  animation: drift1 44s ease-in-out infinite alternate;   /* slowed 50% */
+}
+.aurora-bg .orb.o2 {
+  width: 52vmax; height: 52vmax; bottom: -18vmax; right: -14vmax;
+  background: radial-gradient(circle, var(--aurora-4) 0%, transparent 65%);
+  animation: drift2 56s ease-in-out infinite alternate;   /* slowed 50% */
+}
+/* Orbs 3-5 disabled by default — only o1 + o2 paint. Keeps the HTML
+   structure but removes 3 of the 5 "paint storms" that thrash the GPU
+   during 3D animations. Re-enabled if the user explicitly wants
+   richer aurora (no UI for that — leave as dev toggle). */
+.aurora-bg .orb.o3,
+.aurora-bg .orb.o4,
+.aurora-bg .orb.o5 { display: none; }
+.aurora-bg::after {
+  /* noise + vignette overlay */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 40%, rgba(7, 4, 26, 0.65) 100%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.35'/></svg>");
+  mix-blend-mode: overlay;
+  opacity: 0.55;
+  pointer-events: none;
+}
+.aurora-bg::before {
+  /* Vertical scanline overlay — 1px lines every 20px @ 5% opacity.
+     Bridges the vertical "dead zone" between top and bottom panels. */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.05) 0 1px,
+    transparent 1px 20px
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+/* Hide aurora bg in light mode (legacy palette still applies there) */
+:root:not([data-theme='dark']) .aurora-bg { display: none; }
+
+@keyframes drift1 { from { transform: translate(0,0) scale(1); } to { transform: translate(6%, 8%) scale(1.12); } }
+@keyframes drift2 { from { transform: translate(0,0) scale(1); } to { transform: translate(-8%, 4%) scale(1.08); } }
+@keyframes drift3 { from { transform: translate(0,0) scale(1); } to { transform: translate(-5%, -7%) scale(1.14); } }
+@keyframes drift4 { from { transform: translate(0,0) scale(1); } to { transform: translate(7%, -5%) scale(1.10); } }
+@keyframes drift5 { from { transform: translate(0,0) scale(1); } to { transform: translate(-4%, 6%) scale(1.15); } }
 
 /* Aurora shimmer — applies to any element with class "shine" */
 .shine {
@@ -150,14 +276,123 @@
 
 /* Respect user motion preference */
 @media (prefers-reduced-motion: reduce) {
+  .aurora-bg .orb { animation: none !important; }
   .shine { animation: none !important; }
+}
+
+/* ============================================================
+   ⚡ PERFORMANCE SPRINT — default-off blurs, hover re-enable,
+   GPU-accelerated UI surfaces, .perf-mode "Turbo" toggle.
+}
+
+/* 2. Re-enable blur on hover for critical-feel surfaces (cheap because
+      only one element blurs at a time) */
+[data-theme='dark'] .navbar:hover,
+[data-theme='dark'] .module-card:hover,
+[data-theme='dark'] .sidebar:hover,
+[data-theme='dark'] .search-results:hover,
+[data-theme='dark'] .lab-hud:hover,
+[data-theme='dark'] .hero-dossier:hover {
+}
+
+/* 3. Solid-ish backgrounds replace the look blur was giving us */
+[data-theme='dark'] .lab-hud,
+[data-theme='dark'] .lab-mission,
+[data-theme='dark'] .surgical-tray,
+[data-theme='dark'] .search-results,
+[data-theme='dark'] .sidebar {
+  background: rgba(11, 7, 34, 0.92) !important;
+}
 /* Navbar — fully solid so huge bright H1s scrolling underneath don't
    ghost through. Border + hover-glow keep the glass aesthetic. */
 [data-theme='dark'] .navbar {
+  background: var(--bg-body) !important;
+}
+
+/* 4. Force GPU compositing on the moving/sticky surfaces */
+.navbar, .sidebar, .lab-hud, .lab-mission, .surgical-tray,
+.lab-hologram, .theme-toggle, .aurora-bg .orb {
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+/* Preserve centering for elements that legitimately use transform */
+.lab-mission { transform: translate3d(-50%, 0, 0) !important; }
 .surgical-tray { transform: translate3d(-50%, 0, 0) !important; }
 .navbar { transform: translate3d(-50%, 0, 0) !important; }
 
+/* 5. ⚡ Turbo Mode — body.perf-mode disables every decorative animation
+      and replaces the aurora background with the deep-violet solid */
+body.perf-mode .aurora-bg,
+body.perf-mode .aurora-bg::before,
+body.perf-mode .aurora-bg::after { display: none !important; }
+body.perf-mode { background: var(--bg-deep) !important; }
+body.perf-mode .shine,
+body.perf-mode .aurora-shimmer {
+  animation: none !important;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  color: var(--aurora-3) !important;
+}
+body.perf-mode .module-progress-fill,
+body.perf-mode .lab-telemetry,
+body.perf-mode .module-card-ring { animation: none !important; }
+body.perf-mode .module-card:hover,
+body.perf-mode .navbar:hover,
+body.perf-mode .sidebar:hover,
+body.perf-mode .search-results:hover,
+body.perf-mode .lab-hud:hover,
+body.perf-mode .hero-dossier:hover {
+}
+
+/* 6. The "Turbo" toggle itself — lives in the nav pill */
+.perf-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  margin-left: 6px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-edge);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.perf-toggle:hover {
+  color: var(--aurora-1);
+  border-color: rgba(94, 234, 212, 0.55);
+}
+.perf-toggle .perf-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--text-muted);
+  transition: all 0.2s ease;
+}
+body.perf-mode .perf-toggle {
+  color: var(--aurora-1);
+  border-color: rgba(94, 234, 212, 0.55);
+  background: rgba(94, 234, 212, 0.12);
+}
+body.perf-mode .perf-toggle .perf-dot {
+  background: var(--aurora-1);
+  box-shadow: 0 0 8px var(--aurora-1);
+}
+
 /* (Earlier version had `body > :not(.aurora-bg) { position: relative }`
+   here to force content above aurora-bg. That rule had specificity
+   0,1,1 and silently overrode the position:fixed on .navbar / .sidebar,
+   forcing them into document flow — which pushed .main (and the whole
+   homepage hero) way down below the sidebar. Removed. Each element
+   that needs to sit above aurora-bg sets its own z-index explicitly.) */
+
+html { scroll-behavior: smooth; }
 
 body {
   font-family: 'Bricolage Grotesque', ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -2136,26 +2371,200 @@ body.presentation-mode #app-container::after {
    z-index: 50 → above content (0), below sidebar (90) and navbar (100),
    so navigation chrome stays reachable while the lab is active.
    ============================================================ */
+#lab-container {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 50;
+  background: var(--bg-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* overflow allowed so hologram/label overlays can extend beyond
+     the lab viewport without being clipped */
+}
+#lab-container canvas {
+  display: block;
+  width: 100vw !important;
+  height: 100vh !important;
+  position: absolute;
+  top: 0; left: 0;
+  z-index: 1;                          /* behind the UI cockpit */
+}
+
+/* ============================================================
+   UI COCKPIT — single framed overlay that contains every lab
+   UI element (HUD, mission, tray, hologram, labeler, etc).
+   Children keep their own absolute positioning but are now
+   constrained to a 1600-wide, 32×48-padded frame so they never
+   drift to the corners of ultra-wide monitors.
+   ============================================================ */
+#ui-cockpit {
+  position: fixed;
+  inset: 0;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 32px 48px;
+  pointer-events: none;
+  z-index: 100;
+}
+/* Re-enable clicks/drags on interactive children.
+   #ui-cockpit itself has pointer-events: none so the navbar/sidebar
+   underneath stay clickable; only the actual lab UI children opt back in. */
+#ui-cockpit .lab-hud,
+#ui-cockpit .lab-mission,
+#ui-cockpit .surgical-tray,
+#ui-cockpit .lab-hologram,
+#ui-cockpit .lab-data-lake,
+#ui-cockpit .lab-labeler,
+#ui-cockpit .lab-prediction-label,
+#ui-cockpit .lab-templates,
+#ui-cockpit .xray-label { pointer-events: auto; }
+
+/* Re-anchor formerly-viewport-relative overlays to the cockpit frame.
+   They kept absolute positioning; the cockpit is their new parent. */
+#ui-cockpit .lab-hud       { top: 0;   left: 0;   }
+#ui-cockpit .lab-mission   { top: 0;   left: 50%; transform: translateX(-50%); }
+#ui-cockpit .surgical-tray { bottom: 0; left: 50%; transform: translateX(-50%); }
+/* Templates panel — moved out of the top-left (was overlapping HUD)
+   to bottom-left above the tray. */
+#ui-cockpit .lab-templates {
+  top: auto;
+  bottom: 120px;
+  left: 0;
+  background: rgba(11, 7, 34, 0.92) !important;
+  pointer-events: auto;
+}
+
+/* Telemetry stream — faint scrolling log at right-middle, bridges
+   the vertical gap between HUD and tray. Opacity 0.1, no input. */
+.lab-telemetry {
+  position: absolute;
+  right: 24px;
+  top: 20%;
+  bottom: 20%;
+  width: 280px;
+  max-width: 22vw;
+  overflow: hidden;
+  opacity: 0.1;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10.5px;
+  line-height: 1.7;
+  color: var(--aurora-1);
+  pointer-events: none;
+  user-select: none;
+  z-index: 2;
+  mask-image: linear-gradient(180deg, transparent, #000 20%, #000 80%, transparent);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 20%, #000 80%, transparent);
+}
+.lab-telemetry::before,
+.lab-telemetry::after { /* purely decorative */ }
+.lab-telemetry-row { white-space: nowrap; letter-spacing: 0.05em; }
+.lab-telemetry {
+  animation: telemetryScroll 40s linear infinite;
+}
+@keyframes telemetryScroll {
+  from { transform: translateY(0); }
   to   { transform: translateY(-50%); }        /* second copy seamlessly loops */
 }
 
 /* Scenario-active viewport vignette — darkens the edges so the
    student's eye goes to the central "broken" area. */
+#lab-container.is-scenario-active::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 35%,
+    rgba(7, 4, 26, 0.55) 80%,
+    rgba(7, 4, 26, 0.80) 100%);
+  animation: vignettePulse 5s ease-in-out infinite;
+}
 @keyframes vignettePulse {
   0%, 100% { opacity: 0.85; }
   50%      { opacity: 1.00; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .lab-telemetry { animation: none; }
+  #lab-container.is-scenario-active::after { animation: none; }
+}
+
+/* Z-index sync for the site-wide background system */
+.aurora-bg { z-index: 0; }
+.aurora-bg::before,
+.aurora-bg::after { z-index: 1; }
+body > :not(.aurora-bg):not(#lab-container) { z-index: 2; }
 
 /* Presentation-mode line-height polish for projector legibility */
 body.presentation-mode .section-body p,
 body.presentation-mode .section-body li,
 body.presentation-mode .class-header .class-subtitle {
+  line-height: 1.6 !important;
+}
+.lab-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
+}
+.lab-placeholder h2 {
+  font-size: 1.8rem;
+  color: var(--text-heading);
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+.lab-placeholder p { font-size: 0.95rem; max-width: 520px; }
+.lab-placeholder .lab-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* Lab HUD — Vital Signs monitor in the top-left corner */
+.lab-hud {
+  position: absolute;
+  top: 16px;
+  left: max(20px, calc(50vw - 700px));   /* center-weight on ultra-wide */
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid rgba(0, 242, 255, 0.32);
+  border-radius: 10px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  color: #00f2ff;
+  z-index: 10;
+  user-select: none;
+  transition: border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+  pointer-events: none;
+  min-width: 260px;
+}
+.lab-hud.is-failure {
+  border-color: rgba(255, 48, 96, 0.65);
+  color: #ff3060;
+  box-shadow: 0 0 24px rgba(255, 48, 96, 0.35);
+  animation: labAlertPulse 0.8s ease-in-out infinite;
+}
 @keyframes labAlertPulse {
   0%, 100% { box-shadow: 0 0 24px rgba(255, 48, 96, 0.35); }
   50%      { box-shadow: 0 0 40px rgba(255, 48, 96, 0.6); }
 }
 .hud-label {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: rgba(0, 242, 255, 0.7);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+.lab-hud.is-failure .hud-label { color: rgba(255, 48, 96, 0.75); }
 .hud-ekg {
   display: block;
   width: 100%;
@@ -2295,6 +2704,12 @@ body.presentation-mode .class-header .class-subtitle {
 }
 .hud-training.is-crash .hud-training-report strong { color: #ff3060 !important; }
 
+/* Full-screen glitch effect on #lab-container for 0.5s */
+#lab-container.is-glitching {
+  animation: labGlitchEffect 0.5s steps(10, end);
+}
+@keyframes labGlitchEffect {
+  0%   { filter: none;                                        transform: translate(0, 0); }
   8%   { filter: hue-rotate(80deg) contrast(1.6) saturate(2); transform: translate(-4px, 2px); }
   16%  { filter: hue-rotate(-110deg) saturate(2.5);           transform: translate(5px, -3px); }
   24%  { filter: brightness(2) contrast(2.2) hue-rotate(30deg); transform: translate(-6px, 0); }
@@ -2306,6 +2721,13 @@ body.presentation-mode .class-header .class-subtitle {
   72%  { filter: saturate(0) brightness(1.3);                 transform: translate(-1px, 2px); }
   80%  { filter: hue-rotate(40deg) contrast(1.5);             transform: translate(2px, -2px); }
   100% { filter: none;                                        transform: translate(0, 0); }
+}
+
+/* HUD green flash on successful training completion */
+.lab-hud.is-success {
+  border-color: #10b981 !important;
+  animation: hudSuccessPulse 1.6s ease-in-out;
+}
 @keyframes hudSuccessPulse {
   0%   { box-shadow: 0 0 24px rgba(16, 185, 129, 0.3); }
   40%  { box-shadow: 0 0 52px rgba(16, 185, 129, 0.8); }
@@ -2318,6 +2740,8 @@ body.presentation-mode .class-header .class-subtitle {
 .hud-latency-fill.slow { background: linear-gradient(90deg, #ffcc00, #ff9d00); color: #ffcc00; }
 .hud-integrity-fill { background: linear-gradient(90deg, #33ff00, #00f2ff); color: #33ff00; }
 .hud-integrity-fill.degraded { background: linear-gradient(90deg, #ff3060, #ff9d00); color: #ff3060; }
+.lab-hud.is-failure .hud-row-fill { background: #ff3060 !important; color: #ff3060; }
+.lab-hud.is-failure .hud-row-value { color: #ff3060; }
 
 /* Compute Power meter below the EKG */
 .hud-compute {
@@ -2351,6 +2775,34 @@ body.presentation-mode .class-header .class-subtitle {
 }
 .hud-compute-fill.warning { background: linear-gradient(90deg, #ffcc00, #ff9d00); }
 .hud-compute-fill.danger  { background: linear-gradient(90deg, #ff3060, #ff0040); }
+
+/* Lab keyboard hint at bottom */
+.lab-hint-bar {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 18px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: 0.06em;
+  z-index: 10;
+  user-select: none;
+  pointer-events: none;
+}
+.lab-hint-bar kbd {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 1px 7px;
+  border-radius: 4px;
+  margin: 0 2px;
+  font-size: 11px;
+  color: #fff;
+}
 
 /* Surgical Tray — HTML dock at bottom for spawning blocks */
 .surgical-tray {
@@ -2459,7 +2911,97 @@ body.presentation-mode .class-header .class-subtitle {
 /* ============================================================
    TEMPLATES — quick-start pipeline scaffolds
    ============================================================ */
+.lab-templates {
+  position: absolute;
+  top: 80px;
+  left: 20px;
+  width: 220px;
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  color: #fff;
+  z-index: 10;
+  user-select: none;
+}
+.lab-templates-label {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.lab-template-btn {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 5px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 12px;
+  font-family: inherit;
+  color: rgba(255, 255, 255, 0.85);
+  transition: all 0.25s ease;
+}
+.lab-template-btn:hover {
+  background: rgba(189, 0, 255, 0.12);
+  border-color: rgba(189, 0, 255, 0.4);
+  color: #fff;
+}
+
+/* ============================================================
+   NESTED / DEEP-SURGERY view
+   ============================================================ */
+.lab-nested-panel {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 380px;
+  padding: 24px 28px;
+  background: rgba(5, 8, 18, 0.94);
+  border: 1px solid rgba(0, 242, 255, 0.42);
+  border-radius: 16px;
+  box-shadow: 0 0 50px rgba(0, 242, 255, 0.35), 0 30px 60px rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  z-index: 25;
+  display: none;
+}
+.lab-nested-panel.is-open {
+  display: block;
+  animation: nestedReveal 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes nestedReveal {
+  from { opacity: 0; transform: translate(-50%, -48%) scale(0.92); }
   to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+.lab-nested-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed rgba(0, 242, 255, 0.2);
+}
+.lab-nested-title-group .nested-type {
+  font-size: 10px; letter-spacing: 0.22em;
+  color: rgba(0, 242, 255, 0.7);
+  text-transform: uppercase;
+}
+.lab-nested-title-group .nested-name {
+  font-size: 20px; font-weight: 700; letter-spacing: -0.01em;
+  color: #fff; margin-top: 3px;
+}
+.lab-nested-close {
+  all: unset; cursor: pointer;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 18px; padding: 4px 8px; border-radius: 4px;
+}
+.lab-nested-close:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
 .nested-ports {
   display: grid; grid-template-columns: 1fr 1fr;
   gap: 10px; margin-bottom: 14px;
@@ -2506,28 +3048,477 @@ body.presentation-mode .class-header .class-subtitle {
 }
 .nested-subnode .subnode-name { color: rgba(255, 255, 255, 0.78); }
 .nested-subnode .subnode-val  { color: #00f2ff; font-variant-numeric: tabular-nums; }
+.lab-nested-hint {
+  margin-top: 12px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.45);
+  text-align: center;
+}
+.lab-nested-hint kbd {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  color: #fff;
+}
+
+/* Close/Zoom-Out button shown while a block is expanded */
+.lab-close-expansion {
+  display: none;
+  position: fixed;
+  top: 76px;
+  right: 20px;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid rgba(0, 242, 255, 0.45);
+  border-radius: 999px;
+  color: #00f2ff;
+  cursor: pointer;
+  z-index: 26;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: all 0.25s ease;
+  user-select: none;
+  box-shadow: 0 0 20px rgba(0, 242, 255, 0.25);
+}
+.lab-close-expansion:hover {
+  background: rgba(0, 242, 255, 0.15);
+  color: #fff;
+  transform: scale(1.04);
+}
+body.lab-expanded .lab-close-expansion { display: inline-flex; }
+.lab-close-expansion svg { width: 14px; height: 14px; }
+body.lab-presenting .lab-close-expansion { display: none !important; }
+
+/* ============================================================
+   DATA LAKE — right-side HTML panel for dataset selection
+   ============================================================ */
+.lab-data-lake {
+  position: absolute;
+  top: 80px;
+  right: 20px;
+  width: 240px;
+  padding: 14px 16px;
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  color: #fff;
+  z-index: 10;
+  user-select: none;
+}
+.lab-data-lake-label {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.lab-dataset-btn {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  font-size: 12px;
+  font-family: inherit;
+  color: rgba(255, 255, 255, 0.85);
+  transition: all 0.25s ease;
+}
+.lab-dataset-btn:hover {
+  background: rgba(0, 242, 255, 0.08);
+  border-color: rgba(0, 242, 255, 0.35);
+  color: #fff;
+}
+.lab-dataset-btn.is-active {
+  background: rgba(0, 242, 255, 0.14);
+  border-color: #00f2ff;
+  color: #00f2ff;
+}
+.lab-dataset-icon { font-size: 16px; }
+.lab-data-lake-stats {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.04em;
+}
+.lab-data-lake-stats .stat-row {
+  display: flex; justify-content: space-between;
+  padding: 2px 0;
+}
+.lab-data-lake-stats strong { color: #00f2ff; font-variant-numeric: tabular-nums; }
+.lab-open-labeler {
+  all: unset;
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 12px;
+  padding: 8px 0;
+  background: linear-gradient(90deg, #00f2ff22, #bd00ff22);
+  border: 1px solid rgba(0, 242, 255, 0.5);
+  border-radius: 8px;
+  color: #00f2ff;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.lab-open-labeler:hover {
+  background: linear-gradient(90deg, #00f2ff44, #bd00ff44);
+  color: #fff;
+}
+.lab-open-labeler:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   LABELING STATION — centered modal overlay
+   ============================================================ */
+.lab-labeler {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  padding: 28px 32px;
+  background: rgba(10, 10, 20, 0.94);
+  border: 1px solid rgba(0, 242, 255, 0.35);
+  border-radius: 16px;
+  z-index: 20;
+  color: #fff;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  display: none;
+}
+.lab-labeler.is-open { display: block; animation: labelerReveal 0.35s ease-out; }
 @keyframes labelerReveal {
   from { opacity: 0; transform: translate(-50%, -48%) scale(0.94); }
   to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+.lab-labeler-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px;
+}
+.lab-labeler-title {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+.lab-labeler-close {
+  all: unset;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 16px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.lab-labeler-close:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
+.lab-labeler-item {
+  text-align: center;
+  padding: 32px 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+.lab-labeler-icon { font-size: 44px; margin-bottom: 10px; }
+.lab-labeler-name {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+.lab-labeler-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.lab-labeler-btn {
+  all: unset;
+  cursor: pointer;
+  padding: 14px 0;
+  text-align: center;
+  border-radius: 10px;
+  border: 2px solid;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  transition: all 0.2s ease;
+}
+.lab-labeler-btn.class-a {
+  border-color: #00d2ff;
+  color: #00d2ff;
+  background: rgba(0, 210, 255, 0.05);
+}
+.lab-labeler-btn.class-b {
+  border-color: #bd00ff;
+  color: #bd00ff;
+  background: rgba(189, 0, 255, 0.05);
+}
+.lab-labeler-btn:hover { transform: translateY(-2px); filter: brightness(1.4); }
+.lab-labeler-btn:active { transform: translateY(0); }
+.lab-labeler-progress {
+  margin-top: 14px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  letter-spacing: 0.06em;
+}
+.lab-labeler-progress strong { color: #00f2ff; font-variant-numeric: tabular-nums; }
 
 /* ============================================================
    LIVE INFERENCE — drag-drop zone + prediction label
    ============================================================ */
+#lab-container.is-drop-target {
+  box-shadow: inset 0 0 0 3px rgba(0, 242, 255, 0.5);
+}
+#lab-container.is-drop-target::after {
+  content: 'Drop image to run inference';
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px 32px;
+  background: rgba(0, 242, 255, 0.15);
+  border: 2px dashed #00f2ff;
+  border-radius: 16px;
+  color: #00f2ff;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  z-index: 30;
+  pointer-events: none;
+}
+.lab-prediction-label {
+  position: absolute;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+  padding: 14px 22px;
+  background: rgba(10, 10, 20, 0.95);
+  border: 2px solid #33ff00;
+  border-radius: 12px;
+  color: #fff;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  z-index: 14;
+  box-shadow: 0 0 32px rgba(51, 255, 0, 0.5);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  margin-top: -14px;
+}
+.lab-prediction-label.is-visible { opacity: 1; animation: predictionReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes predictionReveal {
+  0%   { transform: translate(-50%, -100%) scale(0.6); opacity: 0; }
   60%  { transform: translate(-50%, -100%) scale(1.1); opacity: 1; }
   100% { transform: translate(-50%, -100%) scale(1); opacity: 1; }
+}
+.lab-prediction-title {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: rgba(51, 255, 0, 0.7);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.lab-prediction-class {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.lab-prediction-confidence {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 3px;
+}
+
+/* Remote Qwen hologram — floating inference response panel */
+.lab-hologram {
+  position: absolute;
+  left: 50%;
+  top: 14%;
+  transform: translate(-50%, 0) perspective(900px) rotateX(6deg);
+  min-width: 360px;
+  max-width: 560px;
+  padding: 18px 24px 16px;
+  background: linear-gradient(180deg, rgba(8, 22, 30, 0.86), rgba(5, 14, 20, 0.78));
+  border: 1px solid rgba(45, 230, 255, 0.55);
+  border-radius: 14px;
+  color: #d7fbff;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  letter-spacing: 0.02em;
+  box-shadow:
+    0 0 42px rgba(45, 230, 255, 0.35),
+    inset 0 0 24px rgba(45, 230, 255, 0.12);
+  z-index: 16;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
+}
+.lab-hologram::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(45, 230, 255, 0.08) 0px,
+    rgba(45, 230, 255, 0.08) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: hologramScan 3.6s linear infinite;
+}
+.lab-hologram.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0) perspective(900px) rotateX(0deg);
+}
+.lab-hologram.is-error {
+  border-color: rgba(255, 180, 60, 0.55);
+  box-shadow:
+    0 0 42px rgba(255, 180, 60, 0.3),
+    inset 0 0 24px rgba(255, 180, 60, 0.12);
+  color: #ffe7b3;
+}
+.lab-hologram-title {
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(45, 230, 255, 0.85);
+  margin-bottom: 8px;
+}
+.lab-hologram.is-error .lab-hologram-title { color: rgba(255, 180, 60, 0.9); }
+.lab-hologram-body {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.lab-hologram-meta {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(45, 230, 255, 0.25);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(215, 251, 255, 0.55);
+}
+.lab-hologram.is-error .lab-hologram-meta {
+  border-top-color: rgba(255, 180, 60, 0.25);
+  color: rgba(255, 231, 179, 0.6);
+}
 @keyframes hologramScan {
   0%   { background-position: 0 0; }
   100% { background-position: 0 48px; }
+}
+
+/* Validation error tooltip — red holographic tag */
+.lab-error-tooltip {
+  position: absolute;
+  padding: 10px 16px;
+  background: rgba(255, 48, 96, 0.14);
+  border: 1px solid #ff3060;
+  border-radius: 10px;
+  color: #ff3060;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  box-shadow: 0 0 30px rgba(255, 48, 96, 0.45);
+  white-space: nowrap;
+  z-index: 15;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -100%);
+  transition: opacity 0.25s ease;
+  margin-top: -12px;
+  user-select: none;
+}
+.lab-error-tooltip.is-visible { opacity: 1; animation: errorTooltipPulse 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+.lab-error-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -6px; left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 10px; height: 10px;
+  background: rgba(255, 48, 96, 0.14);
+  border-right: 1px solid #ff3060;
+  border-bottom: 1px solid #ff3060;
+}
 @keyframes errorTooltipPulse {
   0%   { transform: translate(-50%, -100%) scale(0.85); }
   35%  { transform: translate(-50%, -100%) scale(1.1); }
   55%  { transform: translate(calc(-50% - 6px), -100%) scale(1.05); }
   70%  { transform: translate(calc(-50% + 6px), -100%) scale(1.02); }
   100% { transform: translate(-50%, -100%) scale(1); }
+}
+
+/* Mission overlay — top center */
+.lab-mission {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 22px;
+  background: rgba(0, 0, 0, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 13px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  z-index: 11;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  pointer-events: none;
+  user-select: none;
+}
+.lab-mission.is-complete {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #10b981;
+  color: #10b981;
+  box-shadow: 0 0 28px rgba(16, 185, 129, 0.55);
+}
+.lab-mission.is-flash {
+  animation: missionPop 0.9s ease-out;
+}
 @keyframes missionPop {
   0%   { transform: translateX(-50%) scale(1); }
   45%  { transform: translateX(-50%) scale(1.18); box-shadow: 0 0 64px rgba(16, 185, 129, 0.9); }
   100% { transform: translateX(-50%) scale(1); }
+}
+
+/* ============================================================
+   AURORA HUD + MISSION TRACKER (dark mode / lab)
+   Frosted-glass violet panel instead of cyan console overlay.
+   Keeps the is-failure / is-complete state visuals, re-tinted.
+   ============================================================ */
+[data-theme='dark'] .lab-hud {
+  background: rgba(11, 7, 34, 0.55);
+  border: 1px solid var(--glass-edge);
+  border-radius: 16px;
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  color: var(--text-main);
+  padding: 14px 18px;
+}
 [data-theme='dark'] .hud-label {
   color: var(--text-muted);
   font-family: 'JetBrains Mono', monospace;
@@ -2556,6 +3547,35 @@ body.presentation-mode .class-header .class-subtitle {
 [data-theme='dark'] .hud-row:nth-of-type(2) .hud-row-fill { background: var(--aurora-3); color: var(--aurora-3); }
 [data-theme='dark'] .hud-row:nth-of-type(3) .hud-row-fill { background: var(--aurora-4); color: var(--aurora-4); }
 [data-theme='dark'] .hud-row-value { color: var(--text-main); }
+[data-theme='dark'] .lab-hud.is-failure {
+  border-color: rgba(244, 114, 182, 0.55);
+  color: var(--aurora-4);
+  box-shadow: 0 0 28px rgba(244, 114, 182, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+[data-theme='dark'] .lab-hud.is-failure .hud-label { color: var(--aurora-4); }
+[data-theme='dark'] .lab-hud.is-success {
+  border-color: rgba(94, 234, 212, 0.55);
+  color: var(--aurora-1);
+  box-shadow: 0 0 28px rgba(94, 234, 212, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* Mission tracker — glass pill */
+[data-theme='dark'] .lab-mission {
+  background: rgba(11, 7, 34, 0.55);
+  border: 1px solid var(--glass-edge);
+  color: var(--text-soft, #c9c2e0);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  font-family: 'JetBrains Mono', monospace;
+}
+[data-theme='dark'] .lab-mission.is-complete {
+  background: linear-gradient(90deg,
+    rgba(94, 234, 212, 0.18),
+    rgba(167, 139, 250, 0.14),
+    rgba(94, 234, 212, 0.18));
+  border-color: rgba(94, 234, 212, 0.55);
+  color: var(--aurora-1);
+  box-shadow: 0 0 34px rgba(94, 234, 212, 0.55);
+}
 
 /* Surgical tray — glass dock at the bottom */
 [data-theme='dark'] .surgical-tray {
@@ -2574,6 +3594,27 @@ body.presentation-mode .class-header .class-subtitle {
 }
 [data-theme='dark'] .tray-label { color: var(--text-muted); }
 [data-theme='dark'] .tray-slot:hover .tray-label { color: var(--text-main); }
+
+/* Lab Presentation Mode — hide every UI element, just the grid remains */
+body.lab-presenting .navbar,
+body.lab-presenting .sidebar,
+body.lab-presenting .sidebar-overlay,
+body.lab-presenting .lab-hud,
+body.lab-presenting .surgical-tray,
+body.lab-presenting .lab-hint-bar,
+body.lab-presenting .xray-label,
+body.lab-presenting .lab-mission,
+body.lab-presenting .lab-error-tooltip,
+body.lab-presenting .lab-data-lake,
+body.lab-presenting .lab-labeler,
+body.lab-presenting .lab-prediction-label,
+body.lab-presenting .lab-hologram,
+body.lab-presenting .lab-templates,
+body.lab-presenting .lab-nested-panel,
+body.lab-presenting .present-exit {
+  display: none !important;
+}
+body.lab-presenting.has-sidebar .main { padding-left: 0 !important; }
 
 /* ============================================================
    RESPONSIVE
@@ -2621,8 +3662,7 @@ body.presentation-mode .class-header .class-subtitle {
     </button>
     <button id="present-toggle" class="theme-toggle" aria-label="Toggle presentation mode" title="Presentation mode (Esc to exit)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-    </button>
-  </div>
+    </button>  </div>
 </nav>
 
 
