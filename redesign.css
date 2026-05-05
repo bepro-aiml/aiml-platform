@@ -450,6 +450,264 @@ body.presentation-mode .class-toc-fab {
 }
 
 /* ============================================================
+   STYLE BORROW — patterns adapted from external reference
+   Applied only to existing bepro components. No new markup.
+   ============================================================ */
+
+/* ── 1. Brighter, more confident kicker (replaces understated grey)
+       Maps to: .kicker, .hero-kicker, .class-toc-heading, .module-num
+       Inspiration: their .label — 11px, 3px tracking, cyan, uppercase.
+   ───────────────────────────────────────────────────────────── */
+.kicker, .hero-kicker, .module-num.kicker, .class-toc-heading {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--aurora-1, #5eead4);
+  opacity: 0.92;
+  font-weight: 600;
+}
+[data-theme="light"] .kicker,
+[data-theme="light"] .hero-kicker,
+[data-theme="light"] .module-num.kicker,
+[data-theme="light"] .class-toc-heading {
+  color: #0891b2;
+  opacity: 1;
+}
+
+/* ── 2. Neon glow utilities for emphasis words — opt-in via class.
+       Existing .shine gradient stays; these add single-color glow.
+       Use sparingly (1 word per heading, like the reference).
+   ───────────────────────────────────────────────────────────── */
+.glow-cyan {
+  color: var(--aurora-1, #5eead4);
+  text-shadow:
+    0 0 12px var(--aurora-1, #5eead4),
+    0 0 30px rgba(94, 234, 212, 0.45);
+}
+.glow-violet {
+  color: var(--aurora-3, #a78bfa);
+  text-shadow:
+    0 0 12px var(--aurora-3, #a78bfa),
+    0 0 30px rgba(167, 139, 250, 0.45);
+}
+.glow-mint {
+  color: #34d399;
+  text-shadow:
+    0 0 12px #34d399,
+    0 0 30px rgba(52, 211, 153, 0.45);
+}
+[data-theme="light"] .glow-cyan,
+[data-theme="light"] .glow-violet,
+[data-theme="light"] .glow-mint {
+  text-shadow: none;
+}
+
+/* ── 3. Hero "shine" gradient — broaden the existing 2-color treatment
+       to a richer 3-stop (cyan → violet → mint). Already used on the
+       word "real" in the subtitle.
+   ───────────────────────────────────────────────────────────── */
+.hero .shine,
+.hero-subtitle .shine,
+.shine {
+  background: linear-gradient(135deg,
+    var(--aurora-1, #5eead4) 0%,
+    var(--aurora-3, #a78bfa) 55%,
+    #34d399 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 0 18px rgba(167, 139, 250, 0.25));
+}
+
+/* ── 4. Stat numbers — neon glow on the digits.
+       Maps to: .hero-stat-num.
+   ───────────────────────────────────────────────────────────── */
+.hero-stat-num {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg,
+    var(--aurora-1, #5eead4) 0%,
+    var(--aurora-3, #a78bfa) 70%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 0 14px rgba(94, 234, 212, 0.35));
+}
+[data-theme="light"] .hero-stat-num { filter: none; }
+
+/* ── 5. Pulsing live-dot on the hero kicker (cohort year line)
+       Pure CSS — no JS, no new markup; uses ::before on .hero-kicker.
+   ───────────────────────────────────────────────────────────── */
+.hero-kicker { display: inline-flex; align-items: center; gap: 8px; }
+.hero-kicker::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--aurora-1, #5eead4);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--aurora-1, #5eead4);
+  animation: live-pulse 2.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.45; transform: scale(0.7); }
+}
+
+/* ── 6. Module cards — colored top stripe rotating cyan/violet/mint
+       per card via :nth-child. Adds the "category accent" effect
+       without changing markup.
+   ───────────────────────────────────────────────────────────── */
+.module-card { position: relative; isolation: isolate; }
+.module-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 1;
+}
+.module-card:nth-child(3n+1)::before {
+  background: linear-gradient(90deg, var(--aurora-1, #5eead4), transparent 80%);
+}
+.module-card:nth-child(3n+2)::before {
+  background: linear-gradient(90deg, var(--aurora-3, #a78bfa), transparent 80%);
+}
+.module-card:nth-child(3n)::before {
+  background: linear-gradient(90deg, #34d399, transparent 80%);
+}
+.module-card.locked::before { opacity: 0.25; }
+
+/* Hover: lift + colored shadow tinted to that card's accent */
+.module-card:not(.locked):hover {
+  transform: translateY(-4px);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.25s ease;
+}
+.module-card:nth-child(3n+1):not(.locked):hover {
+  box-shadow: 0 12px 40px rgba(94, 234, 212, 0.14);
+}
+.module-card:nth-child(3n+2):not(.locked):hover {
+  box-shadow: 0 12px 40px rgba(167, 139, 250, 0.16);
+}
+.module-card:nth-child(3n):not(.locked):hover {
+  box-shadow: 0 12px 40px rgba(52, 211, 153, 0.14);
+}
+
+/* ── 7. Class-meta pills — match their tech-tag treatment.
+       Bolder colored backgrounds, thinner borders, scale-on-hover.
+   ───────────────────────────────────────────────────────────── */
+.class-meta-pill {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.04em;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.class-meta-pill:hover { transform: scale(1.04); }
+.class-meta-pill:nth-child(1) {
+  background: rgba(167, 139, 250, 0.08);
+  border-color: rgba(167, 139, 250, 0.28);
+  color: var(--aurora-3, #a78bfa);
+}
+.class-meta-pill:nth-child(1) .dot { background: var(--aurora-3, #a78bfa); }
+.class-meta-pill:nth-child(2) {
+  background: rgba(94, 234, 212, 0.07);
+  border-color: rgba(94, 234, 212, 0.28);
+  color: var(--aurora-1, #5eead4);
+}
+.class-meta-pill:nth-child(3) {
+  background: rgba(251, 191, 36, 0.07);
+  border-color: rgba(251, 191, 36, 0.28);
+  color: #fbbf24;
+}
+[data-theme="light"] .class-meta-pill:nth-child(1) {
+  background: rgba(124, 58, 237, 0.06);
+  border-color: rgba(124, 58, 237, 0.22);
+  color: #7c3aed;
+}
+[data-theme="light"] .class-meta-pill:nth-child(2) {
+  background: rgba(8, 145, 178, 0.06);
+  border-color: rgba(8, 145, 178, 0.22);
+  color: #0891b2;
+}
+[data-theme="light"] .class-meta-pill:nth-child(3) {
+  background: rgba(217, 119, 6, 0.06);
+  border-color: rgba(217, 119, 6, 0.22);
+  color: #b45309;
+}
+
+/* ── 8. Section cards — accent border on hover (was just shadow).
+   ───────────────────────────────────────────────────────────── */
+.section:hover {
+  border-color: rgba(167, 139, 250, 0.28);
+  box-shadow: 0 8px 30px rgba(167, 139, 250, 0.08);
+}
+
+/* ── 9. Inline <code> chips — tech-tag treatment so code references
+       in body text stand out (their .tech-t style, scaled down).
+   ───────────────────────────────────────────────────────────── */
+.section-body code,
+.section-body p code,
+.section-body li code {
+  background: rgba(94, 234, 212, 0.07);
+  border: 1px solid rgba(94, 234, 212, 0.22);
+  color: var(--aurora-1, #5eead4);
+  padding: 1px 7px;
+  border-radius: 5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.86em;
+  letter-spacing: 0;
+}
+[data-theme="light"] .section-body code,
+[data-theme="light"] .section-body p code,
+[data-theme="light"] .section-body li code {
+  background: rgba(8, 145, 178, 0.06);
+  border-color: rgba(8, 145, 178, 0.18);
+  color: #0e7490;
+}
+/* Code blocks (multi-line <pre>) keep their existing styling */
+.section-body pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* ── 10. Class TOC active item — stronger accent (left bar + bg)
+   ───────────────────────────────────────────────────────────── */
+.class-toc-item.is-active {
+  background: linear-gradient(90deg,
+    rgba(94, 234, 212, 0.14),
+    rgba(167, 139, 250, 0.04));
+  border-left-color: var(--aurora-1, #5eead4);
+  box-shadow: -2px 0 12px rgba(94, 234, 212, 0.15);
+}
+
+/* ── 11. Scroll progress bar — richer 3-stop gradient + bigger glow
+   ───────────────────────────────────────────────────────────── */
+.scroll-progress-fill {
+  background: linear-gradient(90deg,
+    var(--aurora-1, #5eead4) 0%,
+    var(--aurora-3, #a78bfa) 55%,
+    #34d399 100%);
+  box-shadow: 0 0 14px rgba(167, 139, 250, 0.65);
+}
+
+/* ── 12. Search box — slight cyan accent on focus (matches nav-cta vibe)
+   ───────────────────────────────────────────────────────────── */
+.search-box input:focus {
+  border-color: rgba(94, 234, 212, 0.45) !important;
+  box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.1),
+              0 0 16px rgba(94, 234, 212, 0.18) !important;
+  outline: none !important;
+}
+
+/* ============================================================
    12. MOBILE TWEAKS
    ============================================================ */
 @media (max-width: 720px) {
