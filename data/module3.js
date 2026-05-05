@@ -44,37 +44,11 @@ df = df.drop_duplicates(subset=["user_id"])</pre>
         { icon: "📺", title: "Watch: Pandas Data Cleaning", video: "https://www.youtube.com/watch?v=ZOX18HfLHGQ", videoTitle: "Corey Schafer — cleaning techniques", content: `
 <p>Walkthrough of common cleaning operations on real messy data.</p>
 ` },
-        { icon: "📋", title: "Quick Check", content: `
-<div class="quiz-item">
-<div class="quiz-q">1. Column is 60% missing. First move?</div>
-<ol class="quiz-options" type="A"><li>Drop</li><li>Fill with 0</li><li>Investigate the cause</li><li>Fill with mean</li></ol>
-<button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>C.</strong> Missingness often carries signal.</div>
-</div>
-<div class="quiz-item">
-<div class="quiz-q">2. Dedupe by specific column:</div>
-<ol class="quiz-options" type="A"><li><code>drop_duplicates()</code></li><li><code>drop_duplicates(subset=["id"])</code></li><li><code>dedupe("id")</code></li><li><code>unique("id")</code></li></ol>
-<button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> <code>subset</code> picks the key.</div>
-</div>
-<div class="quiz-item">
-<div class="quiz-q">3. IQR outlier rule flags values outside:</div>
-<ol class="quiz-options" type="A"><li>Mean ± 1 SD</li><li>Q1 - 1.5·IQR to Q3 + 1.5·IQR</li><li>Min to max</li><li>Median ± 10%</li></ol>
-<button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> Tukey's rule.</div>
-</div>
-<div class="quiz-item">
-<div class="quiz-q">4. Why not delete fraud outliers?</div>
-<ol class="quiz-options" type="A"><li>Always errors</li><li>They're the signal</li><li>Deleting is slow</li><li>Forbidden</li></ol>
-<button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> Outliers = fraud.</div>
-</div>
-<div class="quiz-item">
-<div class="quiz-q">5. Best imputation for categorical column?</div>
-<ol class="quiz-options" type="A"><li>Mean</li><li>Mode</li><li>Zero</li><li>Random</li></ol>
-<button class="quiz-reveal">Show Answer</button>
-<div class="quiz-answer"><strong>B.</strong> Mode (most common value).</div>
-</div>
+        { icon: "💻", title: "Classwork", content: `
+<p>Hands-on lab for today: clean a deliberately dirty customer dataset — missing values, duplicates, inconsistent text, wrong dtypes, and outliers all in one file.</p>
+<p><strong>File:</strong> <code>m3_c1_classwork.ipynb</code> — find it in your group repo at <code>module-3/class_1/</code>. Self-contained: generates its own dirty dataset, no download needed.</p>
+<p><strong>What you'll build:</strong> a step-by-step cleaning pipeline that produces a clean, model-ready table. Every section ends with a <em>Try It Yourself</em> tweak.</p>
+<div class="info-box"><strong>How to run:</strong> open the notebook in Google Colab (drag-drop) or locally with Jupyter. Run cells top-to-bottom with Shift+Enter.</div>
 ` }
       ]
     },
