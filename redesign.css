@@ -5,6 +5,29 @@
    ============================================================ */
 
 /* ============================================================
+   0. Z-INDEX HOTFIX — pre-existing collision in styles.css
+   ------------------------------------------------------------
+   styles.css:2474 has:
+     body > :not(.aurora-bg):not(#lab-container) { z-index: 2; }
+   That selector's specificity (1,1,1) beats `.navbar { z-index:100 }`
+   (0,1,0), so navbar/sidebar/overlay all get forced to z=2. With
+   everyone at z=2, DOM order decides — `.main` (later in body) paints
+   on top of `.navbar` and `.sidebar` and swallows every menu click.
+   Restore the intended stacking with !important. The "load-bearing
+   !important" pattern is already used elsewhere in styles.css for the
+   same pair (pointer-events on navbar/sidebar).
+   ============================================================ */
+.navbar          { z-index: 2000 !important; }
+.sidebar         { z-index: 1990 !important; }
+.sidebar-overlay { z-index: 1980 !important; }
+.main            { z-index: 1    !important; }
+#scroll-progress { z-index: 1500 !important; }
+#class-toc       { z-index: 1700 !important; }
+#class-toc-fab   { z-index: 1800 !important; }
+#present-exit    { z-index: 1850 !important; }
+
+
+/* ============================================================
    1. TONED-DOWN AURORA — keep the brand, stop competing with text.
    ============================================================ */
 .aurora-bg, .aurora-bg::before { opacity: 0.55; }
