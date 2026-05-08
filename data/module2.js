@@ -830,17 +830,19 @@ fig.savefig("out.png", dpi=150)</pre>
 </details>
 
 <details class="scenario">
-<summary>10. Aviation — U.S. Flight Delay Network <span class="meta">— Aviation · 5.8M flights</span></summary>
+<summary>10. Aviation — U.S. Flight Delay Hotspots <span class="meta">— Aviation · 5.8M flights</span></summary>
 <div class="scenario-body">
-<p><strong>Business problem.</strong> 5.8M+ US flights for 1 year. Build a network view of which airports propagate delay to which others. Quantify spillover and name the 5 most "infectious" airports.</p>
+<p><strong>Business problem.</strong> 5.8M+ US flights for 1 year. The FAA wants to know which 5 origin airports contribute the most delay to the U.S. flight system, and where their delays spread downstream.</p>
 <h6>Dataset</h6>
 <p>US Flights 2015 (Kaggle / BTS) — 5,819,079 flights.</p>
 <h6>Keep / Drop</h6>
-<p><strong>Keep:</strong> YEAR, MONTH, DAY, AIRLINE, FLIGHT_NUMBER, TAIL_NUMBER, ORIGIN_AIRPORT, DESTINATION_AIRPORT, SCHEDULED_DEPARTURE, DEPARTURE_DELAY, ARRIVAL_DELAY, DISTANCE.<br/><strong>Drop:</strong> any column &gt;40% null.</p>
+<p><strong>Keep:</strong> YEAR, MONTH, DAY, AIRLINE, FLIGHT_NUMBER, TAIL_NUMBER, ORIGIN_AIRPORT, DESTINATION_AIRPORT, SCHEDULED_DEPARTURE, DEPARTURE_DELAY, ARRIVAL_DELAY, DISTANCE, LATE_AIRCRAFT_DELAY.<br/><strong>Drop:</strong> any column &gt;40% null.</p>
 <h6>Hygiene challenges</h6>
-<ul><li>Times stored as HHMM integer ('845' = 08:45)</li><li>Cancelled flights have negative delays</li><li>Tail numbers occasionally null</li></ul>
+<ul><li>Times stored as HHMM integer ('845' = 08:45)</li><li>Cancelled flights have negative delays</li><li>Tail numbers occasionally null</li><li>Dataset is sorted by date — random-sample if you reduce row count</li></ul>
+<h6>Methods (Module 2 toolkit)</h6>
+<p>pandas groupby + sort_values, matplotlib bar charts. No graph libraries or ML needed.</p>
 <h6>Deliverable</h6>
-<p>Top 5 most delay-propagating airports, with a network chart and a one-paragraph recommendation.</p>
+<ol><li>Top 5 origin airports by mean DEPARTURE_DELAY (table + bar chart)</li><li>For each of the top 5: top 10 destinations by mean ARRIVAL_DELAY (spillover view)</li><li>One-paragraph recommendation tied to your top 5</li><li>Cleaning log with row counts before/after each step</li></ol>
 <div class="actions">
 <a class="btn-data" href="https://www.kaggle.com/datasets/usdot/flight-delays" target="_blank" rel="noopener">📥 Dataset</a>
 <a class="btn-doc1" href="https://raw.githubusercontent.com/bepro-aiml/aiml-platform/main/lab-scenarios/module-2/docs/10_flight_delay_network/documentation_phase_1_what.docx" target="_blank" rel="noopener">📝 Doc 1: WHAT</a>
