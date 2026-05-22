@@ -1,0 +1,2627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10_cfpb_complaints_m3_lab</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --text: #e6e8ec;
+    --text-dim: #9aa0aa;
+    --accent: #7aa2f7;
+    --accent-hover: #a5c0ff;
+    --border: #2a2f3a;
+    --code-bg: #11141a;
+    --table-header: #232732;
+    --quote-bar: #7aa2f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(26, 29, 36, 0.92);
+  }
+  .topbar-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .back-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .back-link:hover { color: var(--accent-hover); }
+  .pdf-link {
+    background: var(--accent);
+    color: #0f1115;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pdf-link:hover { background: var(--accent-hover); }
+  .pdf-link svg { width: 14px; height: 14px; }
+
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 56px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  p { margin-bottom: 16px; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+  strong { color: #fff; font-weight: 600; }
+  em { color: var(--text); font-style: italic; }
+
+  ul, ol { margin-bottom: 18px; padding-left: 28px; }
+  li { margin-bottom: 6px; }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 36px 0;
+  }
+
+  blockquote {
+    border-left: 4px solid var(--quote-bar);
+    background: var(--card);
+    padding: 14px 22px;
+    margin: 18px 0;
+    color: var(--text);
+    border-radius: 0 8px 8px 0;
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  blockquote strong { color: var(--accent); }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    font-size: 0.88em;
+    color: #f0a3b5;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 18px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text);
+    font-size: 1em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.94rem;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  thead { background: var(--table-header); }
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+
+  /* Checkboxes in self-check lists */
+  input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+
+  /* Anchored sections for nav */
+  h2[id], h3[id] { scroll-margin-top: 80px; }
+
+  footer.scenario-footer {
+    max-width: 920px;
+    margin: 60px auto 40px;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+  footer.scenario-footer a {
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    main { padding: 24px 16px 60px; }
+    h1 { font-size: 1.7rem; }
+    h2 { font-size: 1.35rem; }
+    h3 { font-size: 1.1rem; }
+    .topbar { padding: 10px 16px; }
+    pre { font-size: 0.8rem; padding: 12px 14px; }
+    table { font-size: 0.85rem; }
+    th, td { padding: 9px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="../../#/module/3/class/6">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <span style="display:inline-block;transform:translateY(-1px)">&larr;</span> Back to all scenarios
+    </a>
+    <a class="pdf-link" href="10_cfpb_complaints_m3_lab.pdf" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-4-4h3V4h2v8h3l-4 4zm-8 4v-2h16v2H4z"/></svg>
+      Download as PDF
+    </a>
+  </div>
+</div>
+
+<main>
+<h1 id="cfpb-complaints-module-3-lab-guide">CFPB Complaints — Module 3
+Lab Guide</h1>
+<p><strong>Scenario:</strong> US Consumer Financial Protection Bureau.
+Auto-route citizen complaints to the right department.
+<strong>Module:</strong> 3 (Data Preparation and Feature Engineering)
+<strong>Audience:</strong> Adult learners, A2 English. New to AI.
+<strong>Tools:</strong> Google Colab (no install needed).
+<strong>Difficulty:</strong> HARD. Multi-class target (10 classes), 4
+million rows, very dirty text, big class imbalance, ~5,000 unique
+companies. Read this guide twice before you start.</p>
+<hr />
+<h1 id="the-scenario-your-mission">The Scenario — Your Mission</h1>
+<h2 id="where-you-work">Where you work</h2>
+<p>You and your team are new data analysts at the <strong>US Consumer
+Financial Protection Bureau (CFPB)</strong>. The CFPB is a US government
+agency in Washington, DC. The agency protects citizens from unfair
+banks, credit cards, mortgage lenders, and loan companies.</p>
+<p>Every day, citizens write to the CFPB. They are angry. Their bank
+charged a wrong fee. Their mortgage was rejected without a reason. A
+debt collector called them 20 times in one day.</p>
+<p>Every day: - <strong>10,000 new complaints</strong> arrive at the
+CFPB. - Each complaint is a long text in English. Citizens type it on
+the CFPB website. - A human analyst must read each complaint and decide:
+“Which department should answer this?” - There are <strong>10
+departments</strong> (one for credit cards, one for mortgages, one for
+student loans, and so on). - A human takes <strong>5 minutes per
+complaint</strong>. That is <strong>833 hours of human work per
+day.</strong></p>
+<h2 id="the-problem">The problem</h2>
+<p>The CFPB is <strong>6 months behind</strong>. Two million complaints
+sit in a queue, unread.</p>
+<p>When the CFPB is slow: - Citizens get angry. They write to their
+Congressperson. - Banks are not punished for bad behavior. - The press
+writes negative articles about the agency. - The agency budget gets cut
+next year.</p>
+<p>The Director is in trouble. She walks into your team’s office on
+Monday morning.</p>
+<h2 id="your-managers-request">Your manager’s request</h2>
+<p>Your manager, <strong>Diana</strong> (Director of Consumer Response
+at CFPB), tells you:</p>
+<blockquote>
+<p>“Citizens send us complaints about banks, credit cards, mortgages,
+loans. Ten thousand arrive every day. My team reads each one and sends
+it to the right department.</p>
+<p>A human takes 5 minutes per complaint. We are six months behind.</p>
+<p>Build me a model. The model reads the complaint narrative. The model
+predicts the right product category. Ten categories. Mortgage, credit
+card, student loan, debt collection, and so on.</p>
+<p>If the model is correct <strong>80% of the time</strong>, my team
+only has to check the 20% the model is unsure about. That is 5x faster.
+We catch up in six weeks, not six months.”</p>
+</blockquote>
+<h2 id="why-this-is-hard">Why this is HARD</h2>
+<p>This scenario is <strong>harder</strong> than the other labs. Be
+ready.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Why it is hard</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>10 target classes</strong>, not 2</td>
+<td>A “yes/no” model is easy. A “pick 1 of 10” model is much
+harder.</td>
+</tr>
+<tr>
+<td><strong>65% of narratives are EMPTY</strong></td>
+<td>Citizens often check a box but write nothing. We must still use
+those rows for Modules 3 and 4.</td>
+</tr>
+<tr>
+<td><strong>Mortgage = 30% of complaints</strong></td>
+<td>The biggest class is much bigger than the smallest. The model will
+be lazy and predict “Mortgage” for everything.</td>
+</tr>
+<tr>
+<td><strong>5,000 unique companies</strong></td>
+<td>One-hot encoding makes 5,000 new columns. Table explodes. We must
+use <strong>target encoding</strong>.</td>
+</tr>
+<tr>
+<td><strong>4 million rows</strong></td>
+<td>Too big for free Colab memory. We sample 200,000.</td>
+</tr>
+<tr>
+<td><strong>Text has “XXXX”</strong></td>
+<td>CFPB redacts (hides) names, account numbers, addresses. The model
+sees “XXXX” instead of “John Smith”.</td>
+</tr>
+<tr>
+<td><strong>Two date columns</strong></td>
+<td><code>date_received</code> and <code>date_sent_to_company</code>.
+Both stored as text. Both need parsing.</td>
+</tr>
+<tr>
+<td><strong><code>timely_response</code> is 97% “Yes”</strong></td>
+<td>Severe imbalance. Almost useless as a target, but a fine
+feature.</td>
+</tr>
+</tbody>
+</table>
+<p>You will see these problems again and again. Do not panic. Solve them
+one by one.</p>
+<h2 id="your-teams-job-for-the-next-2-weeks-module-3">Your team’s job
+for the next 2 weeks (Module 3)</h2>
+<p>Diana cannot do this alone. Her data is <strong>one huge CSV
+file</strong> with 4 million rows. The text is messy. Many columns are
+missing. The target column has 10 values, not 2.</p>
+<p>Your job in Module 3: &gt; <strong>Turn one giant messy CSV into ONE
+clean parquet file with ~200,000 rows and 20-22 specific columns. The
+clean file will be used to train the model in Module 4.</strong></p>
+<p>The clean file is called <code>cfpb_complaints_clean.parquet</code>.
+The exact column list is in Class 6.</p>
+<h2 id="after-module-3">After Module 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Module</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Module 4</strong></td>
+<td>Train the 10-class classifier on the metadata columns. Diana finally
+gets her “auto-route” model.</td>
+</tr>
+<tr>
+<td><strong>Module 5</strong></td>
+<td>Find groups of complaints (debt collection storms, mortgage waves).
+For management dashboards.</td>
+</tr>
+<tr>
+<td><strong>Module 7</strong></td>
+<td>Read the actual complaint narrative text. Use NLP. This is where the
+model becomes really powerful.</td>
+</tr>
+</tbody>
+</table>
+<p>You use the <strong>same CFPB dataset</strong> until the end of
+Module 7.</p>
+<hr />
+<h1 id="how-this-guide-works-read-this-first">How This Guide Works (Read
+This First!)</h1>
+<h2 id="we-do-not-give-you-the-full-code">We do NOT give you the full
+code</h2>
+<p>In this guide you will see two kinds of content:</p>
+<h3 id="what-why-expected-explained-in-words">1. WHAT / WHY / EXPECTED —
+explained in words</h3>
+<p>For every step you read: - <strong>WHAT</strong> you have to do (in
+normal language) - <strong>WHY</strong> you do it (the reason) -
+<strong>HINTS</strong> — the function names, the arguments to remember -
+<strong>EXPECTED</strong> — the result you should see if you did it
+right</p>
+<h3 id="sometimes-a-tiny-code-skeleton-with-blanks">2. Sometimes a tiny
+code skeleton with blanks</h3>
+<p>For the harder steps we give you a code skeleton with
+<code>___</code> blanks. <strong>You fill in the blanks.</strong></p>
+<h3 id="why-no-full-code">Why no full code?</h3>
+<p>Because you will NOT learn if you copy-paste. - In Module 4, the
+model only works if YOU understand each step. - In your future job,
+nobody will give you the code. - Writing the code yourself takes 10
+minutes more today, but saves 10 hours later.</p>
+<p><strong>Rule:</strong> If you finish a step in 30 seconds by
+copy-pasting from a teammate’s notebook, do it AGAIN by yourself.
+Different variable names, same logic.</p>
+<hr />
+<h1 id="visualizations-two-modes">Visualizations — Two Modes</h1>
+<p>In every class you will make charts. There are <strong>two
+reasons</strong> to make a chart:</p>
+<h2 id="exploratory-charts-for-you">1. Exploratory charts (for YOU)</h2>
+<p>Made BEFORE you clean the data. To understand what the data looks
+like. - Fast, ugly, no labels needed. - Examples:
+<code>df.hist()</code>,
+<code>df['column'].value_counts().plot.bar()</code>.</p>
+<blockquote>
+<p>Goal: <strong>“What does this data look like?”</strong></p>
+</blockquote>
+<h2 id="explanatory-charts-for-diana">2. Explanatory charts (for
+DIANA)</h2>
+<p>Made AFTER you understand. To EXPLAIN something to your manager. -
+Clean, labeled, one clear message. - Must have: title, x-label, y-label,
+source, and a 1-sentence takeaway.</p>
+<blockquote>
+<p>Goal: <strong>“Diana, look at this. This is the
+problem.”</strong></p>
+</blockquote>
+<p>In every class you make BOTH kinds.</p>
+<h2 id="your-plotting-toolkit-you-learned-this-in-module-2-class-5">Your
+plotting toolkit (you learned this in Module 2 Class 5)</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Plot</th>
+<th>When to use it</th>
+<th>Function name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Histogram</td>
+<td>See the SHAPE of a numeric column</td>
+<td><code>plt.hist()</code> or <code>sns.histplot()</code></td>
+</tr>
+<tr>
+<td>Bar chart</td>
+<td>Count of each category</td>
+<td><code>df['col'].value_counts().plot.bar()</code></td>
+</tr>
+<tr>
+<td>Box plot</td>
+<td>See outliers in a numeric column</td>
+<td><code>sns.boxplot()</code></td>
+</tr>
+<tr>
+<td>Scatter plot</td>
+<td>See the relationship between 2 numbers</td>
+<td><code>plt.scatter()</code> or <code>sns.scatterplot()</code></td>
+</tr>
+<tr>
+<td>Heatmap</td>
+<td>See correlation between many columns</td>
+<td><code>sns.heatmap(df.corr())</code></td>
+</tr>
+<tr>
+<td>Line plot</td>
+<td>See change over time</td>
+<td><code>plt.plot()</code></td>
+</tr>
+<tr>
+<td>Stacked bar</td>
+<td>Show product mix across states</td>
+<td><code>df.groupby(...).unstack().plot.bar(stacked=True)</code></td>
+</tr>
+</tbody>
+</table>
+<p>Before you start: <code>import matplotlib.pyplot as plt</code> and
+<code>import seaborn as sns</code>.</p>
+<hr />
+<h1 id="before-you-start-google-colab-setup">Before You Start — Google
+Colab Setup</h1>
+<p>You will work in <strong>Google Colab</strong>. That means: - You do
+NOT install Python. - You do NOT install pandas, scikit-learn, or
+anything. - You just open a notebook in your web browser.</p>
+<h2 id="step-1-open-a-new-colab-notebook">Step 1 — Open a new Colab
+notebook</h2>
+<ol type="1">
+<li>Go to https://colab.research.google.com</li>
+<li>Sign in with your Google account.</li>
+<li>Click <strong>“New notebook”</strong> (top left).</li>
+<li>Name it <code>cfpb_module_3.ipynb</code>.</li>
+</ol>
+<h2 id="step-2-connect-to-google-drive">Step 2 — Connect to Google
+Drive</h2>
+<p>Colab files <strong>disappear</strong> when you close the browser. So
+you must save your work to <strong>Google Drive</strong>.</p>
+<p>In the first cell:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> drive</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>drive.mount(<span class="st">&#39;/content/drive&#39;</span>)</span></code></pre></div>
+<p>A pop-up asks for permission. Click “Allow”. After this, Drive is
+available at <code>/content/drive/MyDrive/</code>.</p>
+<h2 id="step-3-create-a-project-folder">Step 3 — Create a project
+folder</h2>
+<p>In a new cell:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&#39;/content/drive/MyDrive/cfpb_lab&#39;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>cd <span class="op">/</span>content<span class="op">/</span>drive<span class="op">/</span>MyDrive<span class="op">/</span>cfpb_lab</span></code></pre></div>
+<p>Your team will save ALL files in this folder.</p>
+<h2 id="step-4-get-the-data">Step 4 — Get the data</h2>
+<p>The CFPB publishes the data on its official portal. It is <strong>US
+Public Domain</strong>. Free for anyone.</p>
+<p><strong>Source URL:</strong>
+https://www.consumerfinance.gov/data-research/consumer-complaints/</p>
+<p><strong>Option A — Direct download in Colab
+(recommended):</strong></p>
+<p>The full file is about 1.5 GB. Too big for free Colab memory. So we
+download and <strong>sample 200,000 rows immediately</strong>.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>URL <span class="op">=</span> <span class="st">&quot;https://files.consumerfinance.gov/ccdb/complaints.csv.zip&quot;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Read directly. Use low_memory=False for mixed-type columns.</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>raw <span class="op">=</span> pd.read_csv(URL, low_memory<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(raw.shape)         <span class="co"># Should be ~ (4,000,000+, 18)</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample 200,000 rows. Fix the random_state so the sample is the same every run.</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> raw.sample(n<span class="op">=</span><span class="dv">200_000</span>, random_state<span class="op">=</span><span class="dv">42</span>).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.shape)          <span class="co"># (200000, 18)</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Save the sample to Drive so we never download again.</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>df.to_csv(<span class="st">&#39;/content/drive/MyDrive/cfpb_lab/complaints_sample_200k.csv&#39;</span>, index<span class="op">=</span><span class="va">False</span>)</span></code></pre></div>
+<p><strong>Option B — Download by hand:</strong></p>
+<ol type="1">
+<li>Go to
+https://www.consumerfinance.gov/data-research/consumer-complaints/</li>
+<li>Click “Download CSV”. Wait for the zip file.</li>
+<li>Unzip on your laptop.</li>
+<li>In Colab’s file panel (left sidebar), drag the CSV in.</li>
+<li>Run the same <code>.sample()</code> code as above.</li>
+</ol>
+<h2 id="step-5-test-it">Step 5 — Test it</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;/content/drive/MyDrive/cfpb_lab/complaints_sample_200k.csv&#39;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                 low_memory<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.shape)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.columns.tolist())</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">&#39;Product&#39;</span>].value_counts().head(<span class="dv">10</span>))</span></code></pre></div>
+<p>You should see ~200,000 rows. The column <code>Product</code> should
+have ~10 categories. The biggest is “Mortgage” or “Debt collection” or
+“Credit reporting”.</p>
+<h2 id="colab-tips">Colab tips</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Save your notebook to Drive often</td>
+<td>Colab disconnects after 12 hours.</td>
+</tr>
+<tr>
+<td>Save intermediate <code>.parquet</code> files to Drive</td>
+<td>Files in <code>/content/</code> disappear when Colab
+disconnects.</td>
+</tr>
+<tr>
+<td>Sample EARLY and save</td>
+<td>The full 4M-row CSV will crash free Colab. Sample to 200k once,
+save, reuse.</td>
+</tr>
+<tr>
+<td>Use <code>low_memory=False</code> on <code>read_csv</code></td>
+<td>Some CFPB columns mix text and numbers. Without this flag, pandas
+guesses wrong.</td>
+</tr>
+<tr>
+<td>Restart runtime if memory full</td>
+<td>Runtime –&gt; Restart runtime.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="class-1-data-cleaning">Class 1 — Data Cleaning</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Diana drops a 1.5 GB CSV file on
+your desk. There are 18 columns. Two date columns are stored as text.
+65% of complaint narratives are empty. Some companies appear once, some
+appear 50,000 times. Your job today: shrink, clean, understand.</p>
+</blockquote>
+<h2 id="your-goal">Your goal</h2>
+<p>Make the messy CFPB file USABLE. Fix the date columns. Find missing
+values. Understand the 10-class target.</p>
+<h2 id="inputs">Inputs</h2>
+<ul>
+<li><code>complaints_sample_200k.csv</code> in your Drive folder (saved
+in Setup Step 4)</li>
+</ul>
+<h2 id="outputs">Outputs</h2>
+<ul>
+<li><code>complaints_step1.parquet</code> saved in your Drive
+folder</li>
+<li>3+ exploratory charts in your notebook</li>
+<li>1 explanatory chart for Diana</li>
+<li>Notes in markdown about every decision you made</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-20-minutes">Phase A — Explore the
+data first (20 minutes)</h2>
+<p>Before you clean anything, <strong>LOOK</strong> at the data.</p>
+<h3
+id="exploratory-chart-1-count-of-each-product-the-target">Exploratory
+chart 1 — Count of each <code>Product</code> (the target)</h3>
+<ul>
+<li><strong>Question:</strong> “Of 200,000 complaints, how many are
+about each product?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>df['Product'].value_counts()</code>.</li>
+<li>Then <code>.plot.bar()</code> on the result.</li>
+<li>Rotate x-labels with
+<code>plt.xticks(rotation=45, ha='right')</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> “Mortgage” and “Credit reporting”
+each take ~30% of the data. The smallest class might be ~1%. This is a
+<strong>big imbalance.</strong></li>
+</ul>
+<h3 id="exploratory-chart-2-how-many-narratives-are-empty">Exploratory
+chart 2 — How many narratives are empty?</h3>
+<ul>
+<li><strong>Question:</strong> “What fraction of the
+<code>Consumer complaint narrative</code> column is blank?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>df['Consumer complaint narrative'].isna().mean()</code>.</li>
+<li>This gives you a fraction between 0 and 1.</li>
+<li>Plot as a 2-bar chart: “Has narrative” vs “Empty”.</li>
+</ul></li>
+<li><strong>What you learn:</strong> About <strong>65% are
+empty.</strong> That is a lot. We must NOT drop them: they still have
+product, date, company, state. We use them in M3 and M4, then filter to
+non-empty for M7.</li>
+</ul>
+<h3 id="exploratory-chart-3-complaints-over-time-by-month">Exploratory
+chart 3 — Complaints over time (by month)</h3>
+<ul>
+<li><strong>Question:</strong> “When did people complain the most? Was
+there a spike around the 2008 financial crisis? Around COVID-19 in
+2020?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>First convert <code>Date received</code> to datetime (you do this in
+Phase B Step 3 anyway, do it here too with a temp variable).</li>
+<li>Use <code>.dt.to_period('M')</code> to group by month.</li>
+<li>Plot the counts as a line plot.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Big spikes show real-world events.
+The model should be aware that “year” is a feature.</li>
+</ul>
+<h3 id="exploratory-chart-4-missing-values-per-column">Exploratory chart
+4 — Missing values per column</h3>
+<ul>
+<li><strong>Question:</strong> “Which of the 18 columns has the most
+missing data?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>df.isna().sum().sort_values(ascending=False)</code>.</li>
+<li>Plot as a bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong>
+<code>Consumer complaint narrative</code>,
+<code>Consumer disputed?</code>, <code>Sub-product</code> will be near
+the top.</li>
+</ul>
+<hr />
+<h2 id="phase-b-clean-the-data-50-minutes">Phase B — Clean the data (50
+minutes)</h2>
+<h3 id="step-1-load-the-sample">Step 1 — Load the sample</h3>
+<ul>
+<li><strong>WHAT:</strong> Load <code>complaints_sample_200k.csv</code>
+into a DataFrame named <code>df</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>pd.read_csv('/content/drive/MyDrive/cfpb_lab/complaints_sample_200k.csv', low_memory=False)</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> <code>df.shape</code> is
+<code>(200000, 18)</code>.</li>
+</ul>
+<h3 id="step-2-rename-columns">Step 2 — Rename columns</h3>
+<p>The CFPB column names are LONG and have spaces (e.g.,
+<code>Consumer complaint narrative</code>). Rename them to short
+snake_case names.</p>
+<ul>
+<li><p><strong>WHAT:</strong> Use <code>df.rename(columns={...})</code>
+or <code>df.columns = [...]</code>.</p></li>
+<li><p><strong>HINTS:</strong> A <code>dict</code> is cleanest.
+Skeleton:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>rename_map <span class="op">=</span> {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Date received&#39;</span>:                  <span class="st">&#39;date_received&#39;</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Product&#39;</span>:                        <span class="st">&#39;product&#39;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Sub-product&#39;</span>:                    <span class="st">&#39;sub_product&#39;</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Issue&#39;</span>:                          <span class="st">&#39;issue&#39;</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Sub-issue&#39;</span>:                      <span class="st">&#39;sub_issue&#39;</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Consumer complaint narrative&#39;</span>:   <span class="st">&#39;narrative&#39;</span>,</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Company public response&#39;</span>:        <span class="st">&#39;company_public_response&#39;</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Company&#39;</span>:                        <span class="st">&#39;company&#39;</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;State&#39;</span>:                          <span class="st">&#39;state&#39;</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;ZIP code&#39;</span>:                       <span class="st">&#39;___&#39;</span>,     <span class="co"># YOU fill in</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Tags&#39;</span>:                           <span class="st">&#39;___&#39;</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Consumer consent provided?&#39;</span>:     <span class="st">&#39;___&#39;</span>,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Submitted via&#39;</span>:                  <span class="st">&#39;submitted_via&#39;</span>,</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Date sent to company&#39;</span>:           <span class="st">&#39;date_sent_to_company&#39;</span>,</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Company response to consumer&#39;</span>:   <span class="st">&#39;company_response_type&#39;</span>,</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Timely response?&#39;</span>:               <span class="st">&#39;timely_response&#39;</span>,</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Consumer disputed?&#39;</span>:             <span class="st">&#39;consumer_disputed&#39;</span>,</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Complaint ID&#39;</span>:                   <span class="st">&#39;complaint_id&#39;</span>,</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.rename(columns<span class="op">=</span>rename_map)</span></code></pre></div></li>
+<li><p><strong>EXPECTED:</strong> <code>df.columns.tolist()</code> shows
+all short names.</p></li>
+</ul>
+<h3 id="step-3-fix-the-two-date-columns">Step 3 — Fix the two date
+columns</h3>
+<ul>
+<li><strong>WHAT:</strong> <code>date_received</code> and
+<code>date_sent_to_company</code> are stored as <strong>text</strong>
+(e.g., <code>"2021-08-15"</code>). Convert both to real datetime.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>The function is <code>pd.to_datetime()</code>.</li>
+<li>Add the argument <code>errors='coerce'</code>. If a cell is bad, it
+becomes <code>NaT</code> (Not a Time = missing). The code does not
+crash.</li>
+<li>Use a <code>for</code> loop over the 2 column names. Do NOT write 2
+separate lines.</li>
+</ul></li>
+<li><strong>WHY:</strong> If dates are strings, you cannot subtract
+them. “How many days from <code>date_received</code> to
+<code>date_sent_to_company</code>?” is impossible.</li>
+<li><strong>EXPECTED:</strong> <code>df.dtypes</code> shows
+<code>datetime64[ns]</code> for those 2 columns.</li>
+</ul>
+<h3 id="step-4-find-missing-values">Step 4 — Find missing values</h3>
+<ul>
+<li><p><strong>WHAT:</strong> Count missing values per column.</p></li>
+<li><p><strong>HINTS:</strong> <code>.isna()</code> returns True/False
+per cell. <code>.sum()</code> counts the Trues per column.</p></li>
+<li><p><strong>EXPECTED:</strong> Something like:</p>
+<pre><code>narrative              ~130,000
+consumer_disputed       ~80,000
+sub_issue               ~70,000
+...</code></pre></li>
+</ul>
+<h3 id="step-5-decide-what-to-do-with-each-missing-column">Step 5 —
+Decide what to do with each missing column</h3>
+<p>You do NOT drop rows with missing values. You handle each column.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>Decision</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>narrative</code></td>
+<td>KEEP missing as empty string <code>""</code>. Make a new column
+<code>has_narrative_flag</code> = 1 if not empty, else 0.</td>
+<td>We still need the row for product prediction.</td>
+</tr>
+<tr>
+<td><code>consumer_disputed</code></td>
+<td>Map “Yes”=1, “No”=0, missing=-1 (a 3rd category).</td>
+<td>Missing means “field was removed by CFPB after 2017”. That itself is
+information.</td>
+</tr>
+<tr>
+<td><code>sub_issue</code></td>
+<td>Fill with <code>"unknown"</code>.</td>
+<td>Just a label.</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>Fill with <code>"XX"</code>.</td>
+<td>Some complaints have no state.</td>
+</tr>
+<tr>
+<td><code>tags</code></td>
+<td>Drop the column. Too many missing values, low information.</td>
+<td>We will not use it.</td>
+</tr>
+<tr>
+<td><code>zip_code</code></td>
+<td>Drop the column. Privacy-redacted in most rows.</td>
+<td>Not useful.</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['narrative'] = df['narrative'].fillna('')</code>.</li>
+<li><code>df['has_narrative_flag'] = (df['narrative'] != '').astype(int)</code>.</li>
+<li>For <code>consumer_disputed</code>:
+<code>df['consumer_disputed'] = df['consumer_disputed'].map({'Yes': 1, 'No': 0}).fillna(-1).astype(int)</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-6-standardize-timely_response">Step 6 — Standardize
+<code>timely_response</code></h3>
+<ul>
+<li><strong>WHAT:</strong> This column is <code>"Yes"</code> /
+<code>"No"</code>. Convert to 1 / 0.</li>
+<li><strong>HINTS:</strong>
+<code>df['timely_response'] = (df['timely_response'] == 'Yes').astype(int)</code>.</li>
+<li><strong>WARNING:</strong> About <strong>97% of values are
+“Yes”</strong>. This is extreme imbalance. The column is a poor target
+but is OK as a feature. Mention this in your markdown notes.</li>
+</ul>
+<h3 id="step-7-standardize-product-values">Step 7 — Standardize
+<code>product</code> values</h3>
+<ul>
+<li><strong>WHAT:</strong> Some product names have been renamed by CFPB
+over the years. For example, old data has
+<code>"Credit reporting"</code> but newer data has
+<code>"Credit reporting, credit repair services, or other personal consumer reports"</code>.
+Merge them.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Print all unique values: <code>df['product'].unique()</code>.</li>
+<li>Write a small <code>dict</code> to map old –&gt; new.</li>
+<li>Apply with <code>.replace(product_map)</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> After cleaning, you have <strong>exactly
+10 product categories</strong>. Write the final list in your
+notebook.</li>
+</ul>
+<h3 id="step-8-write-down-what-you-did">Step 8 — Write down what you
+did</h3>
+<p>In a markdown cell, write: - Starting rows: 200,000 - Rows after
+cleaning: 200,000 (we kept all) - Rows dropped: 0 - Columns dropped:
+<code>tags</code>, <code>zip_code</code> - New columns created:
+<code>has_narrative_flag</code> - WHY for each decision.</p>
+<h3 id="step-9-save-to-drive">Step 9 — Save to Drive</h3>
+<ul>
+<li><strong>WHAT:</strong> Save the cleaned <code>df</code> as parquet,
+inside your Drive folder.</li>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/cfpb_lab/complaints_step1.parquet')</code>.</li>
+<li><strong>WHY parquet, not CSV?</strong> Parquet is 10x smaller and
+keeps the dtype info. CSV does not.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-diana-15-minutes">Phase C — Make ONE
+chart for Diana (15 minutes)</h2>
+<p>She does not have time to read your code. She wants ONE picture.</p>
+<h3 id="dianas-chart-complaint-volume-over-time">Diana’s chart —
+“Complaint volume over time”</h3>
+<p>A line chart showing how the number of complaints has changed every
+month since CFPB opened in 2011.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Group by month:
+<code>df.groupby(df['date_received'].dt.to_period('M')).size()</code>.</li>
+<li><code>.plot.line()</code>.</li>
+<li>Add the title:
+<code>"Monthly CFPB complaint volume - sample of 200k"</code>.</li>
+<li>X-label: “Month”.</li>
+<li>Y-label: “Number of complaints”.</li>
+</ul></li>
+<li><strong>Takeaway for Diana:</strong> “Complaint volume has tripled
+since 2015. The 2020 COVID spike is huge. Your backlog is not random; it
+follows real economic events.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-1">Common mistakes in Class 1</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Forget <code>errors='coerce'</code> on <code>to_datetime</code></td>
+<td>Code crashes on one bad date.</td>
+</tr>
+<tr>
+<td>Drop rows where <code>narrative</code> is empty</td>
+<td>You lose 65% of the data. Diana fires you.</td>
+</tr>
+<tr>
+<td>One-hot encode <code>company</code> here</td>
+<td>5,000 columns. Memory crash. We use target encoding in Class 2.</td>
+</tr>
+<tr>
+<td>Forget <code>low_memory=False</code> on <code>read_csv</code></td>
+<td>Some columns get dtype <code>object</code> mixed with NaN. Filters
+break.</td>
+</tr>
+<tr>
+<td>Save to <code>/content/</code> instead of Drive</td>
+<td>File disappears when Colab disconnects.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-2">Self-check before Class 2</h2>
+<ul class="task-list">
+<li><label><input
+type="checkbox" /><code>complaints_step1.parquet</code> exists in
+Drive.</label></li>
+<li><label><input type="checkbox" />Columns are renamed to
+snake_case.</label></li>
+<li><label><input type="checkbox" /><code>date_received</code> and
+<code>date_sent_to_company</code> have dtype
+<code>datetime64</code>.</label></li>
+<li><label><input type="checkbox" /><code>has_narrative_flag</code>
+exists. About 35% of rows = 1.</label></li>
+<li><label><input type="checkbox" /><code>product</code> has exactly 10
+unique values.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory charts in
+your notebook.</label></li>
+<li><label><input type="checkbox" />1 polished chart for
+Diana.</label></li>
+<li><label><input type="checkbox" />You wrote down (in markdown) what
+you did and WHY.</label></li>
+</ul>
+<hr />
+<h1 id="class-2-encoding-and-scaling">Class 2 — Encoding and
+Scaling</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Diana looks at your cleaned data.
+She is happy. But she says: “The model is a math model. It does not
+understand the word ‘Wells Fargo’ or the word ‘Mortgage’. Turn the words
+into numbers. But careful — <code>company</code> has 5,000 unique
+values. Do not blow up the table.”</p>
+</blockquote>
+<h2 id="your-goal-1">Your goal</h2>
+<p>Turn TEXT columns into numbers. Pick the right encoding for each.
+<strong>Target-encode</strong> the <code>company</code> column. Make
+narrative-length-style features.</p>
+<h2 id="inputs-1">Inputs</h2>
+<ul>
+<li><code>complaints_step1.parquet</code> from Class 1</li>
+</ul>
+<h2 id="outputs-1">Outputs</h2>
+<ul>
+<li><code>complaints_step2.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Diana</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-15-minutes">Phase A — Explore the
+data first (15 minutes)</h2>
+<h3
+id="exploratory-chart-1-top-20-companies-by-complaint-count">Exploratory
+chart 1 — Top 20 companies by complaint count</h3>
+<ul>
+<li><strong>Question:</strong> “Of 5,000 companies, who gets the most
+complaints?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['company'].value_counts().head(20).plot.barh()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> A few mega-banks (Equifax, Bank of
+America, Wells Fargo) dominate. Most companies have only 1 or 2
+complaints. This is a <strong>long tail</strong> distribution. One-hot
+will not work.</li>
+</ul>
+<h3
+id="exploratory-chart-2-distribution-of-complaints-per-company-log-scale">Exploratory
+chart 2 — Distribution of complaints per company (log scale)</h3>
+<ul>
+<li><strong>Question:</strong> “How long is the tail?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>counts = df['company'].value_counts()</code>.</li>
+<li><code>plt.hist(counts, bins=50)</code>.</li>
+<li>Use <code>plt.yscale('log')</code> to see both small and big
+bars.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Hundreds of companies have only 1
+complaint. Hundreds have 10. A few have 50,000. We need a smart
+encoding.</li>
+</ul>
+<h3 id="exploratory-chart-3-submitted_via-counts">Exploratory chart 3 —
+<code>submitted_via</code> counts</h3>
+<ul>
+<li><strong>Question:</strong> “Do people complain on the web, by phone,
+by mail?”</li>
+<li><strong>HINTS:</strong> <code>value_counts().plot.bar()</code>.</li>
+<li><strong>What you learn:</strong> ~80% are web. Phone is small. This
+column has low information but does not hurt.</li>
+</ul>
+<h3 id="exploratory-chart-4-company_response_type-counts">Exploratory
+chart 4 — <code>company_response_type</code> counts</h3>
+<ul>
+<li><strong>Question:</strong> “How do companies usually respond?”</li>
+<li><strong>HINTS:</strong> <code>value_counts().plot.bar()</code>.</li>
+<li><strong>What you learn:</strong> “Closed with explanation” is most
+common. “Untimely response” is small. Useful for one-hot.</li>
+</ul>
+<hr />
+<h2 id="phase-b-encode-and-scale-50-minutes">Phase B — Encode and scale
+(50 minutes)</h2>
+<h3 id="step-1-split-into-train-and-test-first">Step 1 — Split into
+train and test FIRST</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>train_test_split</code> BEFORE any
+encoding. Otherwise you leak test data.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.model_selection import train_test_split</code>.</li>
+<li><code>X = df.drop('product', axis=1)</code>.</li>
+<li><code>y = df['product']</code>.</li>
+<li><code>train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)</code>.</li>
+</ul></li>
+<li><strong>WHY <code>stratify=y</code>?</strong> With 10 classes, the
+test set may by accident miss small classes. Stratify keeps the same
+class proportions in train and test.</li>
+<li><strong>EXPECTED:</strong> <code>X_train.shape</code> is
+<code>(160000, ~18)</code>. <code>X_test.shape</code> is
+<code>(40000, ~18)</code>.</li>
+</ul>
+<h3 id="step-2-label-encode-the-target-product">Step 2 — Label-encode
+the target <code>product</code></h3>
+<ul>
+<li><strong>WHAT:</strong> The target has 10 string values. Convert to
+integers 0..9.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.preprocessing import LabelEncoder</code>.</li>
+<li><code>le = LabelEncoder()</code>.</li>
+<li><code>y_train_enc = le.fit_transform(y_train)</code>.</li>
+<li><code>y_test_enc = le.transform(y_test)</code>.</li>
+<li>SAVE the encoder. You need it later to decode predictions back to
+product names.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> <code>y_train_enc</code> is an array of
+integers 0..9. <code>le.classes_</code> is the list of 10 product
+names.</li>
+</ul>
+<h3 id="step-3-one-hot-encode-the-small-categorical-columns">Step 3 —
+One-hot encode the SMALL categorical columns</h3>
+<ul>
+<li><strong>WHAT:</strong> For columns with <strong>fewer than 20 unique
+values</strong>, one-hot encoding is fine.</li>
+<li><strong>The list:</strong>
+<ul>
+<li><code>submitted_via</code> (~5 values)</li>
+<li><code>company_response_type</code> (~8 values)</li>
+<li><code>state</code> (~52 values, including territories — borderline,
+but still OK for one-hot)</li>
+</ul></li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>pd.get_dummies(X_train, columns=['submitted_via', 'company_response_type'], prefix=['via', 'resp'])</code>.</li>
+<li>Do the SAME thing to <code>X_test</code> (or use
+<code>OneHotEncoder</code> to be safe — see Class 5).</li>
+</ul></li>
+<li><strong>WARNING:</strong> If you use <code>pd.get_dummies</code>
+separately on train and test, you may get DIFFERENT columns. To be safe,
+use <code>pd.get_dummies</code> on the concatenated data, then split
+back. Or use <code>sklearn.OneHotEncoder</code> with
+<code>handle_unknown='ignore'</code> (the safe way).</li>
+</ul>
+<h3 id="step-4-target-encode-company-the-big-categorical">Step 4 —
+Target-encode <code>company</code> (the BIG categorical)</h3>
+<p>This is the most important step in Class 2. <strong>Read it
+twice.</strong></p>
+<ul>
+<li><strong>WHAT:</strong> Replace each company name with a number: the
+AVERAGE class probability for that company. Since the target has 10
+classes, the simplest target encoding is the <strong>most common
+product</strong> per company, mapped to that product’s integer.</li>
+<li><strong>WHY target encoding?</strong> 5,000 companies means 5,000
+new one-hot columns. The table would have 5,000 + 18 = 5,018 columns.
+Most are zero. Slow and useless. Target encoding gives
+<strong>ONE</strong> new column instead.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>For each company in <code>X_train</code>, compute the mean of
+<code>y_train_enc</code>.</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute on TRAIN only.</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>company_target_map <span class="op">=</span> (</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    pd.DataFrame({<span class="st">&#39;company&#39;</span>: X_train[<span class="st">&#39;___&#39;</span>],</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&#39;y&#39;</span>:       y_train_enc})</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    .groupby(<span class="st">&#39;___&#39;</span>)[<span class="st">&#39;y&#39;</span>]</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    .mean()</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply to train AND test.</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>X_train[<span class="st">&#39;company_target_encoded&#39;</span>] <span class="op">=</span> X_train[<span class="st">&#39;company&#39;</span>].<span class="bu">map</span>(company_target_map)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>X_test[<span class="st">&#39;company_target_encoded&#39;</span>]  <span class="op">=</span> X_test[<span class="st">&#39;company&#39;</span>].<span class="bu">map</span>(company_target_map)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Test may have NEW companies not seen in train. Fill them with the overall mean.</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>overall_mean <span class="op">=</span> y_train_enc.mean()</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>X_test[<span class="st">&#39;company_target_encoded&#39;</span>] <span class="op">=</span> X_test[<span class="st">&#39;company_target_encoded&#39;</span>].fillna(___)</span></code></pre></div></li>
+<li><p>Then DROP the original <code>company</code> column.</p></li>
+</ul></li>
+<li><strong>WARNING — leakage:</strong> You <strong>MUST</strong>
+compute the mean on TRAIN ONLY. If you compute on all data, the test
+rows see information from themselves. The model looks great here and
+fails in production.</li>
+<li><strong>EXPECTED:</strong>
+<code>X_train['company_target_encoded']</code> is a float column with no
+missing values.</li>
+</ul>
+<h3 id="step-5-engineer-narrative-related-numeric-features">Step 5 —
+Engineer narrative-related numeric features</h3>
+<p>The narrative text is for Module 7. But we can extract simple NUMBERS
+from it now — these help Module 4 even without NLP.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it measures</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>narrative_length</code></td>
+<td>Number of characters. 0 if empty.</td>
+</tr>
+<tr>
+<td><code>narrative_n_caps_words</code></td>
+<td>Number of ALL-CAPS words (signals an angry complaint).</td>
+</tr>
+<tr>
+<td><code>narrative_intensity_score</code></td>
+<td>A combined score: caps words divided by total words.</td>
+</tr>
+<tr>
+<td><code>n_dollar_mentions</code></td>
+<td>How many <code>$</code> signs in the narrative.</td>
+</tr>
+<tr>
+<td><code>n_dates_mentioned</code></td>
+<td>How many dates appear (regex like
+<code>\d{1,2}/\d{1,2}/\d{2,4}</code>).</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['narrative_length'] = df['narrative'].str.len().fillna(0).astype(int)</code>.</li>
+<li>For caps words: split on space, count words where
+<code>w.isupper() and len(w) &gt;= 2</code>.</li>
+<li>For dollars: <code>df['narrative'].str.count(r'\$')</code>.</li>
+<li>For dates:
+<code>df['narrative'].str.count(r'\d{1,2}/\d{1,2}/\d{2,4}')</code>.</li>
+<li>For intensity: <code>n_caps_words / (n_total_words + 1)</code>. The
+<code>+1</code> avoids divide-by-zero.</li>
+</ul></li>
+<li><strong>WARNING:</strong> Narratives have many <code>XXXX</code>
+tokens (CFPB redacted private info). <code>XXXX</code> is ALL CAPS. Do
+not count <code>XXXX</code> as an angry caps-word. Filter them out
+first: <code>narrative.replace('XXXX', ' ')</code> before counting caps
+words.</li>
+</ul>
+<h3 id="step-6-engineer-date-difference-feature">Step 6 — Engineer
+date-difference feature</h3>
+<ul>
+<li><strong>WHAT:</strong> Compute <code>days_to_company_response</code>
+= <code>date_sent_to_company</code> minus
+<code>date_received</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Subtract two datetime columns. Result is a Timedelta.</li>
+<li>Use <code>.dt.days</code> on the Timedelta to get a number.</li>
+<li>Some values are negative or huge (data error). Clip them:
+<code>.clip(lower=0, upper=365)</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> If CFPB took 30 days to send the complaint,
+the citizen is angry by now. Useful for the model.</li>
+</ul>
+<h3 id="step-7-log-transform-narrative_length">Step 7 — Log-transform
+<code>narrative_length</code></h3>
+<ul>
+<li><strong>WHAT:</strong> <code>narrative_length</code> is very skewed
+(many zeros, a few huge values). Apply <code>np.log1p()</code>.</li>
+<li><strong>HINTS:</strong>
+<code>df['log_narrative_length'] = np.log1p(df['narrative_length'])</code>.</li>
+<li><strong>WHY <code>log1p</code> and not <code>log</code>?</strong>
+<code>log(0)</code> is <code>-inf</code>.
+<code>log1p(x) = log(x + 1)</code> is safe for zeros.</li>
+</ul>
+<h3 id="step-8-scale-numeric-columns-preview-only">Step 8 — Scale
+numeric columns (preview only)</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>StandardScaler</code> to make every
+numeric column have mean = 0, std = 1.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.preprocessing import StandardScaler</code>.</li>
+<li><code>scaler = StandardScaler()</code>.</li>
+<li><code>scaler.fit_transform(X_train[numeric_cols])</code>.</li>
+</ul></li>
+<li><strong>WARNING:</strong> This is for inspection only. In Class 5,
+scaling goes INSIDE the Pipeline. Do NOT save the scaled version as your
+final file.</li>
+</ul>
+<h3 id="step-9-save">Step 9 — Save</h3>
+<ul>
+<li><strong>WHAT:</strong> Save to Drive.
+<code>df.to_parquet('/content/drive/MyDrive/cfpb_lab/complaints_step2.parquet')</code>.</li>
+<li><strong>Save the UNSCALED version.</strong> Scaling will happen
+inside the Pipeline later.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-diana-15-minutes-1">Phase C — Make
+ONE chart for Diana (15 minutes)</h2>
+<h3 id="dianas-chart-top-10-most-complained-about-companies">Diana’s
+chart — “Top 10 most complained-about companies”</h3>
+<p>A horizontal bar chart showing the 10 companies that get the most
+complaints. These are the companies CFPB is watching closest.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['company'].value_counts().head(10).plot.barh()</code>.</li>
+</ul></li>
+<li><strong>Title:</strong>
+<code>"Top 10 companies by complaint volume - sample of 200k"</code>.</li>
+<li><strong>X-label:</strong> “Number of complaints”.</li>
+<li><strong>Y-label:</strong> “Company name”.</li>
+<li><strong>Takeaway for Diana:</strong> “Three credit bureaus (Equifax,
+Experian, TransUnion) get 40% of all complaints. Your team should
+pre-build templates for these three.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-2">Common mistakes in Class 2</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Target-encode BEFORE the train/test split</td>
+<td><strong>Leakage.</strong> Encoder sees test labels. Model looks
+great, fails in production.</td>
+</tr>
+<tr>
+<td>One-hot encode <code>company</code></td>
+<td>5,000 new columns. Memory crash.</td>
+</tr>
+<tr>
+<td>Scale BEFORE train/test split</td>
+<td><strong>Leakage.</strong> Scaler sees test data.</td>
+</tr>
+<tr>
+<td>Use <code>np.log</code> instead of <code>np.log1p</code></td>
+<td><code>np.log(0) = -inf</code>. Crash on empty narratives.</td>
+</tr>
+<tr>
+<td>Count <code>XXXX</code> as caps words</td>
+<td>Every narrative looks angry. Useless feature.</td>
+</tr>
+<tr>
+<td>Save the scaled version</td>
+<td>Class 5 will scale again inside the pipeline. Double scaling = wrong
+numbers.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-3">Self-check before Class 3</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Train/test split done
+FIRST.</label></li>
+<li><label><input type="checkbox" /><code>product</code> is
+label-encoded (0..9).</label></li>
+<li><label><input type="checkbox" /><code>company_target_encoded</code>
+is a numeric column. Original <code>company</code> dropped.</label></li>
+<li><label><input type="checkbox" />Small categoricals one-hot
+encoded.</label></li>
+<li><label><input type="checkbox" /><code>narrative_length</code>,
+<code>narrative_n_caps_words</code>,
+<code>narrative_intensity_score</code>, <code>n_dollar_mentions</code>,
+<code>n_dates_mentioned</code> exist.</label></li>
+<li><label><input
+type="checkbox" /><code>days_to_company_response</code>
+exists.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory
+charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Diana.</label></li>
+<li><label><input
+type="checkbox" /><code>complaints_step2.parquet</code> saved to
+Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-3-feature-engineering">Class 3 — Feature Engineering</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Diana says: “The raw columns are
+not enough. The TRULY useful columns are not there. We must MAKE them.
+For example: which year the complaint was sent, which month, how long
+the narrative is. Many people forget that <strong>date</strong> is a
+goldmine.”</p>
+</blockquote>
+<h2 id="your-goal-2">Your goal</h2>
+<p>Make NEW columns from the existing ones. These will help the model
+predict the <code>product</code> category.</p>
+<h2 id="inputs-2">Inputs</h2>
+<ul>
+<li><code>complaints_step2.parquet</code></li>
+</ul>
+<h2 id="outputs-2">Outputs</h2>
+<ul>
+<li><code>complaints_step3.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Diana</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-15-minutes-1">Phase A — Explore
+the data first (15 minutes)</h2>
+<h3 id="exploratory-chart-1-narrative_length-by-product">Exploratory
+chart 1 — <code>narrative_length</code> by <code>product</code></h3>
+<ul>
+<li><strong>Question:</strong> “Are mortgage complaints longer than
+credit-card complaints?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>sns.boxplot(data=df, x='product', y='narrative_length')</code>.</li>
+<li>Rotate x-labels:
+<code>plt.xticks(rotation=45, ha='right')</code>.</li>
+<li>Limit y-axis: <code>plt.ylim(0, 5000)</code> (hides extreme
+outliers).</li>
+</ul></li>
+<li><strong>What you learn:</strong> Mortgage narratives are usually
+longer (people explain a 30-year loan in detail). Debt collection
+narratives are short and angry.</li>
+</ul>
+<h3 id="exploratory-chart-2-complaint-counts-per-year">Exploratory chart
+2 — Complaint counts per year</h3>
+<ul>
+<li>After you make <code>date_received_year</code> (Step 2 below),
+plot.</li>
+<li><strong>Question:</strong> “Which years have most complaints? Did
+2020 (COVID) spike?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['date_received_year'].value_counts().sort_index().plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Big spikes show real-world events.
+The model should use year as a feature.</li>
+</ul>
+<h3 id="exploratory-chart-3-product-mix-per-month-of-year">Exploratory
+chart 3 — Product mix per month of year</h3>
+<ul>
+<li><strong>Question:</strong> “Are mortgage complaints more common in
+January?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>After Step 2,
+<code>pd.crosstab(df['date_received_month'], df['product'])</code>.</li>
+<li>Plot as a stacked bar.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Some products are seasonal. Student
+loans spike in August (school starts).</li>
+</ul>
+<h3
+id="exploratory-chart-4-n_dollar_mentions-distribution-by-product">Exploratory
+chart 4 — <code>n_dollar_mentions</code> distribution by product</h3>
+<ul>
+<li><strong>Question:</strong> “Which products mention <code>$</code>
+the most?”</li>
+<li><strong>HINTS:</strong> Boxplot, x=product,
+y=n_dollar_mentions.</li>
+<li><strong>What you learn:</strong> Mortgage and debt collection
+mention dollars often. Credit-reporting complaints mention dollars
+rarely. This is a <strong>strong signal</strong> for the model.</li>
+</ul>
+<hr />
+<h2 id="phase-b-engineer-the-features-50-minutes">Phase B — Engineer the
+features (50 minutes)</h2>
+<h3 id="step-1-re-load-the-class-2-file">Step 1 — Re-load the Class 2
+file</h3>
+<ul>
+<li><strong>WHAT:</strong> Load <code>complaints_step2.parquet</code>
+into <code>df</code>.</li>
+<li><strong>HINTS:</strong> <code>pd.read_parquet(...)</code>.</li>
+</ul>
+<h3 id="step-2-date-derived-features-from-date_received">Step 2 —
+Date-derived features from <code>date_received</code></h3>
+<p>Make these new columns:</p>
+<table>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>date_received_year</code></td>
+<td>The year (2011..present)</td>
+</tr>
+<tr>
+<td><code>date_received_month</code></td>
+<td>The month (1..12)</td>
+</tr>
+<tr>
+<td><code>date_received_dayofweek</code></td>
+<td>0=Monday, 6=Sunday</td>
+</tr>
+<tr>
+<td><code>date_received_quarter</code></td>
+<td>1..4</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use the <code>.dt</code> accessor on a datetime column.</li>
+<li><code>df['date_received'].dt.year</code>, <code>.dt.month</code>,
+<code>.dt.dayofweek</code>, <code>.dt.quarter</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> A model can learn “mortgage complaints spike
+in 2008” only if YOU give it the <code>date_received_year</code>
+column.</li>
+</ul>
+<h3 id="step-3-confirm-days_to_company_response">Step 3 — Confirm
+<code>days_to_company_response</code></h3>
+<ul>
+<li><strong>WHAT:</strong> You made this in Class 2 Step 6. Check it is
+still there. If not, recompute.</li>
+<li><strong>HINTS:</strong>
+<code>(df['date_sent_to_company'] - df['date_received']).dt.days.clip(0, 365)</code>.</li>
+</ul>
+<h3 id="step-4-confirm-narrative-features">Step 4 — Confirm narrative
+features</h3>
+<ul>
+<li><strong>WHAT:</strong> These come from Class 2. Check they exist:
+<ul>
+<li><code>narrative_length</code></li>
+<li><code>narrative_n_caps_words</code></li>
+<li><code>narrative_intensity_score</code></li>
+<li><code>n_dollar_mentions</code></li>
+<li><code>n_dates_mentioned</code></li>
+<li><code>has_narrative_flag</code></li>
+</ul></li>
+<li>If any is missing, recompute.</li>
+</ul>
+<h3 id="step-5-re-verify-company_target_encoded">Step 5 — Re-verify
+<code>company_target_encoded</code></h3>
+<ul>
+<li><strong>WHAT:</strong> From Class 2. Re-check no missing
+values.</li>
+<li><strong>HINTS:</strong>
+<code>df['company_target_encoded'].isna().sum()</code> should be 0.</li>
+<li><strong>If missing exist:</strong> fill with the overall train
+mean.</li>
+</ul>
+<h3 id="step-6-engineer-is_recent">Step 6 — Engineer
+<code>is_recent</code></h3>
+<ul>
+<li><strong>WHAT:</strong> A binary column: 1 if
+<code>date_received_year &gt;= 2020</code>, else 0.</li>
+<li><strong>WHY:</strong> Complaint patterns changed after COVID. The
+model should be able to use this as a fast switch.</li>
+<li><strong>HINTS:</strong>
+<code>df['is_recent'] = (df['date_received_year'] &gt;= 2020).astype(int)</code>.</li>
+</ul>
+<h3 id="step-7-engineer-narrative_word_count">Step 7 — Engineer
+<code>narrative_word_count</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Count words in the narrative (split on
+whitespace).</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['narrative_word_count'] = df['narrative'].fillna('').str.split().str.len()</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Character length and word count tell different
+stories. (One huge word vs many short words.)</li>
+</ul>
+<h3 id="step-8-engineer-narrative_has_xxxx">Step 8 — Engineer
+<code>narrative_has_xxxx</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Binary: 1 if narrative contains
+<code>XXXX</code>, else 0.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['narrative_has_xxxx'] = df['narrative'].fillna('').str.contains('XXXX').astype(int)</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> A narrative with redactions probably mentions
+personal info (account number, name). Mortgages and bank complaints
+mention accounts; credit-reporting complaints mention SSN. Useful
+signal.</li>
+</ul>
+<h3 id="step-9-save-1">Step 9 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/cfpb_lab/complaints_step3.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-diana-15-minutes-2">Phase C — Make
+ONE chart for Diana (15 minutes)</h2>
+<h3 id="dianas-chart-product-mix-by-us-state">Diana’s chart — “Product
+mix by US state”</h3>
+<p>A stacked bar chart showing the top 10 US states and the product mix
+in each.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>First, get top 10 states by total volume:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>top_states <span class="op">=</span> df[<span class="st">&#39;state&#39;</span>].value_counts().head(<span class="dv">10</span>).index</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>sub <span class="op">=</span> df[df[<span class="st">&#39;state&#39;</span>].isin(top_states)]</span></code></pre></div></li>
+<li><p>Then:
+<code>pd.crosstab(sub['state'], sub['product'], normalize='index')</code>.</p></li>
+<li><p>Plot as <code>.plot.bar(stacked=True)</code>.</p></li>
+</ul></li>
+<li><strong>Title:</strong> “Product mix in the 10 most complaining
+states”.</li>
+<li><strong>X-label:</strong> “State”.</li>
+<li><strong>Y-label:</strong> “Share of complaints (0 to 1)”.</li>
+<li><strong>Takeaway for Diana:</strong> “California complaints are
+mostly about credit reporting. Florida is mostly mortgage. Build
+state-specific teams.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-3">Common mistakes in Class 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Forget <code>.dt.days</code> and get a Timedelta</td>
+<td>Model crashes on Timedelta dtype.</td>
+</tr>
+<tr>
+<td>Use <code>.dt.dayofweek</code> on a string column</td>
+<td>AttributeError. The column must be datetime first.</td>
+</tr>
+<tr>
+<td>Count XXXX as caps words (again)</td>
+<td>This was the Class 2 mistake. Re-check.</td>
+</tr>
+<tr>
+<td>Compute company target-encoding on full data</td>
+<td>Leakage. Train-only.</td>
+</tr>
+<tr>
+<td>Drop the narrative column entirely</td>
+<td>Module 7 cannot run without it.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-4">Self-check before Class 4</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />4 date-derived features
+exist.</label></li>
+<li><label><input
+type="checkbox" /><code>days_to_company_response</code> exists, no
+missing.</label></li>
+<li><label><input type="checkbox" />All 5 narrative numeric features
+exist.</label></li>
+<li><label><input type="checkbox" /><code>company_target_encoded</code>
+exists, no missing.</label></li>
+<li><label><input type="checkbox" /><code>is_recent</code>,
+<code>narrative_word_count</code>, <code>narrative_has_xxxx</code>
+exist.</label></li>
+<li><label><input type="checkbox" />Narrative text column is STILL there
+(for Module 7).</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 explanatory chart.</label></li>
+<li><label><input
+type="checkbox" /><code>complaints_step3.parquet</code> saved to
+Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-4-feature-selection">Class 4 — Feature Selection</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Now you have ~22 columns. Diana
+says: “Too many. Some are duplicates. Some are useless. I want 15 GOOD
+columns plus the narrative. Pick them.”</p>
+</blockquote>
+<h2 id="your-goal-3">Your goal</h2>
+<p>Pick the best ~15 columns. Drop the rest. Justify every choice.</p>
+<h2 id="inputs-3">Inputs</h2>
+<ul>
+<li><code>complaints_step3.parquet</code></li>
+</ul>
+<h2 id="outputs-3">Outputs</h2>
+<ul>
+<li><code>complaints_step4.parquet</code> in Drive (only the selected
+columns + <code>product</code> + <code>narrative</code>)</li>
+<li>3+ exploratory charts (correlation heatmap, mutual info bars,
+importance bars)</li>
+<li>A short markdown report explaining your choices</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-15-minutes-2">Phase A — Explore
+the data first (15 minutes)</h2>
+<h3
+id="exploratory-chart-1-correlation-heatmap-of-numeric-columns">Exploratory
+chart 1 — Correlation heatmap of numeric columns</h3>
+<ul>
+<li><strong>Question:</strong> “Which columns say the same thing as each
+other?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Pick all numeric columns:
+<code>numeric_cols = df.select_dtypes(include='number').columns</code>.</li>
+<li><code>df[numeric_cols].corr()</code>.</li>
+<li><code>sns.heatmap()</code> with <code>annot=True</code> and
+<code>fmt='.2f'</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> <code>narrative_length</code> and
+<code>narrative_word_count</code> should be highly correlated (~0.95).
+Pick ONE.</li>
+</ul>
+<h3 id="exploratory-chart-2-mutual-information-bar-chart">Exploratory
+chart 2 — Mutual information bar chart</h3>
+<ul>
+<li>After you compute mutual info (Step 4 below), plot it.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Sort the values, then bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Which columns predict
+<code>product</code> strongest. Expect
+<code>company_target_encoded</code> and narrative features at the
+top.</li>
+</ul>
+<h3
+id="exploratory-chart-3-random-forest-feature-importance">Exploratory
+chart 3 — Random Forest feature importance</h3>
+<ul>
+<li>After you train the RF (Step 5 below), plot the importances.</li>
+<li><strong>HINTS:</strong>
+<code>pd.Series(rf.feature_importances_, index=...).sort_values().plot.barh()</code>.</li>
+<li><strong>What you learn:</strong> A second opinion on feature
+importance.</li>
+</ul>
+<hr />
+<h2 id="phase-b-select-features-50-minutes">Phase B — Select features
+(50 minutes)</h2>
+<h3 id="step-1-re-create-the-traintest-split">Step 1 — Re-create the
+train/test split</h3>
+<ul>
+<li><strong>WHAT:</strong> You did this in Class 2, but the split was on
+a different DataFrame. Redo on <code>complaints_step3.parquet</code>.
+Use the SAME <code>random_state=42</code> for reproducibility.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.model_selection import train_test_split</code>.</li>
+<li><code>X = df.drop(['product', 'narrative'], axis=1)</code>. (Drop
+the target AND the raw text — text is for M7.)</li>
+<li><code>y = df['product']</code>.</li>
+<li>Encode <code>y</code> again:
+<code>LabelEncoder().fit_transform(y)</code>.</li>
+<li><code>train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-2-remove-low-variance-columns">Step 2 — Remove low-variance
+columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop columns where almost all values are the
+same. Example: a column that is 99% zero.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import VarianceThreshold</code>.</li>
+<li><code>VarianceThreshold(threshold=0.01).fit(X_train[numeric_cols])</code>.</li>
+<li><code>.get_support()</code> returns True/False per column.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Maybe 0-2 columns dropped.</li>
+</ul>
+<h3 id="step-3-remove-highly-correlated-columns">Step 3 — Remove highly
+correlated columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop one of each pair where
+<code>|corr| &gt; 0.9</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute correlation matrix.</li>
+<li>Get upper triangle with <code>np.triu(...)</code>.</li>
+<li>For each column, if any of its upper-triangle correlations is &gt;
+0.9, mark it for dropping.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> You probably drop
+<code>narrative_word_count</code> (it duplicates
+<code>narrative_length</code>).</li>
+</ul>
+<h3 id="step-4-rank-by-mutual-information">Step 4 — Rank by mutual
+information</h3>
+<ul>
+<li><strong>WHAT:</strong> Score each column by how much it tells you
+about <code>product</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import mutual_info_classif</code>.</li>
+<li><code>mi = mutual_info_classif(X_train_numeric, y_train_enc)</code>.</li>
+<li>Put in a Series, sort.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> <code>company_target_encoded</code>,
+<code>narrative_length</code>, <code>n_dollar_mentions</code>,
+<code>date_received_year</code> should be at the top.</li>
+</ul>
+<h3 id="step-5-random-forest-importance-second-opinion">Step 5 — Random
+Forest importance (second opinion)</h3>
+<ul>
+<li><strong>WHAT:</strong> Train a small Random Forest, look at
+<code>feature_importances_</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.ensemble import RandomForestClassifier</code>.</li>
+<li><code>RandomForestClassifier(n_estimators=100, max_depth=10, n_jobs=-1, class_weight='balanced', random_state=42)</code>.</li>
+<li><code>.fit(X_train_numeric, y_train_enc)</code>.</li>
+<li>Look at <code>.feature_importances_</code>.</li>
+</ul></li>
+<li><strong>WARNING:</strong> This may take 2-3 minutes on 160,000 rows.
+Use <code>n_jobs=-1</code> to use all CPU cores.</li>
+</ul>
+<h3 id="step-6-pick-the-final-15-columns">Step 6 — Pick the final 15
+columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Combine the rankings. Pick columns that:
+<ul>
+<li>Are high in mutual info, AND</li>
+<li>Are high in RF importance, AND</li>
+<li>Were not dropped by variance/correlation pruning.</li>
+</ul></li>
+<li><strong>WRITE DOWN:</strong> In your notebook, list the columns.
+Explain in 1 sentence why each one is in.</li>
+</ul>
+<p>A reasonable final list (you may pick differently):</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Column</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>complaint_id</code></td>
+<td>ID (not for model, for tracking)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>date_received_year</code></td>
+<td>Era of complaint</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>date_received_month</code></td>
+<td>Seasonality</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>date_received_dayofweek</code></td>
+<td>Weekend effect</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>days_to_company_response</code></td>
+<td>Backlog signal</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>product</code></td>
+<td>TARGET</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>sub_product</code></td>
+<td>Sub-category hint</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>issue</code></td>
+<td>Strong text-y label</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>company_response_type</code></td>
+<td>One-hot</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>state</code></td>
+<td>Geography</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>has_narrative_flag</code></td>
+<td>Did citizen write text?</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>narrative_length</code></td>
+<td>Length of text</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>narrative_n_caps_words</code></td>
+<td>Anger signal</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>narrative_intensity_score</code></td>
+<td>Anger ratio</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>n_dollar_mentions</code></td>
+<td>Money signal</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>n_dates_mentioned</code></td>
+<td>Specificity signal</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>company_target_encoded</code></td>
+<td>Company identity, compressed</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>consumer_disputed</code></td>
+<td>1/0/-1</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>timely_response</code></td>
+<td>1/0</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>is_recent</code></td>
+<td>Post-COVID flag</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>narrative_has_xxxx</code></td>
+<td>Redaction flag</td>
+</tr>
+<tr>
+<td>22</td>
+<td><code>narrative</code></td>
+<td>Raw text - KEPT for Module 7</td>
+</tr>
+</tbody>
+</table>
+<p>That is 22 columns. Diana wanted ~20-22. Good.</p>
+<h3 id="step-7-save">Step 7 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong> Keep only the selected columns. Save as
+<code>complaints_step4.parquet</code> to Drive.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-diana-15-minutes-3">Phase C — Make
+ONE chart for Diana (15 minutes)</h2>
+<h3
+id="dianas-chart-these-are-the-10-most-important-columns-for-routing">Diana’s
+chart — “These are the 10 most important columns for routing”</h3>
+<p>A horizontal bar chart of your top 10 features and their importance
+score.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use the RF importance.</li>
+<li><code>sort_values()</code> then <code>.tail(10)</code> then
+<code>.plot.barh()</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Top 10 predictors of complaint product
+category.”</li>
+<li><strong>Y-axis:</strong> column names.</li>
+<li><strong>X-axis:</strong> Random Forest importance.</li>
+<li><strong>Takeaway for Diana:</strong> “The company name
+(target-encoded) and the narrative length predict 60% of routing. With
+just these two signals we already beat random guessing 6 times.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-4">Common mistakes in Class 4</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compute mutual info on the FULL data</td>
+<td>Leakage.</td>
+</tr>
+<tr>
+<td>Drop columns without writing why</td>
+<td>Module 4 students will not understand.</td>
+</tr>
+<tr>
+<td>Keep too many columns (40+)</td>
+<td>Slow training. Overfitting risk.</td>
+</tr>
+<tr>
+<td>Drop the raw narrative column</td>
+<td>Module 7 cannot run without it.</td>
+</tr>
+<tr>
+<td>Drop <code>complaint_id</code></td>
+<td>OK to drop from the FEATURES but KEEP it in the file (for
+tracking).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-5">Self-check before Class 5</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Train/test split done
+FIRST.</label></li>
+<li><label><input type="checkbox" />~15 numeric/categorical columns
+selected + <code>product</code> + <code>narrative</code> +
+<code>complaint_id</code>.</label></li>
+<li><label><input type="checkbox" />Total ~20-22 columns in the
+file.</label></li>
+<li><label><input type="checkbox" />You wrote down WHY for each kept
+column.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Diana.</label></li>
+<li><label><input
+type="checkbox" /><code>complaints_step4.parquet</code> saved to
+Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-5-pipelines">Class 5 — Pipelines</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Diana says: “Your cleaning code
+is in 4 different notebooks. When a new complaint arrives tomorrow at
+9am, you cannot copy 4 notebooks to the server. We need ONE object that
+does everything.”</p>
+</blockquote>
+<h2 id="your-goal-4">Your goal</h2>
+<p>Put EVERY cleaning step inside ONE Pipeline object. Production-ready
+code.</p>
+<h2 id="inputs-4">Inputs</h2>
+<ul>
+<li><code>complaints_step4.parquet</code> (selected columns)</li>
+</ul>
+<h2 id="outputs-4">Outputs</h2>
+<ul>
+<li><code>cfpb_pipeline.joblib</code> saved in Drive</li>
+<li>1 confusion-matrix chart (10x10) + 1 per-class F1 chart</li>
+<li>A pipeline that takes RAW input and produces a predicted
+product</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-15-minutes-3">Phase A — Explore
+the data first (15 minutes)</h2>
+<h3 id="exploratory-chart-1-confusion-matrix-after-training">Exploratory
+chart 1 — Confusion matrix (after training)</h3>
+<ul>
+<li>After Step 6, build a confusion matrix.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay</code>.</li>
+<li><code>cm = confusion_matrix(y_test, y_pred)</code>.</li>
+<li><code>ConfusionMatrixDisplay(cm, display_labels=le.classes_).plot(xticks_rotation=45)</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Which products does the model
+confuse? Mortgage vs Mortgage broker? Credit reporting vs Credit
+card?</li>
+</ul>
+<h3 id="exploratory-chart-2-per-class-f1-score-bar-chart">Exploratory
+chart 2 — Per-class F1 score bar chart</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.metrics import classification_report</code>.</li>
+<li><code>report = classification_report(y_test, y_pred, output_dict=True)</code>.</li>
+<li>Pull out the F1 per class. Bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Big classes (Mortgage) have high
+F1. Small classes (Money transfer) have low F1. This is the
+<strong>imbalance problem</strong>.</li>
+</ul>
+<hr />
+<h2 id="phase-b-build-the-pipeline-50-minutes">Phase B — Build the
+pipeline (50 minutes)</h2>
+<h3
+id="step-1-decide-which-columns-are-numeric-and-which-are-categorical">Step
+1 — Decide which columns are numeric and which are categorical</h3>
+<ul>
+<li><strong>HINTS:</strong> Make two lists. Drop
+<code>complaint_id</code> and <code>narrative</code> from the feature
+lists.</li>
+<li><strong>EXAMPLE:</strong>
+<ul>
+<li>numeric: <code>date_received_year</code>,
+<code>date_received_month</code>, <code>date_received_dayofweek</code>,
+<code>days_to_company_response</code>, <code>narrative_length</code>,
+<code>narrative_n_caps_words</code>,
+<code>narrative_intensity_score</code>, <code>n_dollar_mentions</code>,
+<code>n_dates_mentioned</code>, <code>company_target_encoded</code>,
+<code>has_narrative_flag</code>, <code>consumer_disputed</code>,
+<code>timely_response</code>, <code>is_recent</code>,
+<code>narrative_has_xxxx</code>.</li>
+<li>categorical: <code>sub_product</code>, <code>issue</code>,
+<code>company_response_type</code>, <code>state</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-2-build-the-numeric-mini-pipeline">Step 2 — Build the
+numeric mini-pipeline</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer (fill missing) +
+scaler.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.pipeline import Pipeline</code>.</p></li>
+<li><p><code>from sklearn.impute import SimpleImputer</code>.</p></li>
+<li><p><code>from sklearn.preprocessing import StandardScaler</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>numeric_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;scaler&#39;</span>,  StandardScaler()),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in the blank: best strategy for numeric?
+(<code>'median'</code>)</p></li>
+</ul></li>
+</ul>
+<h3 id="step-3-build-the-categorical-mini-pipeline">Step 3 — Build the
+categorical mini-pipeline</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer + one-hot encoder.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.preprocessing import OneHotEncoder</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>categorical_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>, fill_value<span class="op">=</span><span class="st">&#39;unknown&#39;</span>)),</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;onehot&#39;</span>,  OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">&#39;___&#39;</span>, sparse_output<span class="op">=</span>___)),</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in blanks. (Strategy <code>'constant'</code>, handle_unknown
+<code>'ignore'</code>, sparse_output <code>False</code>.)</p></li>
+</ul></li>
+<li><strong>WHY <code>handle_unknown='ignore'</code>?</strong> In
+production, a new company response type or US state may appear. We do
+not want the code to crash.</li>
+</ul>
+<h3 id="step-4-combine-into-a-columntransformer">Step 4 — Combine into a
+ColumnTransformer</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.compose import ColumnTransformer</code>.</p></li>
+<li><p>It takes a list of tuples:
+<code>(name, transformer, list_of_columns)</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>preprocessor <span class="op">=</span> ColumnTransformer(transformers<span class="op">=</span>[</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;num&#39;</span>, numeric_transformer,     numeric_cols),</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;cat&#39;</span>, categorical_transformer, categorical_cols),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+</ul></li>
+</ul>
+<h3 id="step-5-add-the-model-on-top">Step 5 — Add the model on top</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.linear_model import LogisticRegression</code>.</li>
+<li><code>LogisticRegression(class_weight='balanced', max_iter=1000, multi_class='multinomial', solver='lbfgs', random_state=42, n_jobs=-1)</code>.</li>
+<li>Put it in a Pipeline with the preprocessor.</li>
+</ul></li>
+<li><strong>WHY <code>class_weight='balanced'</code>?</strong> Mortgage
+is 30% of data. Money transfer is 1%. Without balancing, the model
+predicts “Mortgage” for almost everything.</li>
+<li><strong>WHY <code>multi_class='multinomial'</code>?</strong> Because
+we have 10 classes, not 2.</li>
+</ul>
+<h3 id="step-6-train-and-evaluate">Step 6 — Train and evaluate</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>full_pipeline.fit(X_train, y_train_enc)</code>.</li>
+<li><code>y_pred = full_pipeline.predict(X_test)</code>.</li>
+<li><code>from sklearn.metrics import classification_report</code>.</li>
+<li><code>print(classification_report(y_test_enc, y_pred, target_names=le.classes_))</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Overall accuracy around 60-70%. Mortgage
+F1 ~0.85. Smallest class F1 ~0.20. (Module 4 improves this with a
+stronger model and SMOTE.)</li>
+</ul>
+<h3 id="step-7-save-the-trained-pipeline">Step 7 — Save the trained
+pipeline</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>import joblib</code>.</li>
+<li><code>joblib.dump(full_pipeline, '/content/drive/MyDrive/cfpb_lab/cfpb_pipeline.joblib')</code>.</li>
+<li>Also save the label encoder:
+<code>joblib.dump(le, '/content/drive/MyDrive/cfpb_lab/cfpb_label_encoder.joblib')</code>.</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-diana-15-minutes-4">Phase C — Make
+ONE chart for Diana (15 minutes)</h2>
+<h3 id="dianas-chart-how-well-do-we-route-each-product">Diana’s chart —
+“How well do we route each product?”</h3>
+<p>A horizontal bar chart of per-class F1 scores.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>From the classification report, pull each class’s F1.</li>
+<li>Sort. Bar chart.</li>
+</ul></li>
+<li><strong>Title:</strong> “Routing accuracy by product (baseline
+model)”.</li>
+<li><strong>X-axis:</strong> F1 score (0 to 1).</li>
+<li><strong>Y-axis:</strong> product name.</li>
+<li><strong>Takeaway for Diana:</strong> “We route Mortgage and Credit
+reporting at 85% F1. We are weak on Money transfer (20%) because we only
+have 2,000 examples. Module 4 with SMOTE will help.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-5">Common mistakes in Class 5</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Build the pipeline AFTER you scaled the data manually</td>
+<td>Pipeline scales it twice. Numbers wrong.</td>
+</tr>
+<tr>
+<td>Forget <code>sparse_output=False</code> in OneHotEncoder</td>
+<td>Some downstream code breaks.</td>
+</tr>
+<tr>
+<td>Use <code>class_weight='balanced'</code> AND SMOTE</td>
+<td>Over-correction. Pick one. Save SMOTE for Module 4.</td>
+</tr>
+<tr>
+<td>Forget <code>random_state</code></td>
+<td>Results change every run. Hard to debug.</td>
+</tr>
+<tr>
+<td>Forget to save the LabelEncoder</td>
+<td>You can predict numbers but not product names.</td>
+</tr>
+<tr>
+<td>Train on the <code>narrative</code> text column</td>
+<td>Logistic Regression on raw text crashes. Drop it before fit.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-6">Self-check before Class 6</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Pipeline has preprocessor +
+model.</label></li>
+<li><label><input type="checkbox" />Preprocessor has numeric +
+categorical transformers.</label></li>
+<li><label><input type="checkbox" /><code>handle_unknown='ignore'</code>
+set.</label></li>
+<li><label><input type="checkbox" /><code>class_weight='balanced'</code>
+set.</label></li>
+<li><label><input
+type="checkbox" /><code>multi_class='multinomial'</code>
+set.</label></li>
+<li><label><input type="checkbox" />Confusion matrix (10x10) + per-class
+F1 chart in your notebook.</label></li>
+<li><label><input type="checkbox" /><code>cfpb_pipeline.joblib</code>
+saved to Drive.</label></li>
+<li><label><input
+type="checkbox" /><code>cfpb_label_encoder.joblib</code> saved to
+Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-6-end-to-end-lab-the-big-one">Class 6 — End-to-End Lab
+(THE BIG ONE)</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Diana is in the meeting room. She
+wants the FINAL clean dataset on her desk in 100 minutes. This is the
+lab.</p>
+</blockquote>
+<h2 id="your-goal-5">Your goal</h2>
+<p>Take the raw CFPB complaints CSV. Produce ONE final
+<code>.parquet</code> file with the exact 22-column schema. Plus a
+1-page findings report.</p>
+<h2 id="time">Time</h2>
+<p><strong>100 minutes</strong> of focused work. (10 more than usual
+because of the size of the data and the 10-class target.)</p>
+<h2 id="inputs-5">Inputs</h2>
+<ul>
+<li><code>complaints_sample_200k.csv</code> in your Drive folder</li>
+</ul>
+<h2 id="outputs-5">Outputs</h2>
+<ul>
+<li><code>cfpb_complaints_clean.parquet</code> (~200,000 rows × 22
+columns) in Drive</li>
+<li><code>findings.md</code> (~1 page)</li>
+<li>Your full Colab notebook</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-15-minutes-4">Phase A — Explore
+the data first (15 minutes)</h2>
+<p>You will reuse charts from Classes 1-5. Pick 3 of them. Put them all
+on ONE PAGE of your notebook with markdown headers:</p>
+<ol type="1">
+<li>Complaint volume over time (Class 1) - the backlog story.</li>
+<li>Top 10 complained-about companies (Class 2) - who CFPB is
+watching.</li>
+<li>Product mix per US state (Class 3) - the routing map.</li>
+</ol>
+<p>These 3 charts tell Diana the whole story.</p>
+<hr />
+<h2 id="phase-b-build-the-final-dataset-75-minutes">Phase B — Build the
+final dataset (75 minutes)</h2>
+<h3 id="required-output-schema">Required output schema</h3>
+<p>Your <code>cfpb_complaints_clean.parquet</code> MUST have these 22
+columns, with these names and types:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Column</th>
+<th>Type</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>complaint_id</code></td>
+<td>int / string</td>
+<td>raw CFPB</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>date_received_year</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>date_received_month</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>date_received_dayofweek</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>days_to_company_response</code></td>
+<td>int (0-365)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>product</code></td>
+<td>string (10 categories)</td>
+<td>TARGET (cleaned)</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>sub_product</code></td>
+<td>string</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>issue</code></td>
+<td>string</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>company_response_type</code></td>
+<td>string</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>state</code></td>
+<td>string (52 incl. territories)</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>has_narrative_flag</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>narrative_length</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>narrative_n_caps_words</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>narrative_intensity_score</code></td>
+<td>float</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>n_dollar_mentions</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>n_dates_mentioned</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>company_target_encoded</code></td>
+<td>float</td>
+<td>engineered (TRAIN ONLY mean)</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>consumer_disputed</code></td>
+<td>int (-1/0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>timely_response</code></td>
+<td>int (0/1)</td>
+<td>raw -&gt; binary</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>is_recent</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>narrative_has_xxxx</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>22</td>
+<td><code>narrative</code></td>
+<td>string</td>
+<td>raw (kept for Module 7)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lab-phases-timed">Lab phases (timed)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Time</th>
+<th>What you do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Load + rename</td>
+<td>10 min</td>
+<td>Load sample CSV. Rename to snake_case. Drop <code>tags</code>,
+<code>zip_code</code>.</td>
+</tr>
+<tr>
+<td>2. Clean dates</td>
+<td>10 min</td>
+<td>Convert 2 date columns. Add
+<code>date_received_year/month/dayofweek</code>. Compute
+<code>days_to_company_response</code>.</td>
+</tr>
+<tr>
+<td>3. Clean product/state</td>
+<td>10 min</td>
+<td>Merge legacy product names into 10 categories. Fill
+<code>state</code> missing with <code>"XX"</code>.</td>
+</tr>
+<tr>
+<td>4. Handle narrative + missing</td>
+<td>15 min</td>
+<td>Fill empty narratives with <code>""</code>. Make
+<code>has_narrative_flag</code>. Make
+<code>narrative_has_xxxx</code>.</td>
+</tr>
+<tr>
+<td>5. Numeric narrative features</td>
+<td>15 min</td>
+<td>Compute <code>narrative_length</code>,
+<code>narrative_n_caps_words</code>,
+<code>narrative_intensity_score</code>, <code>n_dollar_mentions</code>,
+<code>n_dates_mentioned</code>.</td>
+</tr>
+<tr>
+<td>6. Encode + target-encode</td>
+<td>10 min</td>
+<td>Binary <code>timely_response</code>, <code>consumer_disputed</code>.
+Target-encode <code>company</code> (TRAIN MEAN ONLY).</td>
+</tr>
+<tr>
+<td>7. Save + validate</td>
+<td>5 min</td>
+<td>Drop unused columns. Confirm 22 columns. Save
+<code>.parquet</code>.</td>
+</tr>
+<tr>
+<td>8. Findings</td>
+<td>10 min</td>
+<td>Write <code>findings.md</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total: 85 minutes work + 15 minutes for charts = 100
+minutes.</strong></p>
+<hr />
+<h2 id="phase-c-findings-report-for-diana-10-minutes">Phase C — Findings
+report for Diana (10 minutes)</h2>
+<p>Write <code>findings.md</code> with these sections:</p>
+<h3 id="final-numbers">Final numbers</h3>
+<ul>
+<li>Final row count: ____ (should be ~200,000)</li>
+<li>Number of unique products: ____ (should be 10)</li>
+<li>% of rows with non-empty narrative: ____% (should be ~35%)</li>
+<li>Largest product class % share: ____% (Mortgage or Credit
+reporting)</li>
+<li>Smallest product class % share: ____% (Money transfer or Prepaid
+card)</li>
+</ul>
+<h3 id="top-3-insights">Top 3 insights</h3>
+<ol type="1">
+<li><hr /></li>
+<li><hr /></li>
+<li><hr /></li>
+</ol>
+<h3 id="one-question-to-investigate-in-module-4">One question to
+investigate in Module 4</h3>
+<ul>
+<li><hr /></li>
+</ul>
+<h3 id="one-chart-that-summarizes-everything">One chart that summarizes
+everything</h3>
+<p>Embed your most important chart (the product mix per state stacked
+bar).</p>
+<hr />
+<h2 id="grading-rubric-100-points">Grading rubric (100 points)</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Item</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All 22 columns exist with the right names and dtypes</td>
+<td>20</td>
+</tr>
+<tr>
+<td>Cleaning decisions written in markdown</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Pipeline is reproducible (re-run from raw CSV in ONE command)</td>
+<td>15</td>
+</tr>
+<tr>
+<td><code>product</code> has exactly 10 categories after cleaning</td>
+<td>10</td>
+</tr>
+<tr>
+<td><code>company_target_encoded</code> was computed on TRAIN ONLY (no
+leakage)</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Narrative kept (NOT dropped) and <code>has_narrative_flag</code>
+exists</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>At least 3 exploratory + 1 explanatory chart per
+class</strong></td>
+<td><strong>15</strong></td>
+</tr>
+<tr>
+<td><code>findings.md</code> has insights, not just numbers</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<h2 id="submit">Submit</h2>
+<p>Upload to
+<code>module-3/class_6/submissions/&lt;YourTeamName&gt;/</code>:</p>
+<ul>
+<li><code>cfpb_complaints_clean.parquet</code></li>
+<li>Your Colab notebook
+(<code>File --&gt; Download --&gt; Download .ipynb</code>)</li>
+<li><code>findings.md</code></li>
+</ul>
+<hr />
+<h1 id="tips-for-the-whole-module">Tips for the whole module</h1>
+<ol type="1">
+<li><strong>Do NOT copy-paste code from this guide.</strong> This guide
+gives you HINTS only. Write the code yourself. You will learn much
+faster.</li>
+<li><strong>Sample early, save early.</strong> The full 4M-row CSV will
+crash free Colab. Sample to 200k once, save to Drive, reuse.</li>
+<li><strong>Save your notebook to Drive often.</strong> Colab
+disconnects after 12 hours.</li>
+<li><strong>Save intermediate <code>.parquet</code> files to
+Drive</strong> (<code>complaints_step1</code>,
+<code>complaints_step2</code>, etc.). If something breaks, you do not
+redo everything.</li>
+<li><strong>Never target-encode on the full data.</strong> Always
+train-only. This single mistake makes the model look great in class and
+fail in production. Write the rule on a sticky note on your
+monitor.</li>
+<li><strong>Pair-program.</strong> One student types, one reads. Switch
+every 20 minutes.</li>
+<li><strong>Make a chart BEFORE you write cleaning code.</strong> You
+must SEE the problem before you can fix it.</li>
+<li><strong>Make a chart AFTER each step.</strong> Confirm your code did
+what you expected.</li>
+<li><strong>Watch for <code>XXXX</code>.</strong> Almost every narrative
+feature you compute is affected by CFPB’s redaction tokens. Always
+replace <code>XXXX</code> with a space BEFORE measuring caps words or
+word counts.</li>
+<li><strong>Ask the mentor early.</strong> If you are stuck for 20
+minutes, ask. Do not waste an afternoon.</li>
+</ol>
+<p>This is the hardest scenario in the curriculum. If you finish this
+one, every future lab will feel easy.</p>
+<p>Good luck.</p>
+</main>
+
+<footer class="scenario-footer">
+  <p><a href="../../#/module/3/class/6">&larr; Back to all 15 scenarios</a></p>
+</footer>
+
+</body>
+</html>

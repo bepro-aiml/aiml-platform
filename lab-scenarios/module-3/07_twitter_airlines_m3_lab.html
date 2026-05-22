@@ -1,0 +1,2288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>07_twitter_airlines_m3_lab</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --text: #e6e8ec;
+    --text-dim: #9aa0aa;
+    --accent: #7aa2f7;
+    --accent-hover: #a5c0ff;
+    --border: #2a2f3a;
+    --code-bg: #11141a;
+    --table-header: #232732;
+    --quote-bar: #7aa2f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(26, 29, 36, 0.92);
+  }
+  .topbar-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .back-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .back-link:hover { color: var(--accent-hover); }
+  .pdf-link {
+    background: var(--accent);
+    color: #0f1115;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pdf-link:hover { background: var(--accent-hover); }
+  .pdf-link svg { width: 14px; height: 14px; }
+
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 56px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  p { margin-bottom: 16px; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+  strong { color: #fff; font-weight: 600; }
+  em { color: var(--text); font-style: italic; }
+
+  ul, ol { margin-bottom: 18px; padding-left: 28px; }
+  li { margin-bottom: 6px; }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 36px 0;
+  }
+
+  blockquote {
+    border-left: 4px solid var(--quote-bar);
+    background: var(--card);
+    padding: 14px 22px;
+    margin: 18px 0;
+    color: var(--text);
+    border-radius: 0 8px 8px 0;
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  blockquote strong { color: var(--accent); }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    font-size: 0.88em;
+    color: #f0a3b5;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 18px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text);
+    font-size: 1em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.94rem;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  thead { background: var(--table-header); }
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+
+  /* Checkboxes in self-check lists */
+  input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+
+  /* Anchored sections for nav */
+  h2[id], h3[id] { scroll-margin-top: 80px; }
+
+  footer.scenario-footer {
+    max-width: 920px;
+    margin: 60px auto 40px;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+  footer.scenario-footer a {
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    main { padding: 24px 16px 60px; }
+    h1 { font-size: 1.7rem; }
+    h2 { font-size: 1.35rem; }
+    h3 { font-size: 1.1rem; }
+    .topbar { padding: 10px 16px; }
+    pre { font-size: 0.8rem; padding: 12px 14px; }
+    table { font-size: 0.85rem; }
+    th, td { padding: 9px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="../../#/module/3/class/6">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <span style="display:inline-block;transform:translateY(-1px)">&larr;</span> Back to all scenarios
+    </a>
+    <a class="pdf-link" href="07_twitter_airlines_m3_lab.pdf" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-4-4h3V4h2v8h3l-4 4zm-8 4v-2h16v2H4z"/></svg>
+      Download as PDF
+    </a>
+  </div>
+</div>
+
+<main>
+<h1 id="twitter-us-airlines-module-3-lab-guide">Twitter US Airlines —
+Module 3 Lab Guide</h1>
+<p><strong>Scenario:</strong> US Airlines on Twitter. Auto-classify
+customer service tweets. <strong>Module:</strong> 3 (Data Preparation
+and Feature Engineering) <strong>Audience:</strong> Adult learners, A2
+English. New to AI. <strong>Tools:</strong> Google Colab (no install
+needed).</p>
+<hr />
+<h1 id="the-scenario-your-mission">The Scenario — Your Mission</h1>
+<h2 id="where-you-work">Where you work</h2>
+<p>You and your team are new data analysts at <strong>American
+Airlines</strong> in the United States. American Airlines is one of the
+biggest airlines in the world. They fly 200 million passengers every
+year.</p>
+<p>Every day: - <strong>10,000 tweets</strong> are sent to airlines on
+Twitter. - People complain about late flights, lost bags, and bad food.
+- A few people say “thank you” for a kind flight attendant. - A team of
+12 customer service agents reads the tweets.</p>
+<h2 id="the-problem">The problem</h2>
+<p>The team of 12 can answer only <strong>500 tweets per day.</strong>
+That means <strong>9,500 tweets get NO answer.</strong></p>
+<p>What happens with those 9,500 tweets: - Angry customers tweet AGAIN,
+in capital letters. - Some send to TV news. - Some never fly American
+Airlines again. - Marketing misses the praise tweets and cannot share
+them. - Real urgent problems (lost baby stroller, missed medical flight)
+wait for hours.</p>
+<p>The director is worried. He calls your team into a meeting on Monday
+morning.</p>
+<h2 id="your-managers-request">Your manager’s request</h2>
+<p>Your manager, <strong>James</strong> (Director of Customer
+Operations), tells you:</p>
+<blockquote>
+<p>“We get 10,000 angry tweets a day. My team of 12 can answer 500.</p>
+<p>Build a tool that reads each tweet and <strong>routes it</strong> to
+the right team: 1. <strong>‘Urgent complaint’</strong> –&gt; goes to a
+human agent right now. 2. <strong>‘Praise’</strong> –&gt; goes to
+marketing. They share it on TV. 3. <strong>‘Late flight’</strong> –&gt;
+goes to operations. They check the flight. 4. <strong>‘Lost
+luggage’</strong> –&gt; goes to the baggage team.</p>
+<p>If we route correctly, we answer 10x more tweets with the same
+team.”</p>
+</blockquote>
+<h2 id="your-teams-job-for-the-next-2-weeks-module-3">Your team’s job
+for the next 2 weeks (Module 3)</h2>
+<p>James cannot do this alone. His data is <strong>one big CSV
+file</strong> with 14,600 tweets. The tweets have <span class="citation"
+data-cites="mentions">@mentions</span>, hashtags, URLs, and many missing
+fields.</p>
+<p>Your job in Module 3: &gt; <strong>Turn the messy CSV file into ONE
+clean file. The clean file will be used to train the routing model in
+Module 4.</strong></p>
+<p>The clean file is called <code>airline_tweets_clean.parquet</code>.
+It must have <strong>19 specific columns</strong> (we will see them in
+Class 6).</p>
+<h2 id="after-module-3">After Module 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Module</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Module 4</strong></td>
+<td>Train the routing model. James gets his “tweet category”
+prediction.</td>
+</tr>
+<tr>
+<td><strong>Module 5</strong></td>
+<td>Find groups of customers (super angry, neutral, fans). For
+marketing.</td>
+</tr>
+<tr>
+<td><strong>Module 7</strong></td>
+<td>Read the tweet text itself. Find common complaint topics.</td>
+</tr>
+</tbody>
+</table>
+<p>You use the <strong>same Twitter Airlines dataset</strong> until the
+end of Module 7.</p>
+<h2 id="a-note-about-the-dataset-size">A note about the dataset
+size</h2>
+<p>This dataset has only <strong>~14,600 rows</strong>. That is small.
+The Olist dataset had 99,000. Some teams will be worried. <strong>Do not
+worry.</strong></p>
+<p>Small data is GOOD for learning, because: - Every step runs fast (no
+waiting). - You can SEE every change you make. - Real customer service
+teams also have small data when they start. - Module 4 will show you
+tricks for small data (cross-validation, regularization).</p>
+<p>In a real airline, the dataset would grow to millions of tweets. But
+the steps you do today are exactly the same.</p>
+<hr />
+<h1 id="how-this-guide-works-read-this-first">How This Guide Works (Read
+This First!)</h1>
+<h2 id="we-do-not-give-you-the-full-code">We do NOT give you the full
+code</h2>
+<p>In this guide you will see two kinds of content:</p>
+<h3 id="what-why-expected-explained-in-words">1. WHAT / WHY / EXPECTED —
+explained in words</h3>
+<p>For every step you read: - <strong>WHAT</strong> you have to do (in
+normal language) - <strong>WHY</strong> you do it (the reason) -
+<strong>HINTS</strong> — the function names, the arguments to remember -
+<strong>EXPECTED</strong> — the result you should see if you did it
+right</p>
+<h3 id="sometimes-a-tiny-code-skeleton-with-blanks">2. Sometimes a tiny
+code skeleton with blanks</h3>
+<p>For the harder steps we give you a code skeleton with
+<code>___</code> blanks. <strong>You fill in the blanks.</strong></p>
+<h3 id="why-no-full-code">Why no full code?</h3>
+<p>Because you will NOT learn if you copy-paste. - In Module 4, the
+model only works if YOU understand each step. - In your future job,
+nobody will give you the code. - Writing the code yourself takes 10
+minutes more today, but saves 10 hours later.</p>
+<p><strong>Rule:</strong> If you finish a step in 30 seconds by
+copy-pasting from a teammate’s notebook, do it AGAIN by yourself.
+Different variable names, same logic.</p>
+<hr />
+<h1 id="visualizations-two-modes">Visualizations — Two Modes</h1>
+<p>In every class you will make charts. There are <strong>two
+reasons</strong> to make a chart:</p>
+<h2 id="exploratory-charts-for-you">1. Exploratory charts (for YOU)</h2>
+<p>Made BEFORE you clean the data. To understand what the data looks
+like. - Fast, ugly, no labels needed. - Examples:
+<code>df.hist()</code>,
+<code>df['column'].value_counts().plot.bar()</code>.</p>
+<blockquote>
+<p>Goal: <strong>“What does this data look like?”</strong></p>
+</blockquote>
+<h2 id="explanatory-charts-for-james">2. Explanatory charts (for
+JAMES)</h2>
+<p>Made AFTER you understand. To EXPLAIN something to your manager. -
+Clean, labeled, one clear message. - Must have: title, x-label, y-label,
+source, and a 1-sentence takeaway.</p>
+<blockquote>
+<p>Goal: <strong>“James, look at this. This is the
+problem.”</strong></p>
+</blockquote>
+<p>In every class you make BOTH kinds.</p>
+<h2 id="your-plotting-toolkit-you-learned-this-in-module-2-class-5">Your
+plotting toolkit (you learned this in Module 2 Class 5)</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Plot</th>
+<th>When to use it</th>
+<th>Function name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Histogram</td>
+<td>See the SHAPE of a numeric column</td>
+<td><code>plt.hist()</code> or <code>sns.histplot()</code></td>
+</tr>
+<tr>
+<td>Bar chart</td>
+<td>Count of each category</td>
+<td><code>df['col'].value_counts().plot.bar()</code></td>
+</tr>
+<tr>
+<td>Box plot</td>
+<td>See outliers in a numeric column</td>
+<td><code>sns.boxplot()</code></td>
+</tr>
+<tr>
+<td>Scatter plot</td>
+<td>See the relationship between 2 numbers</td>
+<td><code>plt.scatter()</code> or <code>sns.scatterplot()</code></td>
+</tr>
+<tr>
+<td>Heatmap</td>
+<td>See correlation between many columns</td>
+<td><code>sns.heatmap(df.corr())</code></td>
+</tr>
+<tr>
+<td>Line plot</td>
+<td>See change over time</td>
+<td><code>plt.plot()</code></td>
+</tr>
+</tbody>
+</table>
+<p>Before you start: <code>import matplotlib.pyplot as plt</code> and
+<code>import seaborn as sns</code>.</p>
+<hr />
+<h1 id="before-you-start-google-colab-setup">Before You Start — Google
+Colab Setup</h1>
+<p>You will work in <strong>Google Colab</strong>. That means: - You do
+NOT install Python. - You do NOT install pandas, scikit-learn, or
+anything. - You just open a notebook in your web browser.</p>
+<h2 id="step-1-open-a-new-colab-notebook">Step 1 — Open a new Colab
+notebook</h2>
+<ol type="1">
+<li>Go to https://colab.research.google.com</li>
+<li>Sign in with your Google account.</li>
+<li>Click <strong>“New notebook”</strong> (top left).</li>
+<li>Name it <code>airline_tweets_module_3.ipynb</code>.</li>
+</ol>
+<h2 id="step-2-connect-to-google-drive">Step 2 — Connect to Google
+Drive</h2>
+<p>Colab files <strong>disappear</strong> when you close the browser. So
+you must save your work to <strong>Google Drive</strong>.</p>
+<p>In the first cell:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> drive</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>drive.mount(<span class="st">&#39;/content/drive&#39;</span>)</span></code></pre></div>
+<p>A pop-up asks for permission. Click “Allow”. After this, Drive is
+available at <code>/content/drive/MyDrive/</code>.</p>
+<h2 id="step-3-create-a-project-folder">Step 3 — Create a project
+folder</h2>
+<p>In a new cell:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&#39;/content/drive/MyDrive/airline_lab&#39;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>cd <span class="op">/</span>content<span class="op">/</span>drive<span class="op">/</span>MyDrive<span class="op">/</span>airline_lab</span></code></pre></div>
+<p>Your team will save ALL files in this folder.</p>
+<h2 id="step-4-get-the-data">Step 4 — Get the data</h2>
+<p><strong>Option A — Direct from Kaggle (recommended):</strong></p>
+<ol type="1">
+<li>Make a free Kaggle account.</li>
+<li>Go to kaggle.com/settings/account, scroll to “API”, click “Create
+New Token”. Save the <code>kaggle.json</code> file.</li>
+<li>In Colab:</li>
+</ol>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> files</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>files.upload()    <span class="co"># pick kaggle.json</span></span></code></pre></div>
+<ol start="4" type="1">
+<li>Then:</li>
+</ol>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>mkdir <span class="op">-</span>p <span class="op">~/</span>.kaggle <span class="op">&amp;&amp;</span> mv kaggle.json <span class="op">~/</span>.kaggle<span class="op">/</span> <span class="op">&amp;&amp;</span> chmod <span class="dv">600</span> <span class="op">~/</span>.kaggle<span class="op">/</span>kaggle.json</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install kaggle <span class="op">-</span>q</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kaggle datasets download <span class="op">-</span>d crowdflower<span class="op">/</span>twitter<span class="op">-</span>airline<span class="op">-</span>sentiment</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>unzip <span class="op">-</span>q twitter<span class="op">-</span>airline<span class="op">-</span>sentiment.<span class="bu">zip</span> <span class="op">-</span>d data</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ls data<span class="op">/</span></span></code></pre></div>
+<p>You should see <strong>1 CSV file</strong> inside <code>data/</code>
+(plus maybe a database file you can ignore).</p>
+<p><strong>Option B — Upload by hand:</strong></p>
+<ol type="1">
+<li>Download the zip from
+kaggle.com/datasets/crowdflower/twitter-airline-sentiment on your
+laptop.</li>
+<li>Unzip it.</li>
+<li>In Colab’s file panel (left sidebar), upload the CSV file.</li>
+</ol>
+<h2 id="step-5-test-it">Step 5 — Test it</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>tweets <span class="op">=</span> pd.read_csv(<span class="st">&#39;data/Tweets.csv&#39;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tweets.shape)</span></code></pre></div>
+<p>Should print <code>(14640, 15)</code>. You are ready.</p>
+<h2 id="colab-tips">Colab tips</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Save your notebook to Drive often</td>
+<td>Colab disconnects after 12 hours.</td>
+</tr>
+<tr>
+<td>Save intermediate <code>.parquet</code> files to Drive</td>
+<td>Files in <code>/content/</code> disappear when Colab
+disconnects.</td>
+</tr>
+<tr>
+<td>Share the notebook with teammates (Share button, top right)</td>
+<td>Editor access. Like Google Docs for code.</td>
+</tr>
+<tr>
+<td>Restart runtime if memory full</td>
+<td>Runtime &gt; Restart runtime. (You will rarely need this with only
+14k rows.)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="class-1-data-cleaning">Class 1 — Data Cleaning</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> James drops the messy CSV on your
+desk. The tweet timestamp is stored as text. About half the rows have no
+timezone. Some rows have URLs and <span class="citation"
+data-cites="mentions">@mentions</span> inside the text. Your job today:
+load the file, fix the date column, decide what to drop.</p>
+</blockquote>
+<h2 id="your-goal">Your goal</h2>
+<p>Make the CSV file USABLE. Fix the date column. Find missing values.
+Decide what to keep.</p>
+<h2 id="inputs">Inputs</h2>
+<ul>
+<li>The CSV file <code>Tweets.csv</code> in <code>data/</code></li>
+</ul>
+<h2 id="outputs">Outputs</h2>
+<ul>
+<li><code>tweets_step1.parquet</code> saved in your Drive folder</li>
+<li>3+ exploratory charts in your notebook</li>
+<li>1 explanatory chart for James</li>
+<li>Notes in markdown about every decision you made</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-15-minutes">Phase A — Explore the
+data first (15 minutes)</h2>
+<p>Before you clean anything, <strong>LOOK</strong> at the data.</p>
+<h3 id="exploratory-chart-1-how-many-tweets-per-sentiment">Exploratory
+chart 1 — How many tweets per sentiment?</h3>
+<ul>
+<li><strong>Question:</strong> “Of 14,640 tweets, how many are
+<code>negative</code>, <code>neutral</code>,
+<code>positive</code>?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>tweets['airline_sentiment'].value_counts()</code>.</li>
+<li>Then <code>.plot.bar()</code> on the result.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Most tweets are negative (~63%).
+The classes are NOT balanced. Module 4 will need to handle this.</li>
+</ul>
+<h3 id="exploratory-chart-2-how-many-tweets-per-airline">Exploratory
+chart 2 — How many tweets per airline?</h3>
+<ul>
+<li><strong>Question:</strong> “Which airline gets the most
+tweets?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>tweets['airline'].value_counts()</code>.</li>
+<li>Plot as a bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> 6 airlines. United and US Airways
+get the most. Some get few. This may affect the model.</li>
+</ul>
+<h3 id="exploratory-chart-3-missing-values-per-column">Exploratory chart
+3 — Missing values per column</h3>
+<ul>
+<li><strong>Question:</strong> “Which columns have the most missing
+data?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>tweets.isna().sum().sort_values(ascending=False)</code>.</li>
+<li>Plot it as a bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> <code>tweet_coord</code> is missing
+in almost every row. <code>negativereason</code> is missing in positive
+and neutral tweets. <code>user_timezone</code> is missing about half the
+time.</li>
+</ul>
+<h3 id="exploratory-chart-4-why-are-people-negative">Exploratory chart 4
+— Why are people negative?</h3>
+<ul>
+<li><strong>Question:</strong> “When a tweet is negative, what is the
+reason?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Filter to negative tweets only.</li>
+<li><code>tweets[tweets['airline_sentiment']=='negative']['negativereason'].value_counts().plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The top reasons (customer service
+issue, late flight, can’t tell, cancelled flight, lost luggage). This is
+the routing list James asked for.</li>
+</ul>
+<hr />
+<h2 id="phase-b-clean-the-tweets-table-45-minutes">Phase B — Clean the
+tweets table (45 minutes)</h2>
+<h3 id="step-1-load-the-csv-file">Step 1 — Load the CSV file</h3>
+<ul>
+<li><strong>WHAT:</strong> Load the CSV file into a DataFrame called
+<code>tweets</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>pd.read_csv('data/Tweets.csv')</code>.</li>
+<li>Some columns may need a specific encoding. If you see strange
+characters, try <code>encoding='utf-8'</code> or
+<code>encoding='latin-1'</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> A DataFrame with 14,640 rows and 15
+columns.</li>
+</ul>
+<h3 id="step-2-look-at-the-dataframe">Step 2 — Look at the
+DataFrame</h3>
+<ul>
+<li><strong>WHAT:</strong> Check <code>.shape</code>,
+<code>.info()</code>, and <code>.head()</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Look at the <code>Dtype</code> column in <code>.info()</code>
+output. <strong>Is <code>tweet_created</code> stored as
+<code>object</code> (text)?</strong></li>
+<li>Look at the first 5 rows with <code>.head()</code>. The
+<code>text</code> column has <code>@VirginAmerica</code> mentions and
+URLs. Note this for later.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Column group</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Target</td>
+<td><code>airline_sentiment</code>,
+<code>airline_sentiment_confidence</code></td>
+</tr>
+<tr>
+<td>Routing</td>
+<td><code>negativereason</code>,
+<code>negativereason_confidence</code></td>
+</tr>
+<tr>
+<td>Context</td>
+<td><code>airline</code>, <code>name</code>,
+<code>user_timezone</code></td>
+</tr>
+<tr>
+<td>Timestamps</td>
+<td><code>tweet_created</code> (text — needs fixing)</td>
+</tr>
+<tr>
+<td>Text</td>
+<td><code>text</code> (the tweet itself)</td>
+</tr>
+<tr>
+<td>Location</td>
+<td><code>tweet_coord</code>, <code>tweet_location</code> (mostly
+missing)</td>
+</tr>
+<tr>
+<td>Other</td>
+<td><code>retweet_count</code>, <code>tweet_id</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-3-fix-the-date-column">Step 3 — Fix the date column</h3>
+<ul>
+<li><strong>WHAT:</strong> The <code>tweet_created</code> column is
+stored as text like <code>"2015-02-24 11:35:52 -0800"</code>. Convert it
+to a real datetime.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>The function is <code>pd.to_datetime()</code>.</li>
+<li>Add the argument <code>errors='coerce'</code>. If a cell is bad, it
+becomes <code>NaT</code> (Not a Time = missing). The code does not
+crash.</li>
+<li>The string has a timezone (the <code>-0800</code> part). Add the
+argument <code>utc=True</code> to convert everything to UTC. This makes
+all dates comparable.</li>
+</ul></li>
+<li><strong>WHY:</strong> If dates are strings, you cannot extract the
+hour or the day of week. “What time of day do most complaints happen?”
+is impossible without a real datetime.</li>
+<li><strong>EXPECTED:</strong> After your code,
+<code>tweets['tweet_created'].dtype</code> shows
+<code>datetime64[ns, UTC]</code>.</li>
+</ul>
+<h3 id="step-4-find-missing-values">Step 4 — Find missing values</h3>
+<ul>
+<li><p><strong>WHAT:</strong> Count missing values per column.</p></li>
+<li><p><strong>HINTS:</strong> <code>.isna()</code> returns True/False
+per cell. <code>.sum()</code> counts the Trues per column.</p></li>
+<li><p><strong>EXPECTED:</strong> Something like:</p>
+<pre><code>tweet_coord                  13621
+negativereason_gold          14608
+airline_sentiment_gold       14600
+negativereason                5462
+user_timezone                 4820
+tweet_location                4733</code></pre></li>
+</ul>
+<h3 id="step-5-drop-the-useless-columns">Step 5 — Drop the useless
+columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Some columns have almost no data, or will not
+help the model.</li>
+<li><strong>DROP these columns:</strong>
+<ul>
+<li><code>tweet_coord</code> — ~93% missing.</li>
+<li><code>airline_sentiment_gold</code> — ~99% missing (only used by
+data labelers).</li>
+<li><code>negativereason_gold</code> — ~99% missing.</li>
+<li><code>tweet_location</code> — too free-text, ~30% missing.</li>
+</ul></li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>.drop(columns=[...])</code>.</li>
+<li>Or pass a list to
+<code>tweets = tweets.drop(['col1', 'col2'], axis=1)</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> If a column is empty 93% of the time, the
+model cannot use it. Better to remove it now and keep the table
+clean.</li>
+</ul>
+<h3 id="step-6-decide-drop-rows-with-no-text">Step 6 — Decide: drop rows
+with no text</h3>
+<ul>
+<li><strong>WHAT:</strong> Check if any row has missing
+<code>text</code>. If yes, drop it.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>tweets['text'].isna().sum()</code> –&gt; probably 0, but
+always check.</li>
+<li>If &gt; 0, use <code>.dropna(subset=['text'])</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> The whole point of this dataset is the text.
+No text = useless row.</li>
+<li><strong>EXPECTED:</strong> Probably still 14,640 rows.</li>
+</ul>
+<h3 id="step-7-check-for-duplicate-tweets">Step 7 — Check for duplicate
+tweets</h3>
+<ul>
+<li><strong>WHAT:</strong> Are there any exact duplicate rows?</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>tweets.duplicated().sum()</code>.</li>
+<li>If &gt; 0, use <code>tweets.drop_duplicates()</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Duplicates would bias the model.</li>
+<li><strong>EXPECTED:</strong> Probably very few duplicates (less than
+50).</li>
+</ul>
+<h3 id="step-8-write-down-what-you-did">Step 8 — Write down what you
+did</h3>
+<p>In a markdown cell, write: - Starting rows: 14,640 - Starting
+columns: 15 - Columns dropped (and why): tweet_coord,
+airline_sentiment_gold, negativereason_gold, tweet_location - Final
+rows: ~14,600 - Final columns: 11</p>
+<h3 id="step-9-save-to-drive">Step 9 — Save to Drive</h3>
+<ul>
+<li><strong>WHAT:</strong> Save the cleaned <code>tweets</code>
+DataFrame as parquet, inside your Drive folder.</li>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/airline_lab/tweets_step1.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-james-15-minutes">Phase C — Make ONE
+chart for James (15 minutes)</h2>
+<p>He does not have time to read your code. He wants ONE picture.</p>
+<h3 id="jamess-chart-complaint-volume-by-hour-of-day">James’s chart —
+“Complaint volume by hour of day”</h3>
+<p>Make a bar chart showing how many tweets arrive in each hour of the
+day (0–23). Use UTC time for now.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>First extract the hour:
+<code>tweets['tweet_hour'] = tweets['tweet_created'].dt.hour</code>.</li>
+<li>Group: <code>tweets.groupby('tweet_hour').size()</code>.</li>
+<li>Plot as a bar chart.</li>
+<li>Title: “Tweet volume by hour of day — peak hours need more
+agents”.</li>
+<li>X-label: Hour of day (UTC).</li>
+<li>Y-label: Number of tweets.</li>
+</ul></li>
+<li><strong>Takeaway for James:</strong> “Most tweets come between 14:00
+and 22:00 UTC. We should have more agents in those hours.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-1">Common mistakes in Class 1</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Forget <code>errors='coerce'</code> on <code>to_datetime</code></td>
+<td>Code crashes on one bad date.</td>
+</tr>
+<tr>
+<td>Forget <code>utc=True</code> on <code>to_datetime</code></td>
+<td>Some dates have offsets, some do not. Comparing them fails.</td>
+</tr>
+<tr>
+<td>Drop <code>negativereason</code> because it has missing values</td>
+<td>Big mistake. It is missing for positive/neutral tweets, which is
+normal.</td>
+</tr>
+<tr>
+<td>Save to <code>/content/</code> instead of Drive</td>
+<td>File disappears when Colab disconnects.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-2">Self-check before Class 2</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />CSV loaded. 14,640
+rows.</label></li>
+<li><label><input type="checkbox" /><code>tweet_created</code> has dtype
+<code>datetime64[ns, UTC]</code>.</label></li>
+<li><label><input type="checkbox" />4 useless columns
+dropped.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory charts in
+your notebook.</label></li>
+<li><label><input type="checkbox" />1 polished chart for
+James.</label></li>
+<li><label><input type="checkbox" />You saved
+<code>tweets_step1.parquet</code> to your Drive folder.</label></li>
+<li><label><input type="checkbox" />You wrote down (in markdown) what
+you did and WHY.</label></li>
+</ul>
+<hr />
+<h1 id="class-2-encoding-and-scaling">Class 2 — Encoding and
+Scaling</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> James looks at your cleaned data.
+He is happy. But he says: “the model is a math model. It does not
+understand the word ‘United’ or the word ‘negative’. Turn the words into
+numbers.”</p>
+</blockquote>
+<h2 id="your-goal-1">Your goal</h2>
+<p>Turn TEXT columns into numbers. Make all numeric columns about the
+same size.</p>
+<h2 id="inputs-1">Inputs</h2>
+<ul>
+<li><code>tweets_step1.parquet</code> from Class 1</li>
+</ul>
+<h2 id="outputs-1">Outputs</h2>
+<ul>
+<li><code>tweets_step2.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for James</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first">Phase A — Explore the data
+first</h2>
+<h3
+id="exploratory-chart-1-distribution-of-airline_sentiment_confidence">Exploratory
+chart 1 — Distribution of <code>airline_sentiment_confidence</code></h3>
+<ul>
+<li><strong>Question:</strong> “The labelers said how confident they
+were. What does this look like?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use a histogram (<code>plt.hist()</code>).</li>
+<li>Use <code>bins=30</code> to see the shape.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Many tweets have confidence 1.0
+(sure). A few have confidence below 0.5 (the labelers were unsure). Are
+there tweets where the label is bad?</li>
+</ul>
+<h3 id="exploratory-chart-2-distribution-of-retweet_count">Exploratory
+chart 2 — Distribution of <code>retweet_count</code></h3>
+<ul>
+<li><strong>Question:</strong> “Most tweets have 0 retweets. A few have
+30+. Is the distribution skewed?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use a histogram.</li>
+<li>Use <code>bins=50</code>.</li>
+<li>Use <code>plt.yscale('log')</code> to see the small values too.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The retweet column has a “long
+tail”. This is why we will use log-transform.</li>
+</ul>
+<h3 id="exploratory-chart-3-airline-counts-after-combining">Exploratory
+chart 3 — <code>airline</code> counts after combining</h3>
+<ul>
+<li><strong>Question:</strong> “Which airline has the most tweets?
+Should we keep all 6?”</li>
+<li><strong>HINTS:</strong> <code>value_counts().plot.bar()</code>.</li>
+<li><strong>What you learn:</strong> 6 airlines. United, US Airways,
+American get the most. Virgin America has only a few hundred.</li>
+</ul>
+<h3 id="exploratory-chart-4-negativereason-counts">Exploratory chart 4 —
+<code>negativereason</code> counts</h3>
+<ul>
+<li><strong>Question:</strong> “Of the 10 negative reasons, which are
+the biggest?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Filter to negative tweets first.</li>
+<li><code>value_counts().plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> “Customer Service Issue” and “Late
+Flight” are the biggest. “Damaged Luggage” is rare. This affects
+routing.</li>
+</ul>
+<hr />
+<h2 id="phase-b-encode-and-scale">Phase B — Encode and scale</h2>
+<h3 id="step-1-load-the-cleaned-data">Step 1 — Load the cleaned
+data</h3>
+<ul>
+<li><strong>WHAT:</strong> Load <code>tweets_step1.parquet</code> from
+your Drive folder.</li>
+<li><strong>HINTS:</strong>
+<code>tweets = pd.read_parquet('/content/drive/MyDrive/airline_lab/tweets_step1.parquet')</code>.</li>
+</ul>
+<h3 id="step-2-one-hot-encode-airline">Step 2 — One-hot encode
+<code>airline</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Turn the 6 airlines into 6 new 0/1
+columns.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>pd.get_dummies(tweets, columns=['airline'], prefix='airline')</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> The model is math. “United” is text. After
+one-hot, you get 6 new columns: <code>airline_United</code> = 1 or 0,
+<code>airline_Delta</code> = 1 or 0, etc.</li>
+<li><strong>EXPECTED:</strong> 6 new columns added.</li>
+</ul>
+<h3 id="step-3-decide-what-to-do-with-negativereason">Step 3 — Decide
+what to do with <code>negativereason</code></h3>
+<ul>
+<li><strong>WHAT:</strong> This column has 10 categories AND about 5,500
+missing values (for positive/neutral tweets).</li>
+<li><strong>TWO OPTIONS:</strong>
+<ul>
+<li><strong>A — Fill missing with <code>'not_negative'</code>:</strong>
+Then one-hot encode. You get 11 categories.</li>
+<li><strong>B — Keep missing as a separate category with
+<code>pd.get_dummies(..., dummy_na=True)</code>:</strong> Pandas adds a
+“missing” column automatically.</li>
+</ul></li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Option A:
+<code>tweets['negativereason'] = tweets['negativereason'].fillna('not_negative')</code>.</li>
+<li>Then
+<code>pd.get_dummies(tweets, columns=['negativereason'], prefix='reason')</code>.</li>
+</ul></li>
+<li><strong>YOUR CHOICE:</strong> Pick one. Write in your notebook
+WHY.</li>
+</ul>
+<h3 id="step-4-encode-the-target-airline_sentiment">Step 4 — Encode the
+target <code>airline_sentiment</code></h3>
+<ul>
+<li><strong>WHAT:</strong> This is the column the model will PREDICT.
+Turn the 3 categories (negative, neutral, positive) into numbers.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>You can use <code>LabelEncoder</code> from sklearn.</li>
+<li>Or a simple map:
+<code>tweets['airline_sentiment'] = tweets['airline_sentiment'].map({'negative': 0, 'neutral': 1, 'positive': 2})</code>.</li>
+</ul></li>
+<li><strong>WHY a map and not get_dummies?</strong> For the TARGET, we
+want one column with values 0/1/2. Not 3 columns of 0/1.</li>
+</ul>
+<h3 id="step-5-log-transform-retweet_count">Step 5 — Log-transform
+<code>retweet_count</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Most tweets have 0 retweets. A few have 30+.
+Apply <code>np.log1p()</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>import numpy as np</code>.</li>
+<li><code>tweets['log_retweet'] = np.log1p(tweets['retweet_count'])</code>.</li>
+</ul></li>
+<li><strong>WHY <code>log1p</code> and not <code>log</code>?</strong>
+<code>log(0)</code> is <code>-inf</code>.
+<code>log1p(x) = log(x + 1)</code> is safe for zeros.</li>
+<li><strong>WHY transform at all?</strong> A column with values 0, 1, 30
+is hard for the model. After log: 0, 0.69, 3.4. Easier.</li>
+</ul>
+<h3 id="step-6-scale-numeric-columns-preview-only">Step 6 — Scale
+numeric columns (preview only)</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>StandardScaler</code> to make every
+numeric column have mean = 0, std = 1.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.preprocessing import StandardScaler</code>.</li>
+<li><code>scaler = StandardScaler()</code>.</li>
+<li><code>scaler.fit_transform(tweets[numeric_cols])</code>.</li>
+</ul></li>
+<li><strong>WARNING:</strong> This is for inspection only. In Class 5,
+scaling goes INSIDE the Pipeline. Do NOT save the scaled version as your
+final file.</li>
+</ul>
+<h3 id="step-7-decide-what-to-do-with-user_timezone">Step 7 — Decide
+what to do with <code>user_timezone</code></h3>
+<ul>
+<li><strong>WHAT:</strong> About half the rows have NO timezone. The
+other half have ~80 different timezones.</li>
+<li><strong>OPTIONS:</strong>
+<ul>
+<li>Drop the column.</li>
+<li>Keep only the top 5 timezones, group the rest as “other”, then
+one-hot encode.</li>
+</ul></li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Top 5:
+<code>top5 = tweets['user_timezone'].value_counts().head(5).index</code>.</li>
+<li>Group:
+<code>tweets['user_timezone'] = tweets['user_timezone'].where(tweets['user_timezone'].isin(top5), 'other')</code>.</li>
+</ul></li>
+<li><strong>WRITE DOWN:</strong> Your choice in markdown.</li>
+</ul>
+<h3 id="step-8-save">Step 8 — Save</h3>
+<ul>
+<li><strong>WHAT:</strong> Save to Drive.
+<code>df.to_parquet('/content/drive/MyDrive/airline_lab/tweets_step2.parquet')</code>.</li>
+<li><strong>Save the UNSCALED version.</strong> Scaling will happen
+inside the Pipeline later.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-james">Phase C — Make ONE chart for
+James</h2>
+<h3 id="jamess-chart-tweet-count-by-airline">James’s chart — “Tweet
+count by airline”</h3>
+<p>A bar chart of all 6 airlines, ordered by tweet count.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>tweets['airline'].value_counts().plot.bar()</code>. (Use the
+ORIGINAL column before one-hot.)</li>
+</ul></li>
+<li><strong>Title:</strong> “Tweet volume by airline — United and US
+Airways get half of all tweets.”</li>
+<li><strong>X-label:</strong> Airline.</li>
+<li><strong>Y-label:</strong> Number of tweets.</li>
+<li><strong>Takeaway:</strong> “Two airlines drive most of the volume.
+Train the model on data from all 6, but expect best performance on these
+two.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-2">Common mistakes in Class 2</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scale BEFORE train/test split</td>
+<td><strong>Leakage.</strong> Scaler sees test data.</td>
+</tr>
+<tr>
+<td>One-hot encode every text column</td>
+<td>The <code>text</code> column has 14,000 different values. Table
+explodes. Leave it for Module 7.</td>
+</tr>
+<tr>
+<td>Forget <code>np.log1p</code> and use <code>np.log</code> on
+zeros</td>
+<td><code>np.log(0) = -inf</code>. Crash.</td>
+</tr>
+<tr>
+<td>Save the scaled version</td>
+<td>Class 5 will scale again inside the pipeline. Double scaling = wrong
+numbers.</td>
+</tr>
+<tr>
+<td>Drop <code>negativereason</code> because it has 5500 missing</td>
+<td>Big mistake. The missing means “not a negative tweet”. Treat it as a
+category.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-3">Self-check before Class 3</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>airline</code> one-hot encoded
+(6 new columns).</label></li>
+<li><label><input type="checkbox" /><code>negativereason</code> handled
+(your choice written down).</label></li>
+<li><label><input type="checkbox" /><code>airline_sentiment</code>
+mapped to 0/1/2.</label></li>
+<li><label><input type="checkbox" /><code>log_retweet</code>
+exists.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory
+charts.</label></li>
+<li><label><input type="checkbox" />1 chart for James.</label></li>
+<li><label><input type="checkbox" /><code>tweets_step2.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-3-feature-engineering">Class 3 — Feature Engineering</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> James says: “The columns in the
+raw data are not enough. The TRULY useful columns are not there. We must
+MAKE them. For example, how many <span class="citation"
+data-cites="mentions">@mentions</span> does the tweet have? How many
+capital words? Are there exclamation marks? Those small signals tell us
+if a tweet is urgent.”</p>
+</blockquote>
+<h2 id="your-goal-2">Your goal</h2>
+<p>Make NEW columns from the existing ones. These will help the model
+predict the sentiment and the routing class.</p>
+<h2 id="inputs-2">Inputs</h2>
+<ul>
+<li><code>tweets_step2.parquet</code></li>
+</ul>
+<h2 id="outputs-2">Outputs</h2>
+<ul>
+<li><code>tweets_step3.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for James</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-1">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-tweet-length-distribution">Exploratory chart
+1 — Tweet length distribution</h3>
+<ul>
+<li>First make the <code>text_length</code> column (see Step 2
+below).</li>
+<li><strong>Question:</strong> “How long is a typical tweet?”</li>
+<li><strong>HINTS:</strong> Histogram with <code>bins=50</code>.</li>
+<li><strong>What you learn:</strong> Twitter limits tweets to 140
+characters (in 2015). You will see most tweets near the limit. Angry
+people use more characters.</li>
+</ul>
+<h3 id="exploratory-chart-2-sentiment-by-hour-of-day">Exploratory chart
+2 — Sentiment by hour of day</h3>
+<ul>
+<li><strong>Question:</strong> “Are tweets more negative at night? Or in
+the morning?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>tweets.groupby('tweet_hour')['airline_sentiment'].value_counts(normalize=True)</code>.</li>
+<li>Or convert sentiment to a number (neg=-1, neu=0, pos=1) and take the
+mean per hour.</li>
+<li>Plot as a line or bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Patterns by hour. Maybe night
+flights are worst.</li>
+</ul>
+<h3 id="exploratory-chart-3-tweet-length-vs-sentiment">Exploratory chart
+3 — Tweet length vs sentiment</h3>
+<ul>
+<li><strong>Question:</strong> “Do negative tweets have more characters
+than positive ones?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>sns.boxplot(x='airline_sentiment', y='text_length', data=tweets)</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Angry tweets are usually LONGER.
+People type more when they are upset.</li>
+</ul>
+<h3 id="exploratory-chart-4-capital-words-vs-sentiment">Exploratory
+chart 4 — Capital words vs sentiment</h3>
+<ul>
+<li>After you compute <code>n_caps_words</code> (Step 4 below), look at
+it by sentiment.</li>
+<li><strong>HINTS:</strong> Boxplot or bar chart of mean per sentiment
+class.</li>
+<li><strong>What you learn:</strong> “WORST FLIGHT EVER!!!” has 3 caps
+words. Polite tweets have 0. Big signal.</li>
+</ul>
+<hr />
+<h2 id="phase-b-engineer-the-features">Phase B — Engineer the
+features</h2>
+<h3 id="step-1-load-the-data">Step 1 — Load the data</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>tweets = pd.read_parquet('/content/drive/MyDrive/airline_lab/tweets_step2.parquet')</code>.</li>
+</ul>
+<h3 id="step-2-date-derived-features">Step 2 — Date-derived
+features</h3>
+<p>Make these new columns from <code>tweet_created</code>:</p>
+<table>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tweet_year</code></td>
+<td>The year</td>
+</tr>
+<tr>
+<td><code>tweet_month</code></td>
+<td>The month (1–12)</td>
+</tr>
+<tr>
+<td><code>tweet_dayofweek</code></td>
+<td>0=Monday, 6=Sunday</td>
+</tr>
+<tr>
+<td><code>tweet_hour</code></td>
+<td>0–23</td>
+</tr>
+<tr>
+<td><code>is_weekend</code></td>
+<td>1 if dayofweek &gt;= 5, else 0</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use the <code>.dt</code> accessor on the datetime column.</li>
+<li><code>tweets['tweet_created'].dt.year</code>,
+<code>.dt.month</code>, <code>.dt.dayofweek</code>,
+<code>.dt.hour</code>.</li>
+<li>For <code>is_weekend</code>, write a comparison and convert to int
+with <code>.astype(int)</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> A model can learn “Sunday-night tweets are
+angrier” only if YOU give it the <code>tweet_dayofweek</code>
+column.</li>
+<li><strong>NOTE:</strong> All tweets in this dataset are from February
+2015. <code>tweet_year</code> and <code>tweet_month</code> will be
+almost constant. Keep them anyway, for completeness. They will be
+dropped in Class 4 if useless.</li>
+</ul>
+<h3 id="step-3-text-length-features">Step 3 — Text length features</h3>
+<table>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>text_length</code></td>
+<td>Number of characters in the tweet</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>tweets['text_length'] = tweets['text'].str.len()</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Longer tweets often mean angrier
+customers.</li>
+</ul>
+<h3 id="step-4-text-content-features">Step 4 — Text content
+features</h3>
+<p>These are very important for tweet classification.</p>
+<table>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>n_mentions</code></td>
+<td>Number of <span class="citation"
+data-cites="mentions">@mentions</span> in the tweet</td>
+</tr>
+<tr>
+<td><code>n_hashtags</code></td>
+<td>Number of #hashtags in the tweet</td>
+</tr>
+<tr>
+<td><code>has_url</code></td>
+<td>1 if the tweet has a link, else 0</td>
+</tr>
+<tr>
+<td><code>n_caps_words</code></td>
+<td>Number of fully UPPERCASE words (length &gt; 1)</td>
+</tr>
+<tr>
+<td><code>has_question_mark</code></td>
+<td>1 if the tweet has at least one <code>?</code>, else 0</td>
+</tr>
+<tr>
+<td><code>has_exclamation</code></td>
+<td>1 if the tweet has at least one <code>!</code>, else 0</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>For <code>n_mentions</code>:
+<code>tweets['text'].str.count('@')</code>.</li>
+<li>For <code>n_hashtags</code>:
+<code>tweets['text'].str.count('#')</code>.</li>
+<li>For <code>has_url</code>: check if the text contains
+<code>http</code>.
+<code>tweets['text'].str.contains('http').astype(int)</code>.</li>
+<li>For <code>n_caps_words</code>: split the text into words, count
+words where <code>word.isupper()</code> and
+<code>len(word) &gt; 1</code>. You can write a small function and apply
+it.</li>
+<li>For <code>has_question_mark</code>:
+<code>tweets['text'].str.contains(r'\?').astype(int)</code> (the
+<code>\?</code> is regex for literal <code>?</code>).</li>
+<li>For <code>has_exclamation</code>:
+<code>tweets['text'].str.contains('!').astype(int)</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Tweet text is short. These small features
+capture “shouting” signals.</li>
+</ul>
+<h3 id="step-5-build-a-simple-sentiment-lexicon-score">Step 5 — Build a
+simple sentiment lexicon score</h3>
+<p>This is an EXTRA feature that helps the model a lot.</p>
+<ul>
+<li><strong>WHAT:</strong> Make a small list of positive words and
+negative words. For each tweet, count positives minus negatives.</li>
+</ul>
+<p>Skeleton:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>positive_words <span class="op">=</span> [<span class="st">&#39;thank&#39;</span>, <span class="st">&#39;great&#39;</span>, <span class="st">&#39;love&#39;</span>, <span class="st">&#39;awesome&#39;</span>, <span class="st">&#39;amazing&#39;</span>, <span class="st">&#39;best&#39;</span>, <span class="st">&#39;___&#39;</span>]  <span class="co"># YOU add 5 more</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>negative_words <span class="op">=</span> [<span class="st">&#39;worst&#39;</span>, <span class="st">&#39;terrible&#39;</span>, <span class="st">&#39;late&#39;</span>, <span class="st">&#39;lost&#39;</span>, <span class="st">&#39;cancelled&#39;</span>, <span class="st">&#39;awful&#39;</span>, <span class="st">&#39;___&#39;</span>]  <span class="co"># YOU add 5 more</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> lexicon_score(text):</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    text_lower <span class="op">=</span> text.___()                 <span class="co"># YOU fill in (the lowercase method)</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    pos_count <span class="op">=</span> <span class="bu">sum</span>(w <span class="kw">in</span> text_lower <span class="cf">for</span> w <span class="kw">in</span> ___)   <span class="co"># YOU fill in</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    neg_count <span class="op">=</span> <span class="bu">sum</span>(w <span class="kw">in</span> text_lower <span class="cf">for</span> w <span class="kw">in</span> ___)   <span class="co"># YOU fill in</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> pos_count <span class="op">-</span> neg_count</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>tweets[<span class="st">&#39;sentiment_lexicon_score&#39;</span>] <span class="op">=</span> tweets[<span class="st">&#39;text&#39;</span>].<span class="bu">apply</span>(___)   <span class="co"># YOU fill in</span></span></code></pre></div>
+<ul>
+<li><strong>WHY:</strong> This single number already captures a lot.
+Module 7 will do this more carefully with a real NLP library.</li>
+<li><strong>EXPECTED:</strong> <code>sentiment_lexicon_score</code>
+between -5 and +5 for most tweets.</li>
+</ul>
+<h3 id="step-6-sanity-check-the-new-columns">Step 6 — Sanity-check the
+new columns</h3>
+<ul>
+<li><strong>WHAT:</strong> For each new column, look at
+<code>.describe()</code> and check the range is reasonable.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>tweets[['text_length', 'n_mentions', 'n_hashtags', 'n_caps_words']].describe()</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong>
+<ul>
+<li><code>text_length</code>: 0 to 200 (tweets are short).</li>
+<li><code>n_mentions</code>: 0 to maybe 5.</li>
+<li><code>n_hashtags</code>: 0 to maybe 3.</li>
+<li><code>n_caps_words</code>: 0 to maybe 10.</li>
+</ul></li>
+</ul>
+<h3 id="step-7-save">Step 7 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>tweets.to_parquet('/content/drive/MyDrive/airline_lab/tweets_step3.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-james-1">Phase C — Make ONE chart for
+James</h2>
+<h3 id="jamess-chart-what-makes-a-tweet-angry-three-signals.">James’s
+chart — “What makes a tweet angry? Three signals.”</h3>
+<p>A grouped bar chart showing the MEAN of 3 features for each sentiment
+class.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute:
+<code>tweets.groupby('airline_sentiment')[['text_length', 'n_caps_words', 'has_exclamation']].mean()</code>.</li>
+<li>Plot as a grouped bar chart with 3 groups (negative, neutral,
+positive) and 3 bars per group.</li>
+</ul></li>
+<li><strong>Title:</strong> “Negative tweets are longer, louder, and
+full of exclamation marks.”</li>
+<li><strong>X-axis:</strong> Sentiment.</li>
+<li><strong>Y-axis:</strong> Mean value of the feature.</li>
+<li><strong>Takeaway for James:</strong> “If a tweet has 5+ caps words
+and 3 exclamation marks, it is almost always angry. We can route those
+to a human agent in 1 second.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-3">Common mistakes in Class 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Use the FULL text as a feature</td>
+<td>The model cannot use raw text directly. That is Module 7.</td>
+</tr>
+<tr>
+<td>Forget to lowercase before lexicon matching</td>
+<td>“Thank” and “thank” become different. Misses half the matches.</td>
+</tr>
+<tr>
+<td>Use <code>str.contains('http')</code> with <code>regex=False</code>
+missing</td>
+<td>Default is <code>regex=True</code>, which mostly works, but special
+characters in the pattern can cause bugs. Use simple patterns.</td>
+</tr>
+<tr>
+<td>Count <code>@</code> as <code>str.contains('@')</code> instead of
+<code>str.count('@')</code></td>
+<td><code>contains</code> returns True/False (1 or 0).
+<code>count</code> returns the actual number. We want the count.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-4">Self-check before Class 4</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />5 date-derived features
+exist.</label></li>
+<li><label><input type="checkbox" /><code>text_length</code>
+exists.</label></li>
+<li><label><input type="checkbox" /><code>n_mentions</code>,
+<code>n_hashtags</code>, <code>has_url</code>,
+<code>n_caps_words</code>, <code>has_question_mark</code>,
+<code>has_exclamation</code> all exist.</label></li>
+<li><label><input type="checkbox" /><code>sentiment_lexicon_score</code>
+exists.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 explanatory chart.</label></li>
+<li><label><input type="checkbox" /><code>tweets_step3.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-4-feature-selection">Class 4 — Feature Selection</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Now you have ~30 columns. James
+says: “Too many. Some are duplicates. Some are useless. I want 12–15
+GOOD columns. Pick them.”</p>
+</blockquote>
+<h2 id="your-goal-3">Your goal</h2>
+<p>Pick the best 12–15 columns. Drop the rest. Justify every choice.</p>
+<h2 id="inputs-3">Inputs</h2>
+<ul>
+<li><code>tweets_step3.parquet</code></li>
+</ul>
+<h2 id="outputs-3">Outputs</h2>
+<ul>
+<li><code>tweets_step4.parquet</code> in Drive (only the selected
+columns + <code>airline_sentiment</code>)</li>
+<li>3+ exploratory charts (correlation heatmap, mutual info bars,
+importance bars)</li>
+<li>A short markdown report explaining your choices</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-2">Phase A — Explore the data
+first</h2>
+<h3
+id="exploratory-chart-1-correlation-heatmap-of-numeric-columns">Exploratory
+chart 1 — Correlation heatmap of numeric columns</h3>
+<ul>
+<li><strong>Question:</strong> “Which columns say the same thing as each
+other?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute <code>tweets[numeric_cols].corr()</code>.</li>
+<li>Plot with <code>sns.heatmap()</code>.</li>
+<li>Use <code>annot=True</code> and <code>fmt='.2f'</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Pairs of columns with |corr| &gt;
+0.9 are redundant. For example, <code>text_length</code> and
+<code>n_mentions</code> may be correlated.</li>
+</ul>
+<h3 id="exploratory-chart-2-mutual-information-bar-chart">Exploratory
+chart 2 — Mutual information bar chart</h3>
+<ul>
+<li>After you compute mutual info (Step 4 below), plot it.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Sort the values, then bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Which columns predict
+<code>airline_sentiment</code> strongest.</li>
+</ul>
+<h3
+id="exploratory-chart-3-random-forest-feature-importance">Exploratory
+chart 3 — Random Forest feature importance</h3>
+<ul>
+<li>After you train the RF (Step 5 below), plot the importances.</li>
+<li><strong>HINTS:</strong>
+<code>pd.Series(rf.feature_importances_, index=...).sort_values().plot.barh()</code>.</li>
+<li><strong>What you learn:</strong> A second opinion on feature
+importance.</li>
+</ul>
+<hr />
+<h2 id="phase-b-select-features">Phase B — Select features</h2>
+<h3 id="step-1-split-into-train-and-test-first">Step 1 — Split into
+train and test FIRST</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>train_test_split</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.model_selection import train_test_split</code>.</li>
+<li><code>X = tweets.drop('airline_sentiment', axis=1)</code>.</li>
+<li><code>y = tweets['airline_sentiment']</code>.</li>
+<li>Pass: <code>test_size=0.2</code>, <code>random_state=42</code>,
+<code>stratify=y</code>.</li>
+</ul></li>
+<li><strong>WHY <code>stratify=y</code>?</strong> Only ~16% of tweets
+are positive. Without stratify, the test set might have 5% positive by
+accident. Stratify keeps the same balance.</li>
+<li><strong>WHY split first?</strong> All next steps use TRAIN ONLY.
+Otherwise leakage.</li>
+</ul>
+<h3 id="step-2-remove-low-variance-columns">Step 2 — Remove low-variance
+columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop columns where almost all values are the
+same.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import VarianceThreshold</code>.</li>
+<li><code>VarianceThreshold(threshold=0.01)</code> then
+<code>.fit_transform(X_train[numeric_cols])</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> <code>tweet_year</code> may be dropped
+(all tweets are from 2015).</li>
+</ul>
+<h3 id="step-3-remove-highly-correlated-columns">Step 3 — Remove highly
+correlated columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop one of each pair where |corr| &gt;
+0.9.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute correlation matrix.</li>
+<li>Get the upper triangle with <code>np.triu(...)</code>.</li>
+<li>For each column, if any of its upper-triangle correlations is &gt;
+0.9, mark it for dropping.</li>
+</ul></li>
+</ul>
+<h3 id="step-4-rank-by-mutual-information">Step 4 — Rank by mutual
+information</h3>
+<ul>
+<li><strong>WHAT:</strong> Score each column by how much it tells you
+about <code>airline_sentiment</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import mutual_info_classif</code>.</li>
+<li><code>mi = mutual_info_classif(X_train_numeric, y_train)</code>.</li>
+<li>Put in a Series, sort.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> <code>sentiment_lexicon_score</code>,
+<code>n_caps_words</code>, <code>has_exclamation</code>,
+<code>text_length</code> should be at the top.</li>
+</ul>
+<h3 id="step-5-random-forest-importance-second-opinion">Step 5 — Random
+Forest importance (second opinion)</h3>
+<ul>
+<li><strong>WHAT:</strong> Train a small RF, look at
+<code>feature_importances_</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.ensemble import RandomForestClassifier</code>.</li>
+<li><code>RandomForestClassifier(n_estimators=100, max_depth=10, n_jobs=-1, random_state=42)</code>.</li>
+<li><code>.fit(X_train, y_train)</code>.</li>
+<li>Look at <code>.feature_importances_</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-6-pick-the-final-1215-columns">Step 6 — Pick the final
+12–15 columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Combine the rankings. Pick columns that:
+<ul>
+<li>Are high in mutual info, AND</li>
+<li>Are high in RF importance, AND</li>
+<li>Were not dropped by variance/correlation pruning.</li>
+</ul></li>
+<li><strong>WRITE DOWN:</strong> In your notebook, list the columns.
+Explain in 1 sentence why each one is in.</li>
+</ul>
+<h3 id="step-7-save-1">Step 7 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong> Keep only the selected columns +
+<code>airline_sentiment</code>. Save as
+<code>tweets_step4.parquet</code> to Drive.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-james-2">Phase C — Make ONE chart for
+James</h2>
+<h3
+id="jamess-chart-the-10-strongest-signals-for-tweet-sentiment">James’s
+chart — “The 10 strongest signals for tweet sentiment”</h3>
+<p>A horizontal bar chart of your top 10 features and their importance
+score.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use the RF importance.</li>
+<li><code>sort_values()</code> then <code>.head(10)</code> then
+<code>.plot.barh()</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Top 10 predictors of tweet sentiment.”</li>
+<li><strong>Y-axis:</strong> column names.</li>
+<li><strong>X-axis:</strong> Random Forest importance.</li>
+<li><strong>Takeaway:</strong> “The lexicon score and ‘caps words’ alone
+explain ~50% of the prediction. Easy signals. We can use a simple
+model.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-4">Common mistakes in Class 4</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compute mutual info on the FULL data</td>
+<td>Leakage.</td>
+</tr>
+<tr>
+<td>Drop columns without writing why</td>
+<td>Module 4 students will not understand.</td>
+</tr>
+<tr>
+<td>Keep too many columns (40+)</td>
+<td>Slow training. Overfitting risk. Small dataset (14k) cannot support
+many columns.</td>
+</tr>
+<tr>
+<td>Drop <code>airline_sentiment_confidence</code> because it sounds
+technical</td>
+<td>This is useful. It tells you how clean the label is. Keep it.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-5">Self-check before Class 5</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Train/test split done
+FIRST.</label></li>
+<li><label><input type="checkbox" />12–15 columns remain +
+<code>airline_sentiment</code>.</label></li>
+<li><label><input type="checkbox" />You wrote down WHY for each kept
+column.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for James.</label></li>
+<li><label><input type="checkbox" /><code>tweets_step4.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-5-pipelines">Class 5 — Pipelines</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> James says: “Your cleaning code
+is in 4 different notebooks. When a new tweet arrives in 10 seconds, you
+cannot run 4 notebooks. We need ONE object that does everything.”</p>
+</blockquote>
+<h2 id="your-goal-4">Your goal</h2>
+<p>Put EVERY cleaning step inside ONE Pipeline object. Production-ready
+code.</p>
+<h2 id="inputs-4">Inputs</h2>
+<ul>
+<li><code>tweets_step4.parquet</code> (selected columns)</li>
+</ul>
+<h2 id="outputs-4">Outputs</h2>
+<ul>
+<li><code>airline_pipeline.joblib</code> saved in Drive</li>
+<li>1 confusion-matrix chart + 1 classification report</li>
+<li>A pipeline that takes RAW input and produces predictions</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-3">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-confusion-matrix-after-training">Exploratory
+chart 1 — Confusion matrix (after training)</h3>
+<ul>
+<li>After Step 6, build a confusion matrix.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay</code>.</li>
+<li><code>cm = confusion_matrix(y_test, y_pred)</code>.</li>
+<li><code>ConfusionMatrixDisplay(cm, display_labels=['Negative', 'Neutral', 'Positive']).plot()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Does the model confuse neutral and
+positive? Does it catch the negative tweets (most important)?</li>
+</ul>
+<h3 id="exploratory-chart-2-per-class-precision-and-recall">Exploratory
+chart 2 — Per-class precision and recall</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.metrics import classification_report</code>.</li>
+<li><code>print(classification_report(y_test, y_pred, target_names=['Negative', 'Neutral', 'Positive']))</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Which class is hardest? Probably
+“neutral” — it is the middle.</li>
+</ul>
+<hr />
+<h2 id="phase-b-build-the-pipeline">Phase B — Build the pipeline</h2>
+<h3
+id="step-1-decide-which-columns-are-numeric-and-which-are-categorical">Step
+1 — Decide which columns are numeric and which are categorical</h3>
+<ul>
+<li><strong>HINTS:</strong> Make two lists.</li>
+<li><strong>EXAMPLE:</strong>
+<ul>
+<li>numeric: <code>text_length</code>, <code>n_mentions</code>,
+<code>n_hashtags</code>, <code>n_caps_words</code>,
+<code>sentiment_lexicon_score</code>, <code>tweet_hour</code>,
+<code>is_weekend</code>, <code>airline_sentiment_confidence</code>,
+<code>log_retweet</code>, <code>has_url</code>,
+<code>has_question_mark</code>, <code>has_exclamation</code>.</li>
+<li>categorical: <code>airline</code>, <code>negativereason</code> (if
+you kept it as a string).</li>
+</ul></li>
+</ul>
+<h3 id="step-2-build-the-numeric-mini-pipeline">Step 2 — Build the
+numeric mini-pipeline</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer (fill missing) +
+scaler.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.pipeline import Pipeline</code>.</p></li>
+<li><p><code>from sklearn.impute import SimpleImputer</code>.</p></li>
+<li><p><code>from sklearn.preprocessing import StandardScaler</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>numeric_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;scaler&#39;</span>,  StandardScaler()),</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in the blank: best strategy for numeric?
+(<code>'median'</code>)</p></li>
+</ul></li>
+</ul>
+<h3 id="step-3-build-the-categorical-mini-pipeline">Step 3 — Build the
+categorical mini-pipeline</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer + one-hot encoder.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.preprocessing import OneHotEncoder</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>categorical_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;onehot&#39;</span>,  OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">&#39;___&#39;</span>, sparse_output<span class="op">=</span>___)),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in blanks. (Strategy <code>'most_frequent'</code>,
+handle_unknown <code>'ignore'</code>, sparse_output
+<code>False</code>.)</p></li>
+</ul></li>
+<li><strong>WHY <code>handle_unknown='ignore'</code>?</strong> In
+production, a new airline (or a new negative reason) may appear. We do
+not want the code to crash.</li>
+</ul>
+<h3 id="step-4-combine-into-a-columntransformer">Step 4 — Combine into a
+ColumnTransformer</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.compose import ColumnTransformer</code>.</li>
+<li>It takes a list of tuples:
+<code>(name, transformer, list_of_columns)</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-5-add-the-model-on-top">Step 5 — Add the model on top</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.linear_model import LogisticRegression</code>.</li>
+<li><code>LogisticRegression(class_weight='balanced', max_iter=1000, random_state=42, multi_class='multinomial')</code>.</li>
+<li>Put it in a Pipeline with the preprocessor.</li>
+</ul></li>
+<li><strong>WHY <code>class_weight='balanced'</code>?</strong> Only 16%
+of tweets are positive, 63% are negative. Without this, the model just
+predicts “negative” for everyone and gets 63% accuracy (but
+useless).</li>
+<li><strong>WHY <code>multi_class='multinomial'</code>?</strong> We have
+3 classes (negative, neutral, positive), not 2.</li>
+</ul>
+<h3 id="step-6-train-and-evaluate">Step 6 — Train and evaluate</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>full_pipeline.fit(X_train, y_train)</code>.</li>
+<li><code>y_pred = full_pipeline.predict(X_test)</code>.</li>
+<li><code>from sklearn.metrics import classification_report</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> F1 on negative class around 0.80. F1 on
+neutral around 0.45 (neutral is hardest). F1 on positive around
+0.55–0.65. Macro F1 around 0.60–0.65. Module 4 improves this.</li>
+</ul>
+<h3 id="step-7-save-the-trained-pipeline">Step 7 — Save the trained
+pipeline</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>import joblib</code>.</li>
+<li><code>joblib.dump(full_pipeline, '/content/drive/MyDrive/airline_lab/airline_pipeline.joblib')</code>.</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-james-3">Phase C — Make ONE chart for
+James</h2>
+<h3 id="jamess-chart-how-many-tweets-did-we-route-correctly">James’s
+chart — “How many tweets did we route correctly?”</h3>
+<p>A confusion matrix with annotations and clear labels.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>ConfusionMatrixDisplay</code>.</li>
+<li>Or
+<code>sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=[...], yticklabels=[...])</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Routing accuracy: of 1,000 angry tweets,
+our baseline catches ~800.”</li>
+<li><strong>Takeaway for James:</strong> “We catch most angry tweets
+correctly. We confuse neutral and positive sometimes. Marketing may get
+a few wrong tweets. Module 4 with a better model will fix this.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-5">Common mistakes in Class 5</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Build the pipeline AFTER you scaled the data manually</td>
+<td>Pipeline scales it twice. Numbers wrong.</td>
+</tr>
+<tr>
+<td>Forget <code>sparse_output=False</code> in OneHotEncoder</td>
+<td>Some downstream code breaks.</td>
+</tr>
+<tr>
+<td>Use <code>class_weight='balanced'</code> AND oversampling</td>
+<td>Over-correction. Pick one.</td>
+</tr>
+<tr>
+<td>Forget <code>random_state</code></td>
+<td>Results change every run. Hard to debug.</td>
+</tr>
+<tr>
+<td>Forget <code>multi_class='multinomial'</code></td>
+<td>Default uses one-vs-rest. For 3 classes that is OK but multinomial
+is better.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-6">Self-check before Class 6</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Pipeline has preprocessor +
+model.</label></li>
+<li><label><input type="checkbox" />Preprocessor has numeric +
+categorical transformers.</label></li>
+<li><label><input type="checkbox" /><code>handle_unknown='ignore'</code>
+set.</label></li>
+<li><label><input type="checkbox" /><code>class_weight='balanced'</code>
+set.</label></li>
+<li><label><input type="checkbox" />Confusion matrix chart.</label></li>
+<li><label><input type="checkbox" /><code>airline_pipeline.joblib</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-6-end-to-end-lab-the-big-one">Class 6 — End-to-End Lab
+(THE BIG ONE)</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> James is in the meeting room. He
+wants the FINAL clean dataset on his desk in 90 minutes. This is the
+lab.</p>
+</blockquote>
+<h2 id="your-goal-5">Your goal</h2>
+<p>Take 1 raw CSV file. Produce ONE final <code>.parquet</code> file
+with the exact 19-column schema. Plus a 1-page findings report.</p>
+<h2 id="time">Time</h2>
+<p><strong>90 minutes</strong> of focused work.</p>
+<h2 id="inputs-5">Inputs</h2>
+<ul>
+<li>The raw CSV file <code>Tweets.csv</code> in your Drive folder</li>
+</ul>
+<h2 id="outputs-5">Outputs</h2>
+<ul>
+<li><code>airline_tweets_clean.parquet</code> (~14,000 rows × 19
+columns) in Drive</li>
+<li><code>findings.md</code> (~1 page)</li>
+<li>Your full Colab notebook</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-10-minutes">Phase A — Explore the
+data first (10 minutes)</h2>
+<p>You will reuse charts from Classes 1–5. Pick 3 of them. Put them all
+on ONE PAGE of your notebook with markdown headers: 1. Sentiment
+distribution (the 63% negative problem) 2. Top complaint topics (the
+routing list) 3. Top 10 most important features for prediction</p>
+<p>These 3 charts tell James the whole story.</p>
+<hr />
+<h2 id="phase-b-build-the-final-dataset-70-minutes">Phase B — Build the
+final dataset (70 minutes)</h2>
+<h3 id="required-output-schema">Required output schema</h3>
+<p>Your <code>airline_tweets_clean.parquet</code> MUST have these 19
+columns, with these names and types:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>Column</th>
+<th>Type</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>tweet_id</code></td>
+<td>string</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>airline</code></td>
+<td>string</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>airline_sentiment_confidence</code></td>
+<td>float</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>negativereason</code></td>
+<td>string (or “not_negative”)</td>
+<td>raw, filled</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>retweet_count</code></td>
+<td>int</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>tweet_year</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>tweet_month</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>tweet_dayofweek</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>tweet_hour</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>is_weekend</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>text_length</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>n_mentions</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>n_hashtags</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>has_url</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>n_caps_words</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>has_question_mark</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>has_exclamation</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>sentiment_lexicon_score</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>airline_sentiment</code></td>
+<td>string (negative/neutral/positive)</td>
+<td>TARGET (raw)</td>
+</tr>
+</tbody>
+</table>
+<p>You should also keep the <code>text</code> column SEPARATELY (in a
+different file or as an extra column) for Module 7. But it is NOT part
+of the 19 required columns.</p>
+<h3 id="lab-phases-timed">Lab phases (timed)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Time</th>
+<th>What you do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Load</td>
+<td>5 min</td>
+<td>Load <code>Tweets.csv</code>. Confirm 14,640 rows.</td>
+</tr>
+<tr>
+<td>2. Clean</td>
+<td>15 min</td>
+<td>Convert <code>tweet_created</code> to datetime (UTC). Drop 4 useless
+columns. Drop missing-text rows. Drop duplicates.</td>
+</tr>
+<tr>
+<td>3. Date features</td>
+<td>10 min</td>
+<td>Engineer tweet_year/month/dayofweek/hour/is_weekend.</td>
+</tr>
+<tr>
+<td>4. Text features</td>
+<td>20 min</td>
+<td>Engineer text_length, n_mentions, n_hashtags, has_url, n_caps_words,
+has_question_mark, has_exclamation.</td>
+</tr>
+<tr>
+<td>5. Lexicon score</td>
+<td>10 min</td>
+<td>Build positive/negative word lists, compute
+<code>sentiment_lexicon_score</code>.</td>
+</tr>
+<tr>
+<td>6. Fill missing + save</td>
+<td>10 min</td>
+<td>Fill <code>negativereason</code> with “not_negative”. Validate
+schema. Save <code>.parquet</code>.</td>
+</tr>
+<tr>
+<td>7. Findings</td>
+<td>10 min</td>
+<td>Write <code>findings.md</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total: 90 minutes.</strong></p>
+<hr />
+<h2 id="phase-c-findings-report-for-james-10-minutes">Phase C — Findings
+report for James (10 minutes)</h2>
+<p>Write <code>findings.md</code> with these sections:</p>
+<h3 id="final-numbers">Final numbers</h3>
+<ul>
+<li>Final row count: ____ (~14,000)</li>
+<li>Sentiment breakdown:
+<ul>
+<li>Negative: ____% (should be ~63%)</li>
+<li>Neutral: ____% (should be ~21%)</li>
+<li>Positive: ____% (should be ~16%)</li>
+</ul></li>
+</ul>
+<h3 id="top-3-insights">Top 3 insights</h3>
+<ol type="1">
+<li><hr /></li>
+<li><hr /></li>
+<li><hr /></li>
+</ol>
+<h3 id="one-question-to-investigate-in-module-4">One question to
+investigate in Module 4</h3>
+<ul>
+<li><hr /></li>
+</ul>
+<h3
+id="suggested-routing-rules-for-the-simple-rule-based-first-version">Suggested
+routing rules (for the simple rule-based first version)</h3>
+<ul>
+<li>If <code>sentiment_lexicon_score &lt;= -3</code> AND
+<code>n_caps_words &gt;= 2</code>: route to a human agent.</li>
+<li>If <code>negativereason == 'Late Flight'</code>: route to
+operations.</li>
+<li>If
+<code>negativereason == 'Lost Luggage' or 'Damaged Luggage'</code>:
+route to baggage team.</li>
+<li>If <code>airline_sentiment == 'positive'</code>: route to
+marketing.</li>
+<li>(You can refine these in the report.)</li>
+</ul>
+<h3 id="one-chart-that-summarizes-everything">One chart that summarizes
+everything</h3>
+<p>Embed your most important chart. Suggestion: the bar chart of
+complaint topics by airline. James can see at a glance which airline has
+the worst late-flight problem.</p>
+<hr />
+<h2 id="grading-rubric-100-points">Grading rubric (100 points)</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Item</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All 19 columns exist with the right names and dtypes</td>
+<td>25</td>
+</tr>
+<tr>
+<td>Cleaning decisions written in markdown</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Pipeline is reproducible (re-run from raw CSV in ONE command)</td>
+<td>15</td>
+</tr>
+<tr>
+<td><code>sentiment_lexicon_score</code> computed (positive minus
+negative word counts, lowercased)</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Sentiment distribution preserved (~63% / ~21% / ~16%)</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>At least 3 exploratory + 1 explanatory chart per
+class</strong></td>
+<td><strong>15</strong></td>
+</tr>
+<tr>
+<td><code>findings.md</code> has insights, not just numbers</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Code is clean (comments, sensible variable names)</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<h2 id="submit">Submit</h2>
+<p>Upload to
+<code>module-3/class_6/submissions/&lt;YourTeamName&gt;/</code>: -
+<code>airline_tweets_clean.parquet</code> - Your Colab notebook
+(<code>File &gt; Download &gt; Download .ipynb</code>) -
+<code>findings.md</code></p>
+<hr />
+<h1 id="tips-for-the-whole-module">Tips for the whole module</h1>
+<ol type="1">
+<li><strong>Do NOT copy-paste code from this guide.</strong> This guide
+gives you HINTS only. Write the code yourself. You will learn much
+faster.</li>
+<li><strong>Save your notebook to Drive often.</strong> Colab
+disconnects after 12 hours.</li>
+<li><strong>Save intermediate <code>.parquet</code> files to
+Drive</strong> (tweets_step1, tweets_step2, etc.). If something breaks,
+you do not redo everything.</li>
+<li><strong>Pair-program.</strong> One student types, one reads. Switch
+every 20 minutes.</li>
+<li><strong>Make a chart BEFORE you write cleaning code.</strong> You
+must SEE the problem before you can fix it.</li>
+<li><strong>Make a chart AFTER each step.</strong> Confirm your code did
+what you expected.</li>
+<li><strong>Small data is your friend.</strong> 14,000 rows runs in
+seconds. Use the speed: try many ideas, throw away the bad ones.</li>
+<li><strong>Keep the <code>text</code> column safe somewhere.</strong>
+Module 7 will need it. Do not lose it.</li>
+<li><strong>Ask the mentor early.</strong> If you are stuck for 20
+minutes, ask. Do not waste an afternoon.</li>
+</ol>
+<p>Good luck.</p>
+</main>
+
+<footer class="scenario-footer">
+  <p><a href="../../#/module/3/class/6">&larr; Back to all 15 scenarios</a></p>
+</footer>
+
+</body>
+</html>

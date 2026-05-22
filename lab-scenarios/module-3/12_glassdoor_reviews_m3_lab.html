@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>12_glassdoor_reviews_m3_lab</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --text: #e6e8ec;
+    --text-dim: #9aa0aa;
+    --accent: #7aa2f7;
+    --accent-hover: #a5c0ff;
+    --border: #2a2f3a;
+    --code-bg: #11141a;
+    --table-header: #232732;
+    --quote-bar: #7aa2f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(26, 29, 36, 0.92);
+  }
+  .topbar-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .back-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .back-link:hover { color: var(--accent-hover); }
+  .pdf-link {
+    background: var(--accent);
+    color: #0f1115;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pdf-link:hover { background: var(--accent-hover); }
+  .pdf-link svg { width: 14px; height: 14px; }
+
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 56px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  p { margin-bottom: 16px; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+  strong { color: #fff; font-weight: 600; }
+  em { color: var(--text); font-style: italic; }
+
+  ul, ol { margin-bottom: 18px; padding-left: 28px; }
+  li { margin-bottom: 6px; }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 36px 0;
+  }
+
+  blockquote {
+    border-left: 4px solid var(--quote-bar);
+    background: var(--card);
+    padding: 14px 22px;
+    margin: 18px 0;
+    color: var(--text);
+    border-radius: 0 8px 8px 0;
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  blockquote strong { color: var(--accent); }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    font-size: 0.88em;
+    color: #f0a3b5;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 18px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text);
+    font-size: 1em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.94rem;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  thead { background: var(--table-header); }
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+
+  /* Checkboxes in self-check lists */
+  input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+
+  /* Anchored sections for nav */
+  h2[id], h3[id] { scroll-margin-top: 80px; }
+
+  footer.scenario-footer {
+    max-width: 920px;
+    margin: 60px auto 40px;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+  footer.scenario-footer a {
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    main { padding: 24px 16px 60px; }
+    h1 { font-size: 1.7rem; }
+    h2 { font-size: 1.35rem; }
+    h3 { font-size: 1.1rem; }
+    .topbar { padding: 10px 16px; }
+    pre { font-size: 0.8rem; padding: 12px 14px; }
+    table { font-size: 0.85rem; }
+    th, td { padding: 9px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="../../#/module/3/class/6">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <span style="display:inline-block;transform:translateY(-1px)">&larr;</span> Back to all scenarios
+    </a>
+    <a class="pdf-link" href="12_glassdoor_reviews_m3_lab.pdf" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-4-4h3V4h2v8h3l-4 4zm-8 4v-2h16v2H4z"/></svg>
+      Download as PDF
+    </a>
+  </div>
+</div>
+
+<main>
+<h1 id="glassdoor-reviews-module-3-lab-guide">Glassdoor Reviews — Module
+3 Lab Guide</h1>
+<p><strong>Scenario:</strong> HR &amp; jobs. Predict if an employee
+would recommend their company. <strong>Module:</strong> 3 (Data
+Preparation and Feature Engineering) <strong>Audience:</strong> Adult
+learners, A2 English. New to AI. <strong>Tools:</strong> Google Colab
+(no install needed).</p>
+<hr />
+<h1 id="the-scenario-your-mission">The Scenario — Your Mission</h1>
+<h2 id="where-you-work">Where you work</h2>
+<p>You and your team are new data analysts at
+<strong>Glassdoor</strong>. Glassdoor is a website where workers
+anonymously review their company. They give 1 to 5 stars + write what is
+good (pros) and bad (cons).</p>
+<p>Every month: - <strong>600,000 reviews</strong> are submitted
+globally. - Some workers click “Yes, I recommend this company”. - Some
+click “No”. - <strong>Many workers leave the recommend field
+empty.</strong></p>
+<h2 id="the-problem">The problem</h2>
+<p>Glassdoor sells “Employer Insights” reports to corporate HR teams.
+The reports show: “Your employees rate you 3.4 stars. 65% would
+recommend you.”</p>
+<p>But when 30% of workers leave the recommend field empty, the report
+is incomplete. HR teams are not happy.</p>
+<p>Linda is worried. She calls your team into a meeting.</p>
+<h2 id="your-managers-request">Your manager’s request</h2>
+<p>Your manager, <strong>Linda</strong> (Director of Insights), tells
+you:</p>
+<blockquote>
+<p>“When a worker leaves the recommend field empty, we are blind. We
+sell incomplete reports.</p>
+<p>I need a model. Read the pros, cons, and advice-to-management text.
+Predict whether the worker would recommend — even when they did not
+click the button.</p>
+<p>Now we deliver a COMPLETE report to every HR team. They pay more for
+complete reports.”</p>
+</blockquote>
+<h2 id="your-teams-job-for-the-next-2-weeks-module-3">Your team’s job
+for the next 2 weeks (Module 3)</h2>
+<p>Linda sends you a CSV with <strong>600,000 reviews</strong>. You will
+sample <strong>100,000</strong> rows to keep it tractable.</p>
+<p>Your job in Module 3: &gt; <strong>Turn this CSV into ONE clean file.
+The clean file will be used to train the model in Module 4.</strong></p>
+<p>The clean file is called
+<code>glassdoor_reviews_clean.parquet</code>. It must have <strong>21
+specific columns</strong> (we will see them in Class 6).</p>
+<h2 id="after-module-3">After Module 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Module</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Module 4</strong></td>
+<td>Train the recommend model. Linda gets her “predicted recommend”
+tool.</td>
+</tr>
+<tr>
+<td><strong>Module 5</strong></td>
+<td>Group companies by review profile. “Pay good, culture bad” vs “Pay
+low, growth high”.</td>
+</tr>
+<tr>
+<td><strong>Module 7</strong></td>
+<td>Use all 4 text columns. Find aspect sentiment: pay, culture, growth,
+management.</td>
+</tr>
+</tbody>
+</table>
+<p>You use the <strong>same Glassdoor dataset</strong> until the end of
+Module 7.</p>
+<hr />
+<h1 id="how-this-guide-works-read-this-first">How This Guide Works (Read
+This First!)</h1>
+<h2 id="we-do-not-give-you-the-full-code">We do NOT give you the full
+code</h2>
+<p>In this guide you will see:</p>
+<h3 id="what-why-expected-explained-in-words">1. WHAT / WHY / EXPECTED —
+explained in words</h3>
+<p>For every step: - <strong>WHAT</strong> you have to do -
+<strong>WHY</strong> you do it - <strong>HINTS</strong> — function names
++ arguments - <strong>EXPECTED</strong> — the result you should see</p>
+<h3 id="sometimes-a-code-skeleton-with-blanks">2. Sometimes a code
+skeleton with blanks</h3>
+<p>You fill in the blanks (<code>___</code>).</p>
+<h3 id="why-no-full-code">Why no full code?</h3>
+<p>You will NOT learn if you copy-paste. <strong>Rule:</strong> Redo
+every copy-pasted step by yourself.</p>
+<hr />
+<h1 id="visualizations-two-modes">Visualizations — Two Modes</h1>
+<h2 id="exploratory-charts-for-you">1. Exploratory charts (for YOU)</h2>
+<p>Fast, ugly. Goal: “What does this data look like?”</p>
+<h2 id="explanatory-charts-for-linda">2. Explanatory charts (for
+LINDA)</h2>
+<p>Clean, labeled, one clear message. Goal: “Linda, look at this.”</p>
+<h2 id="your-plotting-toolkit">Your plotting toolkit</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Plot</th>
+<th>When to use it</th>
+<th>Function name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Histogram</td>
+<td>Shape of a numeric column</td>
+<td><code>plt.hist()</code></td>
+</tr>
+<tr>
+<td>Bar chart</td>
+<td>Count of each category</td>
+<td><code>df['col'].value_counts().plot.bar()</code></td>
+</tr>
+<tr>
+<td>Box plot</td>
+<td>Outliers in a numeric column</td>
+<td><code>sns.boxplot()</code></td>
+</tr>
+<tr>
+<td>Heatmap</td>
+<td>Correlation between many columns</td>
+<td><code>sns.heatmap(df.corr())</code></td>
+</tr>
+</tbody>
+</table>
+<p>Before you start: <code>import matplotlib.pyplot as plt</code> and
+<code>import seaborn as sns</code>.</p>
+<hr />
+<h1 id="before-you-start-google-colab-setup">Before You Start — Google
+Colab Setup</h1>
+<h2 id="step-1-open-a-new-colab-notebook">Step 1 — Open a new Colab
+notebook</h2>
+<ol type="1">
+<li>Go to https://colab.research.google.com</li>
+<li>Sign in with your Google account.</li>
+<li>Click <strong>“New notebook”</strong>.</li>
+<li>Name it <code>glassdoor_module_3.ipynb</code>.</li>
+</ol>
+<h2 id="step-2-connect-to-google-drive">Step 2 — Connect to Google
+Drive</h2>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> drive</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>drive.mount(<span class="st">&#39;/content/drive&#39;</span>)</span></code></pre></div>
+<h2 id="step-3-create-a-project-folder">Step 3 — Create a project
+folder</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&#39;/content/drive/MyDrive/glassdoor_lab&#39;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>cd <span class="op">/</span>content<span class="op">/</span>drive<span class="op">/</span>MyDrive<span class="op">/</span>glassdoor_lab</span></code></pre></div>
+<h2 id="step-4-get-the-data">Step 4 — Get the data</h2>
+<p><strong>Option A — Direct from Kaggle:</strong></p>
+<ol type="1">
+<li>Free Kaggle account.</li>
+<li>Upload <code>kaggle.json</code>:</li>
+</ol>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> files</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>files.upload()</span></code></pre></div>
+<ol start="3" type="1">
+<li>Then:</li>
+</ol>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>mkdir <span class="op">-</span>p <span class="op">~/</span>.kaggle <span class="op">&amp;&amp;</span> mv kaggle.json <span class="op">~/</span>.kaggle<span class="op">/</span> <span class="op">&amp;&amp;</span> chmod <span class="dv">600</span> <span class="op">~/</span>.kaggle<span class="op">/</span>kaggle.json</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install kaggle <span class="op">-</span>q</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kaggle datasets download <span class="op">-</span>d davidgauthier<span class="op">/</span>glassdoor<span class="op">-</span>job<span class="op">-</span>reviews</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>unzip <span class="op">-</span>q glassdoor<span class="op">-</span>job<span class="op">-</span>reviews.<span class="bu">zip</span> <span class="op">-</span>d data</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ls data<span class="op">/</span></span></code></pre></div>
+<p><strong>Option B — Upload by hand</strong> in Colab’s file panel.</p>
+<h2 id="step-5-sample-100000-rows">Step 5 — Sample 100,000 rows</h2>
+<p>The full dataset is 600,000 rows. Sample 100,000 to keep Colab
+fast:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;data/glassdoor_reviews.csv&#39;</span>).sample(<span class="dv">100_000</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.shape)</span></code></pre></div>
+<h2 id="colab-tips">Colab tips</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Save your notebook to Drive often</td>
+<td>Colab disconnects after 12 hours.</td>
+</tr>
+<tr>
+<td>Save intermediate <code>.parquet</code> files to Drive</td>
+<td>Files in <code>/content/</code> disappear when Colab
+disconnects.</td>
+</tr>
+<tr>
+<td>Share the notebook with teammates (Share button, top right)</td>
+<td>Editor access. Like Google Docs for code.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="class-1-data-cleaning">Class 1 — Data Cleaning</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Linda drops a 600,000-row CSV.
+You sample 100,000. The date column is text. Some workers wrote nothing
+in the advice field. Your job today: clean and shape.</p>
+</blockquote>
+<h2 id="your-goal">Your goal</h2>
+<p>Sample, fix dates, deal with missing text fields.</p>
+<h2 id="inputs">Inputs</h2>
+<ul>
+<li><code>data/glassdoor_reviews.csv</code></li>
+</ul>
+<h2 id="outputs">Outputs</h2>
+<ul>
+<li><code>reviews_step1.parquet</code> saved in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 chart for Linda</li>
+<li>Notes in markdown</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-15-min">Phase A — Explore the
+data first (15 min)</h2>
+<h3 id="exploratory-chart-1-distribution-of-overall_rating">Exploratory
+chart 1 — Distribution of <code>overall_rating</code></h3>
+<ul>
+<li><strong>Question:</strong> “Most workers rate around 3.5. Is it
+normal-shaped or skewed?”</li>
+<li><strong>HINTS:</strong> Histogram with <code>bins=5</code> (ratings
+are 1-5).</li>
+<li><strong>What you learn:</strong> Slight skew toward 4-5.</li>
+</ul>
+<h3 id="exploratory-chart-2-recommend-value-counts">Exploratory chart 2
+— <code>recommend</code> value counts</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df['recommend'].value_counts(dropna=False).plot.bar()</code>.</li>
+<li><strong>What you learn:</strong> ~65% Yes, ~25% No, ~10% empty
+(missing).</li>
+</ul>
+<h3 id="exploratory-chart-3-missing-values-per-column">Exploratory chart
+3 — Missing values per column</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df.isna().sum().sort_values(ascending=False).plot.barh()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> <code>advice_to_mgmt</code> is the
+most-missing column (~30%).</li>
+</ul>
+<hr />
+<h2 id="phase-b-clean-the-reviews-table-45-min">Phase B — Clean the
+reviews table (45 min)</h2>
+<h3 id="step-1-load-and-sample">Step 1 — Load and sample</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>pd.read_csv('data/glassdoor_reviews.csv')</code>.</li>
+<li><code>.sample(100_000, random_state=42)</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> 100,000 rows.</li>
+</ul>
+<h3 id="step-2-look-at-the-dataframe">Step 2 — Look at the
+DataFrame</h3>
+<ul>
+<li><strong>WHAT:</strong> Run <code>.info()</code>,
+<code>.head()</code>, <code>.shape</code>, <code>.dtypes</code>.</li>
+<li><strong>EXPECTED:</strong> ~17 columns. <code>date_review</code> is
+<code>object</code> (text, not datetime).</li>
+</ul>
+<h3 id="step-3-convert-date_review-to-datetime">Step 3 — Convert
+<code>date_review</code> to datetime</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>pd.to_datetime(df['date_review'], errors='coerce')</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> We need to compute review age.</li>
+</ul>
+<h3 id="step-4-find-missing-values">Step 4 — Find missing values</h3>
+<ul>
+<li><strong>WHAT:</strong> <code>df.isna().sum()</code>.</li>
+<li><strong>EXPECTED:</strong>
+<ul>
+<li><code>advice_to_mgmt</code>: ~30,000 missing.</li>
+<li><code>recommend</code>: ~10,000 missing (these are our “blind” rows
+from Linda’s problem).</li>
+<li>Sub-ratings (<code>work_life_balance</code>,
+<code>culture_values</code>, etc.): a few thousand missing each.</li>
+</ul></li>
+</ul>
+<h3 id="step-5-decide-what-to-do-with-each-missing-column">Step 5 —
+Decide what to do with each missing column</h3>
+<p>For each column with missing values, decide: - <strong>A</strong>
+Drop the row? - <strong>B</strong> Fill with a default value? -
+<strong>C</strong> Add a flag column “was missing”?</p>
+<p>Common choices: - <code>recommend</code>: This IS our target. Drop
+rows where it is missing? Or keep them as “unknown” for prediction
+later? - For Module 3: drop these rows so we have a clean training
+target. - <code>advice_to_mgmt</code>: Replace empty with the string “no
+advice given”. Keep the row. - Sub-ratings: Impute the median.</p>
+<p><strong>WRITE DOWN</strong> your decisions in markdown.</p>
+<h3 id="step-6-drop-rows-with-missing-recommend">Step 6 — Drop rows with
+missing <code>recommend</code></h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df = df.dropna(subset=['recommend']).copy()</code>.</li>
+<li><strong>EXPECTED:</strong> ~90,000 rows remain.</li>
+</ul>
+<h3 id="step-7-replace-empty-text-fields-with-a-placeholder">Step 7 —
+Replace empty text fields with a placeholder</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['advice_to_mgmt'] = df['advice_to_mgmt'].fillna('no advice given')</code>.</li>
+<li><code>df['pros'] = df['pros'].fillna('')</code>.</li>
+<li>Same for <code>cons</code>, <code>headline</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-8-save-to-drive">Step 8 — Save to Drive</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/glassdoor_lab/reviews_step1.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-linda-15-min">Phase C — Make ONE
+chart for Linda (15 min)</h2>
+<h3 id="lindas-chart-where-we-are-blind">Linda’s chart — “Where we are
+blind”</h3>
+<p>A bar chart showing 3 bars: - Recommend = Yes - Recommend = No -
+Recommend = Missing (= “where we are blind”)</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['recommend'].value_counts(dropna=False).plot.bar()</code>.</li>
+<li>Use <code>'v'</code> (vertical) bars.</li>
+<li>Highlight the “missing” bar in red.</li>
+</ul></li>
+<li><strong>Title:</strong> “10% of reviews leave recommend empty — that
+is 60,000 missing data points per year.”</li>
+<li><strong>Takeaway for Linda:</strong> “Our model fills these in. We
+deliver a complete report.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-1">Common mistakes in Class 1</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Forget <code>random_state=42</code> in sample</td>
+<td>Different teammates have different samples. Hard to compare.</td>
+</tr>
+<tr>
+<td>Drop the rows with missing <code>recommend</code> AFTER
+training</td>
+<td>Leakage. Drop them in Class 1.</td>
+</tr>
+<tr>
+<td>Forget <code>errors='coerce'</code> on <code>to_datetime</code></td>
+<td>One bad date crashes the code.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-2">Self-check before Class 2</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />You sampled 100,000 with
+<code>random_state=42</code>.</label></li>
+<li><label><input type="checkbox" /><code>date_review</code> is
+datetime.</label></li>
+<li><label><input type="checkbox" />Rows with missing
+<code>recommend</code> are dropped.</label></li>
+<li><label><input type="checkbox" />Empty text columns are filled with a
+placeholder.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Linda.</label></li>
+<li><label><input type="checkbox" /><code>reviews_step1.parquet</code>
+saved.</label></li>
+</ul>
+<hr />
+<h1 id="class-2-encoding-and-scaling">Class 2 — Encoding and
+Scaling</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Linda says: “The
+<code>firm</code> column has 50,000 different company names. The
+sub-ratings are 1-5. Some workers are ‘current employees’, some are
+‘former’. Make these usable for the model.”</p>
+</blockquote>
+<h2 id="your-goal-1">Your goal</h2>
+<p>Encode <code>firm</code> (high-cardinality). One-hot the
+current/former status. Scale sub-ratings.</p>
+<h2 id="inputs-1">Inputs</h2>
+<ul>
+<li><code>reviews_step1.parquet</code></li>
+</ul>
+<h2 id="outputs-1">Outputs</h2>
+<ul>
+<li><code>reviews_step2.parquet</code> in Drive</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-top-20-firms-by-review-count">Exploratory
+chart 1 — Top 20 firms by review count</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>value_counts().head(20).plot.bar()</code>.</li>
+<li><strong>What you learn:</strong> Amazon, Google, Walmart dominate.
+Most firms have few reviews.</li>
+</ul>
+<h3 id="exploratory-chart-2-distribution-of-overall_rating">Exploratory
+chart 2 — Distribution of <code>overall_rating</code></h3>
+<ul>
+<li><strong>HINTS:</strong> Histogram.</li>
+</ul>
+<h3 id="exploratory-chart-3-sub-ratings-missing-counts">Exploratory
+chart 3 — Sub-ratings missing counts</h3>
+<ul>
+<li><strong>HINTS:</strong> For each sub-rating
+(<code>work_life_balance</code>, <code>culture_values</code>,
+<code>career_opp</code>, <code>comp_benefits</code>,
+<code>senior_mgmt</code>), count <code>.isna()</code>.</li>
+</ul>
+<h3
+id="exploratory-chart-4-current-vs-former-employee-distribution">Exploratory
+chart 4 — <code>current</code> vs <code>former</code> employee
+distribution</h3>
+<ul>
+<li><strong>HINTS:</strong> <code>value_counts()</code>.</li>
+<li><strong>What you learn:</strong> Maybe 70% current, 30% former.</li>
+</ul>
+<hr />
+<h2 id="phase-b-encode-and-scale">Phase B — Encode and scale</h2>
+<h3 id="step-1-target-encode-firm">Step 1 — Target-encode
+<code>firm</code></h3>
+<ul>
+<li><strong>WHAT:</strong> 50,000 unique firms. One-hot is impossible.
+Target-encode = replace each firm name with the mean
+<code>recommend</code> rate for that firm.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute mean of <code>recommend</code> per firm.</li>
+<li>WARNING: only on train data in Class 4. For EDA now:
+<code>df.groupby('firm')['recommend'].transform('mean')</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Reduces 50,000 categories to 1 number per
+row.</li>
+</ul>
+<h3 id="step-2-one-hot-encode-current">Step 2 — One-hot encode
+<code>current</code></h3>
+<ul>
+<li><strong>WHAT:</strong> This column has values “Current Employee” or
+“Former Employee”.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['is_current_employee'] = (df['current'] == 'Current Employee').astype(int)</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-3-one-hot-encode-top-20-job_title-values">Step 3 — One-hot
+encode top-20 <code>job_title</code> values</h3>
+<ul>
+<li><strong>WHAT:</strong> Many job titles. Keep top 20 + “Other”.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Find top 20:
+<code>df['job_title'].value_counts().head(20).index</code>.</li>
+<li>For each:
+<code>df[f'job_{title}'] = (df['job_title'] == title).astype(int)</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-4-impute-sub-ratings-with-median">Step 4 — Impute
+sub-ratings with median</h3>
+<ul>
+<li><strong>WHAT:</strong> <code>work_life_balance</code>,
+<code>culture_values</code>, etc., have some missing values.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>For each sub-rating, compute median on training data.</li>
+<li>Fill missing with median.</li>
+</ul></li>
+<li><strong>WARNING:</strong> Only learn median from TRAIN. Apply same
+value to TEST.</li>
+</ul>
+<h3 id="step-5-save">Step 5 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/glassdoor_lab/reviews_step2.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-linda">Phase C — Make ONE chart for
+Linda</h2>
+<h3 id="lindas-chart-top-20-firms-by-recommend-rate">Linda’s chart —
+“Top 20 firms by recommend rate”</h3>
+<p>A horizontal bar chart of the top 20 firms (with at least 100
+reviews) by mean <code>recommend</code>.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Filter to firms with &gt;100 reviews.</li>
+<li>GroupBy firm, mean recommend, sort, head 20.</li>
+</ul></li>
+<li><strong>Title:</strong> “Top 20 employers by recommend rate.”</li>
+<li><strong>Takeaway for Linda:</strong> “These are our ‘best employer’
+candidates. Sell them an ‘Employer of Choice’ badge.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-2">Common mistakes in Class 2</h2>
+<table>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Target-encode <code>firm</code> on FULL data</td>
+<td>Leakage.</td>
+</tr>
+<tr>
+<td>One-hot encode <code>firm</code> directly</td>
+<td>50,000 new columns. Crash.</td>
+</tr>
+<tr>
+<td>Impute sub-ratings BEFORE train/test split</td>
+<td>Leakage.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-3">Self-check before Class 3</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>firm</code> is
+target-encoded.</label></li>
+<li><label><input type="checkbox" /><code>is_current_employee</code>
+exists.</label></li>
+<li><label><input type="checkbox" />Top-20 job titles are
+one-hot.</label></li>
+<li><label><input type="checkbox" />Sub-ratings have no missing
+values.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Linda.</label></li>
+<li><label><input type="checkbox" /><code>reviews_step2.parquet</code>
+saved.</label></li>
+</ul>
+<hr />
+<h1 id="class-3-feature-engineering">Class 3 — Feature Engineering</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Linda says: “Now make me the
+SMART columns. Length of the pros. Length of the cons. Does the worker
+mention ‘layoffs’ or ‘great pay’? These are the signals.”</p>
+</blockquote>
+<h2 id="your-goal-2">Your goal</h2>
+<p>Engineer signals from the 4 text columns: <code>headline</code>,
+<code>pros</code>, <code>cons</code>, <code>advice_to_mgmt</code>.</p>
+<h2 id="inputs-2">Inputs</h2>
+<ul>
+<li><code>reviews_step2.parquet</code></li>
+</ul>
+<h2 id="outputs-2">Outputs</h2>
+<ul>
+<li><code>reviews_step3.parquet</code> in Drive</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-1">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-pros_length-vs-recommend">Exploratory chart
+1 — <code>pros_length</code> vs <code>recommend</code></h3>
+<ul>
+<li>After Step 1 below.</li>
+<li><strong>HINTS:</strong> Bin <code>pros_length</code> into 5 groups,
+mean recommend, bar chart.</li>
+<li><strong>What you learn:</strong> Workers who write LONG pros are
+more likely to recommend.</li>
+</ul>
+<h3 id="exploratory-chart-2-cons_length-vs-recommend">Exploratory chart
+2 — <code>cons_length</code> vs <code>recommend</code></h3>
+<ul>
+<li><strong>HINTS:</strong> Same pattern.</li>
+<li><strong>What you learn:</strong> Workers who write LONG cons are
+LESS likely to recommend.</li>
+</ul>
+<h3
+id="exploratory-chart-3-mentions_layoffs-rate-by-recommend">Exploratory
+chart 3 — <code>mentions_layoffs</code> rate by recommend</h3>
+<ul>
+<li>After Step 3 below.</li>
+<li><strong>What you learn:</strong> Mentions of “layoffs”, “fired”
+strongly predict NO recommend.</li>
+</ul>
+<hr />
+<h2 id="phase-b-engineer-the-features">Phase B — Engineer the
+features</h2>
+<h3 id="step-1-length-features">Step 1 — Length features</h3>
+<p>For each of the 4 text columns (<code>headline</code>,
+<code>pros</code>, <code>cons</code>, <code>advice_to_mgmt</code>):</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>New column</th>
+<th>How to make it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>headline_length</code></td>
+<td><code>df['headline'].fillna('').str.len()</code></td>
+</tr>
+<tr>
+<td><code>headline_n_words</code></td>
+<td><code>df['headline'].fillna('').str.split().apply(len)</code></td>
+</tr>
+<tr>
+<td><code>pros_length</code></td>
+<td><code>df['pros'].fillna('').str.len()</code></td>
+</tr>
+<tr>
+<td><code>cons_length</code></td>
+<td><code>df['cons'].fillna('').str.len()</code></td>
+</tr>
+<tr>
+<td><code>advice_length</code></td>
+<td><code>df['advice_to_mgmt'].fillna('').str.len()</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-2-pros-cons-ratio">Step 2 — Pros / Cons ratio</h3>
+<ul>
+<li><strong>WHAT:</strong> A worker who writes MUCH MORE in pros than
+cons is positive.</li>
+<li><strong>HINTS:</strong>
+<code>df['pros_to_cons_ratio'] = (df['pros_length'] + 1) / (df['cons_length'] + 1)</code>.</li>
+</ul>
+<h3 id="step-3-keyword-flags">Step 3 — Keyword flags</h3>
+<p>For each of these keywords (case-insensitive), make a binary
+column:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Keyword group</th>
+<th>Search words</th>
+<th>New column</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compensation</td>
+<td>“pay”, “salary”, “money”, “bonus”</td>
+<td><code>mentions_money</code></td>
+</tr>
+<tr>
+<td>Growth</td>
+<td>“promotion”, “growth”, “career”, “learn”</td>
+<td><code>mentions_growth</code></td>
+</tr>
+<tr>
+<td>Layoffs</td>
+<td>“layoff”, “fired”, “let go”</td>
+<td><code>mentions_layoffs</code></td>
+</tr>
+<tr>
+<td>Management</td>
+<td>“manager”, “boss”, “leadership”</td>
+<td><code>mentions_management</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Combine all 4 text columns into one big text string per row.</li>
+<li><code>df['mentions_money'] = combined_text.str.contains('pay|salary|money|bonus', case=False, regex=True).astype(int)</code>.</li>
+<li>Same for other keywords.</li>
+</ul></li>
+</ul>
+<h3 id="step-4-date-features">Step 4 — Date features</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>New column</th>
+<th>How to make it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>review_year</code></td>
+<td><code>df['date_review'].dt.year</code></td>
+</tr>
+<tr>
+<td><code>review_month</code></td>
+<td><code>.dt.month</code></td>
+</tr>
+<tr>
+<td><code>review_age_days</code></td>
+<td><code>(pd.Timestamp.now() - df['date_review']).dt.days</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-5-save-1">Step 5 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/glassdoor_lab/reviews_step3.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-linda-1">Phase C — Make ONE chart for
+Linda</h2>
+<h3 id="lindas-chart-mentions-of-layoffs-predict-no-recommend">Linda’s
+chart — “Mentions of ‘layoffs’ predict NO recommend”</h3>
+<p>A bar chart showing the recommend rate for: reviews with “layoffs”
+mentioned vs without.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>GroupBy <code>mentions_layoffs</code>, mean recommend.</li>
+<li>Bar chart.</li>
+</ul></li>
+<li><strong>Title:</strong> “Reviews mentioning ‘layoffs’ have 35%
+recommend rate vs 70% baseline.”</li>
+<li><strong>Takeaway for Linda:</strong> “Layoffs are a strong negative
+signal. Companies in mass-layoff news cycles should expect a big
+recommend drop.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-3">Common mistakes in Class 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compute keyword flags on EACH text column separately</td>
+<td>You miss reviews where the word is in cons but not pros. Combine
+first.</td>
+</tr>
+<tr>
+<td>Forget <code>.fillna('')</code> before <code>.str.len()</code></td>
+<td>Crashes on NaN cells.</td>
+</tr>
+<tr>
+<td>Use simple substring search like <code>'pay' in text</code></td>
+<td>Pandas-specific syntax. Use <code>.str.contains()</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-4">Self-check before Class 4</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Length features for all 4 text
+columns.</label></li>
+<li><label><input type="checkbox" /><code>pros_to_cons_ratio</code>
+exists.</label></li>
+<li><label><input type="checkbox" />At least 4 keyword-flag columns
+exist.</label></li>
+<li><label><input type="checkbox" />Date features exist.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Linda.</label></li>
+<li><label><input type="checkbox" /><code>reviews_step3.parquet</code>
+saved.</label></li>
+</ul>
+<hr />
+<h1 id="class-4-feature-selection">Class 4 — Feature Selection</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Linda says: “You have ~30
+columns. Pick the best 12-15.”</p>
+</blockquote>
+<h2 id="your-goal-3">Your goal</h2>
+<p>Pick the best 12-15 columns.</p>
+<h2 id="inputs-3">Inputs</h2>
+<ul>
+<li><code>reviews_step3.parquet</code></li>
+</ul>
+<h2 id="outputs-3">Outputs</h2>
+<ul>
+<li><code>reviews_step4.parquet</code> in Drive</li>
+<li>A short markdown report</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-2">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-correlation-heatmap">Exploratory chart 1 —
+Correlation heatmap</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>sns.heatmap(df[numeric_cols].corr(), annot=True, fmt='.2f')</code>.</li>
+</ul>
+<h3 id="exploratory-chart-2-mutual-information-bars">Exploratory chart 2
+— Mutual information bars</h3>
+<ul>
+<li>After Step 4 below.</li>
+</ul>
+<h3 id="exploratory-chart-3-random-forest-importance-bars">Exploratory
+chart 3 — Random Forest importance bars</h3>
+<ul>
+<li>After Step 5 below.</li>
+</ul>
+<hr />
+<h2 id="phase-b-select-features">Phase B — Select features</h2>
+<h3 id="step-1-split-into-train-and-test-first">Step 1 — Split into
+train and test FIRST</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)</code>.</li>
+</ul>
+<h3 id="step-2-variance-threshold">Step 2 — Variance threshold</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>VarianceThreshold(threshold=0.01)</code>.</li>
+</ul>
+<h3 id="step-3-correlation-pruning">Step 3 — Correlation pruning</h3>
+<ul>
+<li><strong>HINTS:</strong> Drop pairs with |corr| &gt; 0.9. Common
+candidates: <code>pros_length</code> and <code>pros_n_words</code>.</li>
+</ul>
+<h3 id="step-4-mutual-information">Step 4 — Mutual information</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>mutual_info_classif(X_train[numeric_cols], y_train)</code>.</li>
+</ul>
+<h3 id="step-5-random-forest-importance">Step 5 — Random Forest
+importance</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>RandomForestClassifier(n_estimators=50, max_depth=8, n_jobs=-1)</code>.</li>
+</ul>
+<h3 id="step-6-pick-the-final-12-15-columns">Step 6 — Pick the final
+12-15 columns</h3>
+<ul>
+<li><strong>WRITE DOWN</strong> WHY for each.</li>
+</ul>
+<h3 id="step-7-save">Step 7 — Save</h3>
+<ul>
+<li>Keep only selected + <code>recommend</code>. Save as
+<code>reviews_step4.parquet</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-linda-2">Phase C — Make ONE chart for
+Linda</h2>
+<h3 id="lindas-chart-top-10-predictors-of-not-recommend">Linda’s chart —
+“Top 10 predictors of NOT recommend”</h3>
+<p>A horizontal bar chart of top 10 features.</p>
+<ul>
+<li><strong>Title:</strong> “Top 10 signals of ‘would not
+recommend’.”</li>
+<li><strong>Takeaway:</strong> “Mentions of layoffs, low compensation
+rating, and low senior management rating are the strongest. Add an
+early-warning trigger when reviews mention these.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-4">Common mistakes in Class 4</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compute mutual info on FULL data</td>
+<td>Leakage.</td>
+</tr>
+<tr>
+<td>Keep both pros_length and pros_n_words</td>
+<td>Highly correlated. Pick one.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-5">Self-check before Class 5</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Train/test split done
+FIRST.</label></li>
+<li><label><input type="checkbox" />12-15 columns +
+<code>recommend</code>.</label></li>
+<li><label><input type="checkbox" />WHY for each column
+written.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Linda.</label></li>
+<li><label><input type="checkbox" /><code>reviews_step4.parquet</code>
+saved.</label></li>
+</ul>
+<hr />
+<h1 id="class-5-pipelines">Class 5 — Pipelines</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Linda says: “Your code is in 4
+notebooks. When a new review arrives, will you copy 4 notebooks to the
+server? We need ONE Pipeline.”</p>
+</blockquote>
+<h2 id="your-goal-4">Your goal</h2>
+<p>Build ONE Pipeline. Special challenge: 4 text columns need 4 separate
+TF-IDF vectorizers.</p>
+<h2 id="inputs-4">Inputs</h2>
+<ul>
+<li><code>reviews_step4.parquet</code></li>
+</ul>
+<h2 id="outputs-4">Outputs</h2>
+<ul>
+<li><code>glassdoor_pipeline.joblib</code> in Drive</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-3">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-confusion-matrix">Exploratory chart 1 —
+Confusion matrix</h3>
+<ul>
+<li>After training.</li>
+</ul>
+<h3 id="exploratory-chart-2-roc-curve">Exploratory chart 2 — ROC
+curve</h3>
+<ul>
+<li>After training.</li>
+</ul>
+<hr />
+<h2 id="phase-b-build-the-pipeline">Phase B — Build the pipeline</h2>
+<h3
+id="step-1-decide-which-columns-are-numeric-categorical-and-text">Step 1
+— Decide which columns are numeric, categorical, and text</h3>
+<ul>
+<li><strong>EXAMPLE:</strong>
+<ul>
+<li>numeric: <code>overall_rating</code>,
+<code>work_life_balance</code>, <code>culture_values</code>,
+<code>career_opp</code>, <code>comp_benefits</code>,
+<code>senior_mgmt</code>, <code>headline_length</code>,
+<code>pros_length</code>, <code>cons_length</code>,
+<code>advice_length</code>, <code>pros_to_cons_ratio</code>,
+<code>mentions_money</code>, <code>mentions_growth</code>,
+<code>mentions_layoffs</code>.</li>
+<li>categorical: <code>is_current_employee</code>,
+<code>location_state</code>, top-20 <code>job_title</code> dummies.</li>
+<li>text: <code>pros</code>, <code>cons</code>,
+<code>advice_to_mgmt</code>. (4 columns total — <code>headline</code> if
+you want).</li>
+</ul></li>
+</ul>
+<h3 id="step-2-numeric-mini-pipeline">Step 2 — Numeric
+mini-pipeline</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>numeric_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;scaler&#39;</span>,  StandardScaler()),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in: <code>'median'</code>.</p></li>
+</ul></li>
+</ul>
+<h3 id="step-3-categorical-mini-pipeline">Step 3 — Categorical
+mini-pipeline</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>categorical_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;onehot&#39;</span>,  OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">&#39;___&#39;</span>, sparse_output<span class="op">=</span>___)),</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in: <code>'most_frequent'</code>, <code>'ignore'</code>,
+<code>False</code>.</p></li>
+</ul></li>
+</ul>
+<h3 id="step-4-multiple-tf-idf-mini-pipelines-special-challenge">Step 4
+— Multiple TF-IDF mini-pipelines (SPECIAL CHALLENGE)</h3>
+<ul>
+<li><strong>WHAT:</strong> You have 3-4 text columns. Each needs its OWN
+TfidfVectorizer.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.feature_extraction.text import TfidfVectorizer</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>pros_vec <span class="op">=</span> TfidfVectorizer(max_features<span class="op">=</span>___, ngram_range<span class="op">=</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>cons_vec <span class="op">=</span> TfidfVectorizer(max_features<span class="op">=</span>___, ngram_range<span class="op">=</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>advice_vec <span class="op">=</span> TfidfVectorizer(max_features<span class="op">=</span>___, ngram_range<span class="op">=</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span></code></pre></div></li>
+<li><p>Fill in <code>max_features</code>: 500 each is enough for this
+dataset.</p></li>
+</ul></li>
+</ul>
+<h3 id="step-5-combine-everything-in-a-columntransformer">Step 5 —
+Combine everything in a ColumnTransformer</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>ColumnTransformer</code> takes a list of (name, transformer,
+column-or-columns).</li>
+<li>For numeric: list of columns.</li>
+<li>For categorical: list of columns.</li>
+<li>For TF-IDF: a SINGLE column name as a string (not a list). Each
+TfidfVectorizer takes one column.</li>
+</ul></li>
+</ul>
+<h3 id="step-6-add-the-model">Step 6 — Add the model</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>LogisticRegression(class_weight='balanced', max_iter=1000, random_state=42)</code>.</li>
+</ul></li>
+<li><strong>WHY <code>class_weight='balanced'</code>?</strong> Slight
+imbalance (65/35).</li>
+</ul>
+<h3 id="step-7-train-and-evaluate">Step 7 — Train and evaluate</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>full_pipeline.fit(X_train, y_train)</code>. Then
+<code>classification_report</code>.</li>
+<li><strong>EXPECTED:</strong> F1 around 0.75-0.85.</li>
+</ul>
+<h3 id="step-8-save">Step 8 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>joblib.dump(full_pipeline, '/content/drive/MyDrive/glassdoor_lab/glassdoor_pipeline.joblib')</code>.</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-linda-3">Phase C — Make ONE chart for
+Linda</h2>
+<h3
+id="lindas-chart-our-model-fills-90-of-the-missing-recommend-fields-correctly">Linda’s
+chart — “Our model fills 90% of the missing recommend fields
+correctly”</h3>
+<p>A simple bar showing: actual rate, predicted rate, and missing-filled
+rate.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Show 3 bars: “Actual Yes rate”, “Predicted Yes rate”, “F1 on Yes
+class”.</li>
+</ul></li>
+<li><strong>Title:</strong> “Model performance — F1 of 0.82 means we
+fill missing recommend fields correctly 82% of the time.”</li>
+<li><strong>Takeaway:</strong> “We can deliver complete reports to HR
+teams now.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-5">Common mistakes in Class 5</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pass a list of columns to TfidfVectorizer</td>
+<td>TfidfVectorizer takes ONE text column at a time.</td>
+</tr>
+<tr>
+<td>Forget <code>sparse_output=False</code></td>
+<td>OneHotEncoder returns sparse matrix.</td>
+</tr>
+<tr>
+<td>Use max_features too high (e.g., 50,000)</td>
+<td>Pipeline becomes huge and slow.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-6">Self-check before Class 6</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Pipeline has preprocessor +
+model.</label></li>
+<li><label><input type="checkbox" />Numeric, categorical, AND multiple
+TF-IDF transformers.</label></li>
+<li><label><input type="checkbox" />F1 above 0.75.</label></li>
+<li><label><input type="checkbox" />Confusion matrix + ROC curve
+charts.</label></li>
+<li><label><input
+type="checkbox" /><code>glassdoor_pipeline.joblib</code>
+saved.</label></li>
+</ul>
+<hr />
+<h1 id="class-6-end-to-end-lab-the-big-one">Class 6 — End-to-End Lab
+(THE BIG ONE)</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Linda is in the meeting room. 90
+minutes. Deliver the clean dataset.</p>
+</blockquote>
+<h2 id="your-goal-5">Your goal</h2>
+<p>Take the raw CSV. Produce ONE final <code>.parquet</code> file with
+the exact 21-column schema. Plus a 1-page findings report.</p>
+<h2 id="time">Time</h2>
+<p><strong>90 minutes</strong> of focused work.</p>
+<h2 id="outputs-5">Outputs</h2>
+<ul>
+<li><code>glassdoor_reviews_clean.parquet</code> (~90,000 rows × 21
+columns) in Drive</li>
+<li><code>findings.md</code> (~1 page)</li>
+<li>Your Colab notebook</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-10-min">Phase A — Explore the
+data first (10 min)</h2>
+<p>Reuse 3 of your best charts: 1. <code>recommend</code> distribution
+(with the missing slice). 2. Layoffs mention vs recommend rate. 3. Top
+10 most important features.</p>
+<hr />
+<h2 id="phase-b-build-the-final-dataset-70-min">Phase B — Build the
+final dataset (70 min)</h2>
+<h3 id="required-output-schema">Required output schema</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Column</th>
+<th>Type</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>review_id</code></td>
+<td>int</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>firm_target_encoded</code></td>
+<td>float</td>
+<td>engineered (train-only)</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>is_current_employee</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>location_state</code></td>
+<td>string</td>
+<td>parsed from location</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>overall_rating</code></td>
+<td>int 1-5</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>work_life_balance</code></td>
+<td>int 1-5</td>
+<td>raw + median imputed</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>culture_values</code></td>
+<td>int 1-5</td>
+<td>raw + median imputed</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>career_opp</code></td>
+<td>int 1-5</td>
+<td>raw + median imputed</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>comp_benefits</code></td>
+<td>int 1-5</td>
+<td>raw + median imputed</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>senior_mgmt</code></td>
+<td>int 1-5</td>
+<td>raw + median imputed</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>headline_length</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>pros_length</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>cons_length</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>advice_length</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>pros_to_cons_ratio</code></td>
+<td>float</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>mentions_money</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>mentions_growth</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>mentions_layoffs</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>recommend</code></td>
+<td>int (0/1)</td>
+<td>TARGET (mapped Yes/No -&gt; 1/0)</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>pros</code></td>
+<td>string</td>
+<td>raw (kept for Module 7)</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>cons</code></td>
+<td>string</td>
+<td>raw (kept for Module 7)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lab-phases-timed">Lab phases (timed)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Time</th>
+<th>What you do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Load + sample</td>
+<td>10 min</td>
+<td>Load CSV, sample 100k.</td>
+</tr>
+<tr>
+<td>2. Clean</td>
+<td>15 min</td>
+<td>Dates, drop missing recommend, fill empty text.</td>
+</tr>
+<tr>
+<td>3. Encode</td>
+<td>15 min</td>
+<td>Target-encode firm, one-hot current/job, impute sub-ratings.</td>
+</tr>
+<tr>
+<td>4. Engineer</td>
+<td>20 min</td>
+<td>Lengths, ratio, keyword flags, dates.</td>
+</tr>
+<tr>
+<td>5. Validate + save</td>
+<td>10 min</td>
+<td>Check 21 columns + dtypes. Save <code>.parquet</code>.</td>
+</tr>
+<tr>
+<td>6. Findings</td>
+<td>10 min</td>
+<td>Write <code>findings.md</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total: 90 minutes.</strong></p>
+<hr />
+<h2 id="phase-c-findings-report-for-linda-10-min">Phase C — Findings
+report for Linda (10 min)</h2>
+<p>Write <code>findings.md</code> with these sections:</p>
+<h3 id="final-numbers">Final numbers</h3>
+<ul>
+<li>Final row count: ____</li>
+<li>Recommend rate: ____% (should be ~65-70%)</li>
+</ul>
+<h3 id="top-3-insights">Top 3 insights</h3>
+<ol type="1">
+<li><hr /></li>
+<li><hr /></li>
+<li><hr /></li>
+</ol>
+<h3 id="one-question-to-investigate-in-module-4">One question to
+investigate in Module 4</h3>
+<ul>
+<li><hr /></li>
+</ul>
+<h3 id="one-chart-that-summarizes-everything">One chart that summarizes
+everything</h3>
+<p>Embed your most important chart.</p>
+<hr />
+<h2 id="grading-rubric-100-points">Grading rubric (100 points)</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All 21 columns exist with right names and dtypes</td>
+<td>25</td>
+</tr>
+<tr>
+<td>Cleaning decisions in markdown</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Pipeline reproducible (one command, raw CSV to
+<code>.parquet</code>)</td>
+<td>15</td>
+</tr>
+<tr>
+<td>Target encoding done on TRAIN ONLY</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Multiple TF-IDF transformers in Class 5 pipeline</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>At least 3 exploratory + 1 explanatory chart per
+class</strong></td>
+<td><strong>15</strong></td>
+</tr>
+<tr>
+<td><code>findings.md</code> has insights</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Code is clean</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<h2 id="submit">Submit</h2>
+<p>Upload to
+<code>module-3/class_6/submissions/&lt;YourTeamName&gt;/</code>: -
+<code>glassdoor_reviews_clean.parquet</code> - Your Colab notebook -
+<code>findings.md</code></p>
+<hr />
+<h1 id="tips-for-the-whole-module">Tips for the whole module</h1>
+<ol type="1">
+<li><strong>Do NOT copy-paste code from this guide.</strong></li>
+<li><strong>Save your notebook to Drive often.</strong></li>
+<li><strong>Save intermediate <code>.parquet</code> files to
+Drive.</strong></li>
+<li><strong>Pair-program.</strong> Switch every 20 minutes.</li>
+<li><strong>Make a chart BEFORE and AFTER each cleaning
+step.</strong></li>
+<li><strong>The 4-text-column challenge is unique to this
+scenario.</strong> Plan how to handle multiple TF-IDF early.</li>
+<li><strong>Ask the mentor early.</strong> If stuck for 20 minutes,
+ask.</li>
+</ol>
+<p>Good luck.</p>
+</main>
+
+<footer class="scenario-footer">
+  <p><a href="../../#/module/3/class/6">&larr; Back to all 15 scenarios</a></p>
+</footer>
+
+</body>
+</html>

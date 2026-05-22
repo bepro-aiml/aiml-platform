@@ -1,0 +1,2556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>14_steam_reviews_m3_lab</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --text: #e6e8ec;
+    --text-dim: #9aa0aa;
+    --accent: #7aa2f7;
+    --accent-hover: #a5c0ff;
+    --border: #2a2f3a;
+    --code-bg: #11141a;
+    --table-header: #232732;
+    --quote-bar: #7aa2f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(26, 29, 36, 0.92);
+  }
+  .topbar-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .back-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .back-link:hover { color: var(--accent-hover); }
+  .pdf-link {
+    background: var(--accent);
+    color: #0f1115;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pdf-link:hover { background: var(--accent-hover); }
+  .pdf-link svg { width: 14px; height: 14px; }
+
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 56px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  p { margin-bottom: 16px; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+  strong { color: #fff; font-weight: 600; }
+  em { color: var(--text); font-style: italic; }
+
+  ul, ol { margin-bottom: 18px; padding-left: 28px; }
+  li { margin-bottom: 6px; }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 36px 0;
+  }
+
+  blockquote {
+    border-left: 4px solid var(--quote-bar);
+    background: var(--card);
+    padding: 14px 22px;
+    margin: 18px 0;
+    color: var(--text);
+    border-radius: 0 8px 8px 0;
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  blockquote strong { color: var(--accent); }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    font-size: 0.88em;
+    color: #f0a3b5;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 18px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text);
+    font-size: 1em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.94rem;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  thead { background: var(--table-header); }
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+
+  /* Checkboxes in self-check lists */
+  input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+
+  /* Anchored sections for nav */
+  h2[id], h3[id] { scroll-margin-top: 80px; }
+
+  footer.scenario-footer {
+    max-width: 920px;
+    margin: 60px auto 40px;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+  footer.scenario-footer a {
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    main { padding: 24px 16px 60px; }
+    h1 { font-size: 1.7rem; }
+    h2 { font-size: 1.35rem; }
+    h3 { font-size: 1.1rem; }
+    .topbar { padding: 10px 16px; }
+    pre { font-size: 0.8rem; padding: 12px 14px; }
+    table { font-size: 0.85rem; }
+    th, td { padding: 9px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="../../#/module/3/class/6">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <span style="display:inline-block;transform:translateY(-1px)">&larr;</span> Back to all scenarios
+    </a>
+    <a class="pdf-link" href="14_steam_reviews_m3_lab.pdf" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-4-4h3V4h2v8h3l-4 4zm-8 4v-2h16v2H4z"/></svg>
+      Download as PDF
+    </a>
+  </div>
+</div>
+
+<main>
+<h1 id="steam-reviews-module-3-lab-guide">Steam Reviews — Module 3 Lab
+Guide</h1>
+<p><strong>Scenario:</strong> Steam Game Reviews. Predict if a player
+recommends a game. <strong>Module:</strong> 3 (Data Preparation and
+Feature Engineering) <strong>Audience:</strong> Adult learners, A2
+English. New to AI. <strong>Tools:</strong> Google Colab (no install
+needed).</p>
+<hr />
+<h1 id="the-scenario-your-mission">The Scenario — Your Mission</h1>
+<h2 id="where-you-work">Where you work</h2>
+<p>You and your team are new data analysts at <strong>Valve</strong>.
+Valve owns <strong>Steam</strong>. Steam is the biggest store in the
+world for video games on a computer. More than 100 million people use
+Steam every month.</p>
+<p>Every day on Steam: - People <strong>buy games</strong>. - People
+<strong>play games for many hours</strong>. - After playing, people
+<strong>write a review</strong> of the game. - At the end of each
+review, the player clicks one of two big buttons: -
+<strong>“Recommended”</strong> (thumbs up) - <strong>“Not
+recommended”</strong> (thumbs down)</p>
+<p>Steam has <strong>more than 6 million reviews</strong> in our
+dataset. That is a huge number. About <strong>80% of all reviews are
+“Recommended”</strong>. Only 20% are “Not recommended”.</p>
+<h2 id="the-problem">The problem</h2>
+<p>When a shopper opens a game page on Steam, they see two numbers: the
+count of recommended and not-recommended reviews. Then they see a long
+list of review texts. The shopper has 30 seconds. Which reviews should
+we show first?</p>
+<p>Right now, Steam shows the <strong>most “helpful” reviews</strong> at
+the top. But many of those are funny jokes. Some are very short (“10/10
+buy this game”). The shopper does not learn anything new from those
+reviews.</p>
+<p>Our team thinks the <strong>best reviews are smart “Not recommended”
+reviews</strong>. Why? - A long, careful “Not recommended” review tells
+the shopper the real problems. - A long, careful “Not recommended”
+review SAVES the shopper from a bad purchase. - A long, careful “Not
+recommended” review makes the shopper trust Steam.</p>
+<p>But we cannot read 6 million reviews by hand. We need a model that:
+1. Reads the <strong>review text</strong>. 2. Predicts: would this
+person click “Recommended” or “Not recommended”? 3. Helps us find the
+<strong>smart critics</strong> — people whose words match their
+thumb.</p>
+<h2 id="your-managers-request">Your manager’s request</h2>
+<p>Your manager, <strong>Erik</strong> (Steam Reviews Product Lead at
+Valve), tells you in the team meeting:</p>
+<blockquote>
+<p>“Every game has thousands of reviews. Most are ‘recommended’ (thumbs
+up). But a ‘NOT recommended’ review is more valuable — it warns a
+shopper. We want to find the smart critics.</p>
+<p>Build me a model. <strong>Predict the recommend label from the
+text.</strong> Then surface the BEST not-recommended reviews — the long,
+careful ones, not the angry one-liners.</p>
+<p>If we show shoppers the 3 best critical reviews on every game page,
+we will save them from bad purchases. Steam will become the most trusted
+store on the internet.”</p>
+</blockquote>
+<h2 id="your-teams-job-for-the-next-2-weeks-module-3">Your team’s job
+for the next 2 weeks (Module 3)</h2>
+<p>Erik cannot do this alone. Our data has <strong>6.4 million
+reviews</strong>. That is too big to open in Excel. The file has
+<strong>8 columns</strong>, mixed languages, and very long tails (some
+players have 10,000+ hours played).</p>
+<p>Your job in Module 3: &gt; <strong>Turn a huge 6.4M-row file into ONE
+clean file of about 100,000 rows. Filter to English. Build smart new
+columns. The clean file will be used to train the model in Module
+4.</strong></p>
+<p>The clean file is called <code>steam_reviews_clean.parquet</code>. It
+must have <strong>about 19 specific columns</strong> (we will see them
+in Class 6).</p>
+<h2 id="after-module-3">After Module 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Module</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Module 4</strong></td>
+<td>Train the prediction model. Erik finally gets his “recommend score”
+from text.</td>
+</tr>
+<tr>
+<td><strong>Module 5</strong></td>
+<td>Find groups of reviewers (super-fans vs hard critics vs new
+players).</td>
+</tr>
+<tr>
+<td><strong>Module 7</strong></td>
+<td>Read the review text. Find common complaints. Find the smart
+critics.</td>
+</tr>
+</tbody>
+</table>
+<p>You use the <strong>same Steam Reviews dataset</strong> until the end
+of Module 7.</p>
+<hr />
+<h1 id="how-this-guide-works-read-this-first">How This Guide Works (Read
+This First!)</h1>
+<h2 id="we-do-not-give-you-the-full-code">We do NOT give you the full
+code</h2>
+<p>In this guide you will see two kinds of content:</p>
+<h3 id="what-why-expected-explained-in-words">1. WHAT / WHY / EXPECTED —
+explained in words</h3>
+<p>For every step you read: - <strong>WHAT</strong> you have to do (in
+normal language) - <strong>WHY</strong> you do it (the reason) -
+<strong>HINTS</strong> — the function names, the arguments to remember -
+<strong>EXPECTED</strong> — the result you should see if you did it
+right</p>
+<h3 id="sometimes-a-tiny-code-skeleton-with-blanks">2. Sometimes a tiny
+code skeleton with blanks</h3>
+<p>For the harder steps we give you a code skeleton with
+<code>___</code> blanks. <strong>You fill in the blanks.</strong></p>
+<h3 id="why-no-full-code">Why no full code?</h3>
+<p>Because you will NOT learn if you copy-paste. - In Module 4, the
+model only works if YOU understand each step. - In your future job,
+nobody will give you the code. - Writing the code yourself takes 10
+minutes more today, but saves 10 hours later.</p>
+<p><strong>Rule:</strong> If you finish a step in 30 seconds by
+copy-pasting from a teammate’s notebook, do it AGAIN by yourself.
+Different variable names, same logic.</p>
+<hr />
+<h1 id="visualizations-two-modes">Visualizations — Two Modes</h1>
+<p>In every class you will make charts. There are <strong>two
+reasons</strong> to make a chart:</p>
+<h2 id="exploratory-charts-for-you">1. Exploratory charts (for YOU)</h2>
+<p>Made BEFORE you clean the data. To understand what the data looks
+like. - Fast, ugly, no labels needed. - Examples:
+<code>df.hist()</code>,
+<code>df['column'].value_counts().plot.bar()</code>.</p>
+<blockquote>
+<p>Goal: <strong>“What does this data look like?”</strong></p>
+</blockquote>
+<h2 id="explanatory-charts-for-erik">2. Explanatory charts (for
+ERIK)</h2>
+<p>Made AFTER you understand. To EXPLAIN something to your manager. -
+Clean, labeled, one clear message. - Must have: title, x-label, y-label,
+source, and a 1-sentence takeaway.</p>
+<blockquote>
+<p>Goal: <strong>“Erik, look at this. This is the pattern.”</strong></p>
+</blockquote>
+<p>In every class you make BOTH kinds.</p>
+<h2 id="your-plotting-toolkit-you-learned-this-in-module-2-class-5">Your
+plotting toolkit (you learned this in Module 2 Class 5)</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Plot</th>
+<th>When to use it</th>
+<th>Function name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Histogram</td>
+<td>See the SHAPE of a numeric column</td>
+<td><code>plt.hist()</code> or <code>sns.histplot()</code></td>
+</tr>
+<tr>
+<td>Bar chart</td>
+<td>Count of each category</td>
+<td><code>df['col'].value_counts().plot.bar()</code></td>
+</tr>
+<tr>
+<td>Box plot</td>
+<td>See outliers in a numeric column</td>
+<td><code>sns.boxplot()</code></td>
+</tr>
+<tr>
+<td>Scatter plot</td>
+<td>See the relationship between 2 numbers</td>
+<td><code>plt.scatter()</code> or <code>sns.scatterplot()</code></td>
+</tr>
+<tr>
+<td>Heatmap</td>
+<td>See correlation between many columns</td>
+<td><code>sns.heatmap(df.corr())</code></td>
+</tr>
+<tr>
+<td>Line plot</td>
+<td>See change over time</td>
+<td><code>plt.plot()</code></td>
+</tr>
+</tbody>
+</table>
+<p>Before you start: <code>import matplotlib.pyplot as plt</code> and
+<code>import seaborn as sns</code>.</p>
+<hr />
+<h1 id="before-you-start-google-colab-setup">Before You Start — Google
+Colab Setup</h1>
+<p>You will work in <strong>Google Colab</strong>. That means: - You do
+NOT install Python. - You do NOT install pandas, scikit-learn, or
+anything. - You just open a notebook in your web browser.</p>
+<h2 id="step-1-open-a-new-colab-notebook">Step 1 — Open a new Colab
+notebook</h2>
+<ol type="1">
+<li>Go to https://colab.research.google.com</li>
+<li>Sign in with your Google account.</li>
+<li>Click <strong>“New notebook”</strong> (top left).</li>
+<li>Name it <code>steam_module_3.ipynb</code>.</li>
+</ol>
+<h2 id="step-2-connect-to-google-drive">Step 2 — Connect to Google
+Drive</h2>
+<p>Colab files <strong>disappear</strong> when you close the browser. So
+you must save your work to <strong>Google Drive</strong>.</p>
+<p>In the first cell:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> drive</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>drive.mount(<span class="st">&#39;/content/drive&#39;</span>)</span></code></pre></div>
+<p>A pop-up asks for permission. Click “Allow”. After this, Drive is
+available at <code>/content/drive/MyDrive/</code>.</p>
+<h2 id="step-3-create-a-project-folder">Step 3 — Create a project
+folder</h2>
+<p>In a new cell:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&#39;/content/drive/MyDrive/steam_lab&#39;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>cd <span class="op">/</span>content<span class="op">/</span>drive<span class="op">/</span>MyDrive<span class="op">/</span>steam_lab</span></code></pre></div>
+<p>Your team will save ALL files in this folder.</p>
+<h2 id="step-4-get-the-data">Step 4 — Get the data</h2>
+<p><strong>WARNING:</strong> The full file is <strong>about 6.4 million
+rows</strong>. The download is large (~3 GB unzipped). You MUST sample
+it down BEFORE you do anything else. We will do this in Class 1.</p>
+<p><strong>Option A — Direct from Kaggle (recommended):</strong></p>
+<ol type="1">
+<li>Make a free Kaggle account.</li>
+<li>Go to kaggle.com/settings/account, scroll to “API”, click “Create
+New Token”. Save the <code>kaggle.json</code> file.</li>
+<li>In Colab:</li>
+</ol>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> files</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>files.upload()    <span class="co"># pick kaggle.json</span></span></code></pre></div>
+<ol start="4" type="1">
+<li>Then:</li>
+</ol>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>mkdir <span class="op">-</span>p <span class="op">~/</span>.kaggle <span class="op">&amp;&amp;</span> mv kaggle.json <span class="op">~/</span>.kaggle<span class="op">/</span> <span class="op">&amp;&amp;</span> chmod <span class="dv">600</span> <span class="op">~/</span>.kaggle<span class="op">/</span>kaggle.json</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install kaggle <span class="op">-</span>q</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kaggle datasets download <span class="op">-</span>d andrewmvd<span class="op">/</span>steam<span class="op">-</span>reviews</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>unzip <span class="op">-</span>q steam<span class="op">-</span>reviews.<span class="bu">zip</span> <span class="op">-</span>d data</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ls data<span class="op">/</span></span></code></pre></div>
+<p>You should see <strong>1 large CSV file</strong> inside
+<code>data/</code> (around 3 GB).</p>
+<p><strong>Option B — Upload by hand:</strong></p>
+<ol type="1">
+<li>Download the zip from kaggle.com/datasets/andrewmvd/steam-reviews on
+your laptop.</li>
+<li>Unzip it.</li>
+<li>In Colab’s file panel (left sidebar), upload the CSV file. (This is
+slow — Option A is faster.)</li>
+</ol>
+<h2 id="step-5-test-it-read-just-a-few-rows">Step 5 — Test it (read just
+a few rows)</h2>
+<p>Do NOT load the full file. It will eat all your memory.</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>preview <span class="op">=</span> pd.read_csv(<span class="st">&#39;data/dataset.csv&#39;</span>, nrows<span class="op">=</span><span class="dv">1000</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(preview.shape)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(preview.columns.tolist())</span></code></pre></div>
+<p>Should print something like <code>(1000, 8)</code> and a list of 8
+column names. You are ready.</p>
+<h2 id="colab-tips">Colab tips</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Save your notebook to Drive often</td>
+<td>Colab disconnects after 12 hours.</td>
+</tr>
+<tr>
+<td>Save intermediate <code>.parquet</code> files to Drive</td>
+<td>Files in <code>/content/</code> disappear when Colab
+disconnects.</td>
+</tr>
+<tr>
+<td>Share the notebook with teammates (Share button, top right)</td>
+<td>Editor access. Like Google Docs for code.</td>
+</tr>
+<tr>
+<td>Restart runtime if memory full</td>
+<td>Runtime &gt; Restart runtime.</td>
+</tr>
+<tr>
+<td>Use <code>Runtime &gt; Change runtime type &gt; High-RAM</code> if
+you can</td>
+<td>This dataset is big.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="class-1-data-cleaning">Class 1 — Data Cleaning</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Erik drops one HUGE CSV file on
+your desk. 6.4 million rows. Many languages. Crazy long-tail numbers.
+Your job today: cut it down to 100,000 English rows, fix the basic
+columns, and save a small clean file.</p>
+</blockquote>
+<h2 id="your-goal">Your goal</h2>
+<p>Make the giant file USABLE. Filter to English. Sample 100,000 rows.
+Convert Unix timestamps. Find missing values.</p>
+<h2 id="inputs">Inputs</h2>
+<ul>
+<li>The 1 large CSV file in <code>data/</code> (~6.4M rows)</li>
+</ul>
+<h2 id="outputs">Outputs</h2>
+<ul>
+<li><code>steam_step1.parquet</code> saved in your Drive folder
+(~100,000 rows)</li>
+<li>3+ exploratory charts in your notebook</li>
+<li>1 explanatory chart for Erik</li>
+<li>Notes in markdown about every decision you made</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-15-minutes">Phase A — Explore the
+data first (15 minutes)</h2>
+<p>Before you clean anything, <strong>LOOK</strong> at the data. But do
+NOT load the full file. Use <code>nrows</code> to read only a small
+piece.</p>
+<h3
+id="exploratory-chart-1-language-distribution-the-most-important-chart-today">Exploratory
+chart 1 — Language distribution (the most important chart today)</h3>
+<ul>
+<li><strong>Question:</strong> “Of all the reviews, how many are in
+English? How many in Russian, Chinese, German?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Read maybe 500,000 rows for this check:
+<code>pd.read_csv('data/dataset.csv', nrows=500000)</code>.</li>
+<li>Use <code>sample['language'].value_counts().head(15)</code>.</li>
+<li>Then <code>.plot.bar()</code> on the result.</li>
+</ul></li>
+<li><strong>What you learn:</strong> English is the biggest group, but
+not the only one. There are many languages. We MUST filter to English
+before sampling.</li>
+</ul>
+<h3
+id="exploratory-chart-2-how-many-reviews-are-recommended">Exploratory
+chart 2 — How many reviews are “recommended”?</h3>
+<ul>
+<li><strong>Question:</strong> “Of the 500,000 preview rows, how many
+have <code>recommended = True</code>?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>sample['recommended'].value_counts(normalize=True)</code>.</li>
+<li>Then <code>.plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The target is
+<strong>unbalanced</strong>. About 80% recommended, 20% not recommended.
+This will matter in Class 5.</li>
+</ul>
+<h3 id="exploratory-chart-3-missing-values-per-column">Exploratory chart
+3 — Missing values per column</h3>
+<ul>
+<li><strong>Question:</strong> “Which columns have the most missing
+data?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>sample.isna().sum().sort_values(ascending=False)</code>.</li>
+<li>Plot it as a bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Some columns are almost always
+missing. Some are always filled. The text <code>review</code> column has
+some empty values.</li>
+</ul>
+<hr />
+<h2 id="phase-b-clean-the-reviews-table-45-minutes">Phase B — Clean the
+reviews table (45 minutes)</h2>
+<h3
+id="step-1-read-the-file-in-chunks-and-filter-to-english-at-the-same-time">Step
+1 — Read the file in chunks AND filter to English AT THE SAME TIME</h3>
+<ul>
+<li><strong>WHAT:</strong> The file is too big to load. We will read it
+in pieces of 500,000 rows. From each piece, keep ONLY the English rows.
+Add the small piece to a list. At the end, join all the pieces.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>pd.read_csv('data/dataset.csv', chunksize=500000)</code>.
+This gives you an iterator.</li>
+<li>Loop: <code>for chunk in iterator:</code> then
+<code>english_chunk = chunk[chunk['language'] == 'english']</code>.</li>
+<li>Append <code>english_chunk</code> to a Python list.</li>
+<li>After the loop:
+<code>df_english = pd.concat(your_list, ignore_index=True)</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> If you load 6.4M rows into memory and then
+filter, Colab crashes. Filter as you go.</li>
+<li><strong>EXPECTED:</strong> About <strong>2-3 million English
+rows</strong> after the loop (English is the biggest language but not
+all of the data).</li>
+</ul>
+<h3 id="step-2-sample-100000-rows-with-a-fixed-seed">Step 2 — Sample
+100,000 rows with a fixed seed</h3>
+<ul>
+<li><strong>WHAT:</strong> Even 2 million English rows is too many for a
+lab. Take a random 100,000.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>df_english.sample(n=100000, random_state=___)</code>.</li>
+<li>Fill in the blank with the seed <code>42</code>. <strong>Always
+42.</strong> Otherwise your teammates get different numbers than
+you.</li>
+</ul></li>
+<li><strong>WHY <code>random_state=42</code>?</strong> Reproducibility.
+Two students with the same code get the same rows.</li>
+<li><strong>EXPECTED:</strong> A DataFrame <code>df</code> with exactly
+100,000 rows.</li>
+</ul>
+<h3 id="step-3-look-at-each-column">Step 3 — Look at each column</h3>
+<ul>
+<li><strong>WHAT:</strong> Check <code>.shape</code>,
+<code>.info()</code>, and <code>.head()</code> of <code>df</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Look at the <code>Dtype</code> column in <code>.info()</code>
+output.</li>
+<li><strong>Is <code>timestamp_created</code> a number (Unix time) or a
+date?</strong> Right now it is a big integer.</li>
+<li>Is <code>recommended</code> <code>bool</code> or text
+“True”/“False”?</li>
+</ul></li>
+<li><strong>EXPECTED:</strong></li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>What it is</th>
+<th>Dtype</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>app_id</code></td>
+<td>game id</td>
+<td>int</td>
+</tr>
+<tr>
+<td><code>app_name</code></td>
+<td>game title</td>
+<td>object (string)</td>
+</tr>
+<tr>
+<td><code>review_id</code></td>
+<td>unique id of the review</td>
+<td>int</td>
+</tr>
+<tr>
+<td><code>language</code></td>
+<td>language of the review</td>
+<td>object</td>
+</tr>
+<tr>
+<td><code>review</code></td>
+<td>the text of the review</td>
+<td>object</td>
+</tr>
+<tr>
+<td><code>timestamp_created</code></td>
+<td>when the review was written, Unix seconds</td>
+<td>int</td>
+</tr>
+<tr>
+<td><code>timestamp_updated</code></td>
+<td>last edit</td>
+<td>int</td>
+</tr>
+<tr>
+<td><code>recommended</code></td>
+<td>True / False</td>
+<td>bool</td>
+</tr>
+<tr>
+<td><code>votes_up</code></td>
+<td>how many users marked this review as helpful</td>
+<td>int</td>
+</tr>
+<tr>
+<td><code>votes_funny</code></td>
+<td>how many users marked this review as funny</td>
+<td>int</td>
+</tr>
+<tr>
+<td><code>weighted_vote_score</code></td>
+<td>Steam’s own helpfulness score, 0 to 1</td>
+<td>float</td>
+</tr>
+<tr>
+<td><code>comment_count</code></td>
+<td>comments on the review</td>
+<td>int</td>
+</tr>
+<tr>
+<td><code>steam_purchase</code></td>
+<td>was the game bought on Steam?</td>
+<td>bool</td>
+</tr>
+<tr>
+<td><code>received_for_free</code></td>
+<td>did the player get the game for free?</td>
+<td>bool</td>
+</tr>
+<tr>
+<td><code>written_during_early_access</code></td>
+<td>was the review in early access?</td>
+<td>bool</td>
+</tr>
+<tr>
+<td><code>author.steamid</code></td>
+<td>the writer’s id</td>
+<td>int</td>
+</tr>
+<tr>
+<td><code>author.num_games_owned</code></td>
+<td>how many games the writer owns</td>
+<td>int</td>
+</tr>
+<tr>
+<td><code>author.num_reviews</code></td>
+<td>how many reviews the writer has written</td>
+<td>int</td>
+</tr>
+<tr>
+<td><code>author.playtime_forever</code></td>
+<td>total hours played, in MINUTES</td>
+<td>float</td>
+</tr>
+<tr>
+<td><code>author.playtime_last_two_weeks</code></td>
+<td>recent hours, in minutes</td>
+<td>float</td>
+</tr>
+<tr>
+<td><code>author.playtime_at_review</code></td>
+<td>hours played when the review was written, MINUTES</td>
+<td>float</td>
+</tr>
+<tr>
+<td><code>author.last_played</code></td>
+<td>Unix time of the last play</td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+<p>NOTE: The exact column names depend on the dataset version. Use
+<code>df.columns.tolist()</code> to see the real names. Some are
+<code>author.playtime_forever</code>, some are simpler.</p>
+<h3 id="step-4-convert-timestamp_created-to-a-real-date">Step 4 —
+Convert <code>timestamp_created</code> to a real date</h3>
+<ul>
+<li><strong>WHAT:</strong> <code>timestamp_created</code> is a big
+integer like <code>1483228800</code>. That is <strong>Unix time</strong>
+(seconds since 1 January 1970). Turn it into a real date.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>pd.to_datetime(df['timestamp_created'], unit='s')</code>.</li>
+<li>The argument <code>unit='s'</code> tells pandas the number is
+SECONDS, not nanoseconds.</li>
+<li>Save into a new column: <code>df['review_date'] = ___</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> If <code>timestamp_created</code> is a giant
+integer, you cannot say “reviews from 2019”. You cannot use
+<code>.dt.year</code>. You must convert.</li>
+<li><strong>EXPECTED:</strong> <code>df['review_date'].dtype</code> is
+<code>datetime64[ns]</code>. Run <code>df['review_date'].min()</code>
+and <code>.max()</code> — should be between 2010 and 2020.</li>
+</ul>
+<h3
+id="step-5-convert-author.playtime_forever-from-minutes-to-hours">Step 5
+— Convert <code>author.playtime_forever</code> from minutes to
+HOURS</h3>
+<ul>
+<li><strong>WHAT:</strong> Steam stores playtime in
+<strong>minutes</strong>. A player with 6,000 minutes has played 100
+hours. Convert to hours.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['hours_played'] = df['author.playtime_forever'] / 60</code>.</li>
+<li>The column name might be slightly different — check with
+<code>df.columns.tolist()</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> <code>df['hours_played']</code> has
+values from 0 to 10,000+. The mean is around 100. The median is around
+15.</li>
+</ul>
+<h3 id="step-6-find-missing-values">Step 6 — Find missing values</h3>
+<ul>
+<li><p><strong>WHAT:</strong> Count missing values per column.</p></li>
+<li><p><strong>HINTS:</strong> <code>.isna()</code> returns True/False
+per cell. <code>.sum()</code> counts the Trues per column.</p></li>
+<li><p><strong>EXPECTED:</strong> Something like:</p>
+<pre><code>review                          54
+author.playtime_at_review     1230
+weighted_vote_score              0</code></pre></li>
+</ul>
+<h3 id="step-7-drop-rows-where-review-is-missing">Step 7 — Drop rows
+where <code>review</code> is missing</h3>
+<ul>
+<li><strong>WHAT:</strong> If the review text is empty, we cannot use it
+for Module 7. Drop those rows.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>.dropna(subset=['review'])</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> The whole project is about predicting from
+text. No text = no project.</li>
+<li><strong>EXPECTED:</strong> A few hundred rows removed.</li>
+</ul>
+<h3 id="step-8-drop-rows-where-the-review-is-just-spaces">Step 8 — Drop
+rows where the <code>review</code> is just spaces</h3>
+<ul>
+<li><strong>WHAT:</strong> Some reviews are not “missing” but they are
+an empty string <code>""</code> or just spaces.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Filter: <code>df = df[df['review'].str.strip() != '']</code>.</li>
+<li><code>.str.strip()</code> removes spaces at the start and end.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> A few more rows removed.</li>
+</ul>
+<h3 id="step-9-write-down-what-you-did">Step 9 — Write down what you
+did</h3>
+<p>In a markdown cell, write: - Starting rows: ~6,400,000 - After
+English filter: ~2,500,000 - After random sample (seed 42): 100,000 -
+After drop missing review: ~99,940 - After drop blank reviews: ~99,900 -
+WHY you removed each group.</p>
+<h3 id="step-10-save-to-drive">Step 10 — Save to Drive</h3>
+<ul>
+<li><strong>WHAT:</strong> Save the cleaned DataFrame as parquet, inside
+your Drive folder.</li>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/steam_lab/steam_step1.parquet')</code>.</li>
+<li><strong>WHY parquet, not CSV?</strong> Parquet is 10x smaller and
+10x faster than CSV for big data. Also it remembers the dtypes (so dates
+stay as dates).</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-erik-15-minutes">Phase C — Make ONE
+chart for Erik (15 minutes)</h2>
+<p>He does not have time to read your code. He wants ONE picture.</p>
+<h3 id="eriks-chart-language-distribution-before-filtering">Erik’s chart
+— “Language distribution before filtering”</h3>
+<p>A bar chart showing the top 10 languages in the full data, BEFORE we
+filter to English.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Reuse the count from the preview (Phase A chart 1) or count from the
+chunks.</li>
+<li>Use <code>plt.bar()</code> with 10 bars.</li>
+<li>Add the title:
+<code>"Steam reviews by language - English is 40% of all reviews"</code>.</li>
+<li>X-label: language.</li>
+<li>Y-label: number of reviews (or %).</li>
+<li>Add a note: “We will work only with English for this project.”</li>
+</ul></li>
+<li><strong>Takeaway for Erik:</strong> “English is the largest group.
+But 60% of all Steam users review in other languages. In a future
+project we should not ignore them.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-1">Common mistakes in Class 1</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Try to load the full 6.4M-row file at once</td>
+<td>Colab crashes with “out of memory”.</td>
+</tr>
+<tr>
+<td>Sample BEFORE filtering to English</td>
+<td>You get a mixed sample. Only ~40% will be English.</td>
+</tr>
+<tr>
+<td>Forget <code>random_state=42</code></td>
+<td>Each teammate gets different rows. Numbers do not match.</td>
+</tr>
+<tr>
+<td>Forget <code>unit='s'</code> on <code>to_datetime</code></td>
+<td>Pandas thinks the integer is nanoseconds. Dates jump to year
+51000.</td>
+</tr>
+<tr>
+<td>Save to <code>/content/</code> instead of Drive</td>
+<td>File disappears when Colab disconnects.</td>
+</tr>
+<tr>
+<td>Keep playtime in minutes</td>
+<td>Charts show 6,000,000 minutes. Erik thinks something is broken.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-2">Self-check before Class 2</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />You read the file in chunks (not all
+at once).</label></li>
+<li><label><input type="checkbox" />You filtered to
+<code>language == 'english'</code> BEFORE sampling.</label></li>
+<li><label><input type="checkbox" />You sampled 100,000 rows with
+<code>random_state=42</code>.</label></li>
+<li><label><input type="checkbox" /><code>review_date</code> is a real
+datetime column.</label></li>
+<li><label><input type="checkbox" /><code>hours_played</code> is in
+HOURS, not minutes.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory charts in
+your notebook.</label></li>
+<li><label><input type="checkbox" />1 polished chart for Erik (language
+distribution).</label></li>
+<li><label><input type="checkbox" />You saved
+<code>steam_step1.parquet</code> to your Drive folder.</label></li>
+<li><label><input type="checkbox" />You wrote down (in markdown) what
+you did and WHY.</label></li>
+</ul>
+<hr />
+<h1 id="class-2-encoding-and-scaling">Class 2 — Encoding and
+Scaling</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Erik looks at your cleaned data.
+He is happy. But he says: “The numeric columns look strange. One player
+has 10,000 hours played. Most have 5. The model will be confused. Fix
+the scales. Also, <code>recommended</code> is True/False. The model
+needs a number.”</p>
+</blockquote>
+<h2 id="your-goal-1">Your goal</h2>
+<p>Turn TEXT and BOOLEAN columns into numbers. Apply log-transform to
+the long-tail numeric columns. Make all numeric columns about the same
+size.</p>
+<h2 id="inputs-1">Inputs</h2>
+<ul>
+<li><code>steam_step1.parquet</code> from Class 1</li>
+</ul>
+<h2 id="outputs-1">Outputs</h2>
+<ul>
+<li><code>steam_step2.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Erik</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first">Phase A — Explore the data
+first</h2>
+<h3
+id="exploratory-chart-1-distribution-of-hours_played-raw">Exploratory
+chart 1 — Distribution of <code>hours_played</code> (RAW)</h3>
+<ul>
+<li><strong>Question:</strong> “What is the shape of hours played? Is it
+long-tailed?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use a histogram (<code>plt.hist()</code>).</li>
+<li>Use <code>bins=100</code>.</li>
+<li>Try <code>plt.xlim(0, 500)</code> to zoom in on most of the
+data.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The shape is HEAVY long tail. Most
+players have 0-20 hours. A few have 5,000+ hours. The model cannot
+handle this raw.</li>
+</ul>
+<h3
+id="exploratory-chart-2-distribution-of-hours_played-after-np.log1p">Exploratory
+chart 2 — Distribution of <code>hours_played</code> AFTER
+<code>np.log1p</code></h3>
+<ul>
+<li><strong>Question:</strong> “Does log-transform make the shape more
+normal?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Make a NEW column:
+<code>df['hours_played_log'] = np.log1p(df['hours_played'])</code>.</li>
+<li>Histogram it. Use <code>bins=50</code>.</li>
+<li>Compare to chart 1.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Log makes the long tail manageable
+for the model. The shape now looks more like a bell.</li>
+</ul>
+<h3
+id="exploratory-chart-3-hours-played-vs-recommend-rate-the-erik-chart-for-this-class">Exploratory
+chart 3 — Hours played vs recommend rate (the Erik chart for THIS
+class)</h3>
+<ul>
+<li><strong>Question:</strong> “Do players with MORE hours played more
+often click ‘recommended’?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Bin <code>hours_played</code> into 6 buckets: 0-1, 1-5, 5-20,
+20-100, 100-500, 500+.</li>
+<li>Use
+<code>pd.cut(df['hours_played'], bins=[0, 1, 5, 20, 100, 500, 100000])</code>.</li>
+<li>GroupBy the bin, compute <code>mean()</code> of
+<code>recommended</code>.</li>
+<li>Multiply by 100 for percent.</li>
+<li>Bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Players with more hours are MORE
+likely to click “recommended”. This is intuitive (if I hate a game, I
+stop playing). But it is also a useful pattern for the model.</li>
+</ul>
+<h3 id="exploratory-chart-4-votes_up-distribution">Exploratory chart 4 —
+<code>votes_up</code> distribution</h3>
+<ul>
+<li><strong>Question:</strong> “How helpful are most reviews?”</li>
+<li><strong>HINTS:</strong> Histogram. Almost all reviews have 0 or 1
+votes. A few have 1,000+.</li>
+<li><strong>What you learn:</strong> This column also has a long tail.
+We will also log-transform it.</li>
+</ul>
+<hr />
+<h2 id="phase-b-encode-and-scale">Phase B — Encode and scale</h2>
+<h3 id="step-1-load-steam_step1.parquet">Step 1 — Load
+<code>steam_step1.parquet</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Read your file back into memory.</li>
+<li><strong>HINTS:</strong>
+<code>df = pd.read_parquet('/content/drive/MyDrive/steam_lab/steam_step1.parquet')</code>.</li>
+<li><strong>EXPECTED:</strong> ~99,900 rows.</li>
+</ul>
+<h3 id="step-2-convert-recommended-from-boolean-to-01">Step 2 — Convert
+<code>recommended</code> from boolean to 0/1</h3>
+<ul>
+<li><strong>WHAT:</strong> Right now <code>recommended</code> is
+<code>True</code> / <code>False</code>. Turn it into <code>1</code> /
+<code>0</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>.astype(int)</code>.</li>
+<li>Save into the same column or a new one:
+<code>df['recommended'] = df['recommended'].astype(int)</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Math models do not understand
+<code>True</code> and <code>False</code>. They need numbers.</li>
+<li><strong>EXPECTED:</strong> <code>df['recommended'].mean()</code> is
+about 0.80 (80% recommended).</li>
+</ul>
+<h3 id="step-3-same-for-the-other-boolean-columns">Step 3 — Same for the
+other boolean columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Convert <code>steam_purchase</code>,
+<code>received_for_free</code>, <code>written_during_early_access</code>
+to 0/1.</li>
+<li><strong>HINTS:</strong> Same as Step 2. You can write a
+<code>for</code> loop over the column names.</li>
+</ul>
+<h3 id="step-4-log-transform-the-long-tail-numeric-columns">Step 4 —
+Log-transform the long-tail numeric columns</h3>
+<table>
+<thead>
+<tr>
+<th>Original</th>
+<th>New column</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hours_played</code></td>
+<td><code>hours_played_log</code></td>
+</tr>
+<tr>
+<td><code>votes_up</code></td>
+<td><code>votes_up_log</code></td>
+</tr>
+<tr>
+<td><code>votes_funny</code></td>
+<td><code>votes_funny_log</code></td>
+</tr>
+<tr>
+<td><code>author.num_games_owned</code></td>
+<td><code>num_games_owned_log</code></td>
+</tr>
+<tr>
+<td><code>author.num_reviews</code></td>
+<td><code>num_reviews_log</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['new_col'] = np.log1p(df['old_col'])</code>.</li>
+<li>Use <code>np.log1p</code>, NOT <code>np.log</code>. The “1p” means
+“1 plus”. So <code>log1p(0)</code> is <code>log(1)</code> which is
+<code>0</code>. Safe for zeros.</li>
+</ul></li>
+<li><strong>WHY?</strong> <code>log(0)</code> is minus infinity, which
+crashes the model. <code>log1p(0)</code> is just 0.</li>
+<li><strong>WHY long-tail in general?</strong> A player with 10,000
+hours is not 10,000x more important than a player with 1 hour. The model
+thinks linearly. Log compresses the tail.</li>
+</ul>
+<h3 id="step-5-look-at-categorical-columns">Step 5 — Look at categorical
+columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Which columns are STRINGS that we might want
+to encode?</li>
+<li><strong>THINK:</strong>
+<ul>
+<li><code>app_name</code>: the game title. There are thousands of games.
+Too many to one-hot.</li>
+<li><code>language</code>: we already filtered to English, so this
+column is constant. <strong>Drop it.</strong></li>
+</ul></li>
+<li><strong>DECIDE:</strong>
+<ul>
+<li>For <code>app_id</code> (the game id) — we keep it for grouping, but
+we do NOT one-hot encode it. There are too many games.</li>
+<li>Optional: we will use <code>app_id</code> later as a
+“target-encoded” feature in Class 3 (replace each game with its average
+recommend rate).</li>
+</ul></li>
+</ul>
+<h3 id="step-6-drop-columns-we-no-longer-need">Step 6 — Drop columns we
+no longer need</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop <code>language</code> (always “english”
+now). Drop <code>timestamp_updated</code> (we keep
+<code>timestamp_created</code>). Drop <code>comment_count</code> if it
+is mostly zero.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df = df.drop(columns=['language', 'timestamp_updated'])</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Fewer columns = simpler model = faster
+training.</li>
+</ul>
+<h3 id="step-7-scale-numeric-columns-preview-only">Step 7 — Scale
+numeric columns (preview only)</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>StandardScaler</code> to make every
+numeric column have mean = 0, std = 1.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.preprocessing import StandardScaler</code>.</li>
+<li><code>scaler = StandardScaler()</code>.</li>
+<li><code>scaled = scaler.fit_transform(df[numeric_cols])</code>.</li>
+</ul></li>
+<li><strong>WARNING:</strong> This is for inspection only. In Class 5,
+scaling goes INSIDE the Pipeline. Do NOT save the scaled version as your
+final file.</li>
+</ul>
+<h3 id="step-8-save">Step 8 — Save</h3>
+<ul>
+<li><strong>WHAT:</strong> Save to Drive.
+<code>df.to_parquet('/content/drive/MyDrive/steam_lab/steam_step2.parquet')</code>.</li>
+<li><strong>Save the UNSCALED version.</strong> Scaling will happen
+inside the Pipeline later.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-erik">Phase C — Make ONE chart for
+Erik</h2>
+<h3 id="eriks-chart-hours-played-vs-recommend-rate">Erik’s chart —
+“Hours played vs recommend rate”</h3>
+<p>Use the Phase A chart 3 (hours played bucket vs recommend rate).
+Polish it for Erik.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>6 bars: one per hours bucket.</li>
+<li>Y-axis: % recommended.</li>
+<li>Put the % on top of each bar.</li>
+</ul></li>
+<li><strong>Title:</strong> “Players with more hours played are more
+likely to recommend - 95% at 500+ hours vs 60% at 0-1 hours”.</li>
+<li><strong>X-label:</strong> Hours played bucket.</li>
+<li><strong>Y-label:</strong> % recommended.</li>
+<li><strong>Takeaway for Erik:</strong> “If a player keeps playing for
+500+ hours, they almost always recommend. The valuable critical reviews
+come from players with 1-20 hours.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-2">Common mistakes in Class 2</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Forget <code>np.log1p</code> and use <code>np.log</code> on
+zeros</td>
+<td>Crashes. <code>np.log(0) = -inf</code>.</td>
+</tr>
+<tr>
+<td>Forget <code>.astype(int)</code> on <code>recommended</code></td>
+<td>Model crashes on <code>bool</code> dtype later.</td>
+</tr>
+<tr>
+<td>Keep <code>language</code> column after filtering</td>
+<td>Column is constant. Adds noise, no signal.</td>
+</tr>
+<tr>
+<td>Scale BEFORE train/test split</td>
+<td>Leakage in Module 4.</td>
+</tr>
+<tr>
+<td>Save the scaled version</td>
+<td>Class 5 will scale again inside the pipeline. Double scaling = wrong
+numbers.</td>
+</tr>
+<tr>
+<td>One-hot encode <code>app_id</code></td>
+<td>Thousands of games. Table explodes to 10,000 columns.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-3">Self-check before Class 3</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>recommended</code> is int
+0/1.</label></li>
+<li><label><input type="checkbox" />Boolean columns are int
+0/1.</label></li>
+<li><label><input type="checkbox" /><code>hours_played_log</code>,
+<code>votes_up_log</code>, <code>votes_funny_log</code>
+exist.</label></li>
+<li><label><input type="checkbox" /><code>language</code> column is
+dropped.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory
+charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Erik.</label></li>
+<li><label><input type="checkbox" /><code>steam_step2.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-3-feature-engineering">Class 3 — Feature Engineering</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Erik says: “The original columns
+are OK, but the TRULY useful columns are not there. For example, how
+LONG is the review? Does the player use a lot of CAPITAL letters
+(shouting)? Does the review use emoji? You must MAKE these new
+columns.”</p>
+</blockquote>
+<h2 id="your-goal-2">Your goal</h2>
+<p>Make NEW columns from the existing ones. Date features. Text
+features. Helpfulness features. These will help the model predict
+<code>recommended</code>.</p>
+<h2 id="inputs-2">Inputs</h2>
+<ul>
+<li><code>steam_step2.parquet</code></li>
+</ul>
+<h2 id="outputs-2">Outputs</h2>
+<ul>
+<li><code>steam_step3.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Erik</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-1">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-review-length-distribution">Exploratory
+chart 1 — Review length distribution</h3>
+<ul>
+<li><strong>Question:</strong> “How long are Steam reviews? Are most
+short (1 word) or long (1000 words)?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Make a quick column:
+<code>df['review_length'] = df['review'].str.len()</code>.</li>
+<li>Histogram with <code>bins=100</code>.</li>
+<li>Use <code>plt.xlim(0, 2000)</code> to zoom in.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Most reviews are short (10-200
+characters). A few are very long (5000+). Long tail. We will
+log-transform later.</li>
+</ul>
+<h3 id="exploratory-chart-2-review-length-vs-recommend-rate">Exploratory
+chart 2 — Review length vs recommend rate</h3>
+<ul>
+<li><strong>Question:</strong> “Are long reviews more ‘recommended’ or
+more ‘not recommended’?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Bin <code>review_length</code> into 5 buckets: 0-50, 50-200,
+200-500, 500-2000, 2000+.</li>
+<li><code>pd.cut(df['review_length'], bins=[0, 50, 200, 500, 2000, 50000])</code>.</li>
+<li>GroupBy the bucket, mean of <code>recommended</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Short reviews are often emotional
+(“buy this game” or “garbage”). Long reviews are more often critical.
+This is exactly what Erik wants to find.</li>
+</ul>
+<h3 id="exploratory-chart-3-reviews-per-year">Exploratory chart 3 —
+Reviews per year</h3>
+<ul>
+<li><strong>Question:</strong> “When were the reviews written?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Make
+<code>df['review_year'] = df['review_date'].dt.year</code>.</li>
+<li><code>df['review_year'].value_counts().sort_index().plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Steam has been growing. Most
+reviews are from 2017-2019.</li>
+</ul>
+<h3
+id="exploratory-chart-4-weighted_vote_score-vs-recommended">Exploratory
+chart 4 — <code>weighted_vote_score</code> vs
+<code>recommended</code></h3>
+<ul>
+<li><strong>Question:</strong> “Do helpful reviews (high score) tend to
+be recommended or not recommended?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Box plot:
+<code>sns.boxplot(x='recommended', y='weighted_vote_score', data=df)</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Helpfulness alone does not predict
+recommend. There are smart critics with high scores.</li>
+</ul>
+<hr />
+<h2 id="phase-b-engineer-the-features">Phase B — Engineer the
+features</h2>
+<h3 id="step-1-date-derived-features">Step 1 — Date-derived
+features</h3>
+<p>Make these new columns from <code>review_date</code>:</p>
+<table>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>review_year</code></td>
+<td>The year</td>
+</tr>
+<tr>
+<td><code>review_month</code></td>
+<td>The month (1-12)</td>
+</tr>
+<tr>
+<td><code>review_dayofweek</code></td>
+<td>0=Monday, 6=Sunday</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use the <code>.dt</code> accessor.</li>
+<li><code>df['col'].dt.year</code>, <code>.dt.month</code>,
+<code>.dt.dayofweek</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> A model can learn “weekend reviews are
+angrier” only if YOU give it the <code>review_dayofweek</code>
+column.</li>
+</ul>
+<h3 id="step-2-review-text-length">Step 2 — Review text length</h3>
+<ul>
+<li><strong>WHAT:</strong> Make <code>review_length</code> = character
+count of <code>review</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['review_length'] = df['review'].str.len()</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> A new integer column. Most rows in the
+range 20-1000.</li>
+</ul>
+<h3 id="step-3-capital-words-and-caps-ratio">Step 3 — Capital words and
+caps ratio</h3>
+<p>These features measure SHOUTING.</p>
+<table>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>n_capital_words</code></td>
+<td>How many words are ALL CAPS (like “AMAZING”)</td>
+</tr>
+<tr>
+<td><code>caps_ratio</code></td>
+<td>Of all the letters, what % are uppercase</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS for <code>n_capital_words</code>:</strong>
+<ul>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> count_caps_words(text):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> <span class="bu">isinstance</span>(text, <span class="bu">str</span>):</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    words <span class="op">=</span> text.___()           <span class="co"># split into words</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> w <span class="kw">in</span> words <span class="cf">if</span> w.___() <span class="kw">and</span> <span class="bu">len</span>(w) <span class="op">&gt;</span> <span class="dv">1</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;n_capital_words&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;review&#39;</span>].<span class="bu">apply</span>(___)</span></code></pre></div></li>
+<li><p>Fill in the blanks. (<code>split</code>, <code>isupper</code>,
+the function name.)</p></li>
+</ul></li>
+<li><strong>HINTS for <code>caps_ratio</code>:</strong>
+<ul>
+<li>Total upper count:
+<code>sum(1 for ch in text if ch.isupper())</code>.</li>
+<li>Total letter count:
+<code>sum(1 for ch in text if ch.isalpha())</code>.</li>
+<li>Divide. Watch for division by zero (return 0 if no letters).</li>
+</ul></li>
+<li><strong>WHY:</strong> A review that SHOUTS in CAPITAL LETTERS is
+usually emotional. Could be a happy fan or an angry hater. The model can
+learn the pattern.</li>
+</ul>
+<h3 id="step-4-punctuation-count">Step 4 — Punctuation count</h3>
+<ul>
+<li><strong>WHAT:</strong> Count special characters: <code>!</code>,
+<code>?</code>, <code>.</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['n_punctuation'] = df['review'].str.count('[!?.]')</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Many exclamation marks (!!!) = strong emotion.
+The model can learn this.</li>
+</ul>
+<h3 id="step-5-emoji-non-ascii-count">Step 5 — Emoji / non-ASCII
+count</h3>
+<p>Gamers often type ASCII art or symbols. We count any character that
+is NOT a normal letter or number.</p>
+<ul>
+<li><strong>WHAT:</strong> <code>n_emoji_codes</code> = number of
+characters in the review that are outside basic ASCII.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> count_non_ascii(text):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> <span class="bu">isinstance</span>(text, <span class="bu">str</span>):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> ch <span class="kw">in</span> text <span class="cf">if</span> <span class="bu">ord</span>(ch) <span class="op">&gt;</span> ___)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;n_emoji_codes&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;review&#39;</span>].<span class="bu">apply</span>(count_non_ascii)</span></code></pre></div></li>
+<li><p>Fill in the blank with <code>127</code> (the last basic ASCII
+code).</p></li>
+</ul></li>
+<li><strong>WHY:</strong> Steam reviews often use Unicode symbols, ASCII
+art, emoji. This can signal a meme review (low value) or a real
+opinion.</li>
+</ul>
+<h3 id="step-6-simple-sentiment-score-rule-based">Step 6 — Simple
+sentiment score (rule-based)</h3>
+<ul>
+<li><strong>WHAT:</strong> A simple number that says how positive or
+negative the review feels.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Use the library <code>textblob</code>. It is already in
+Colab.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> textblob <span class="im">import</span> TextBlob</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sentiment(text):</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> <span class="bu">isinstance</span>(text, <span class="bu">str</span>):</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="fl">0.0</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> TextBlob(text).sentiment.polarity</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;sentiment_score&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;review&#39;</span>].<span class="bu">apply</span>(sentiment)</span></code></pre></div></li>
+<li><p>The result is between -1.0 (very negative) and +1.0 (very
+positive).</p></li>
+</ul></li>
+<li><strong>WHY:</strong> A very negative sentiment score should match
+<code>recommended = 0</code> most of the time. We can check this in
+Class 4.</li>
+<li><strong>WARNING:</strong> Sentiment is slow. On 100,000 rows it can
+take 2-5 minutes. Be patient. Do not stop the cell.</li>
+</ul>
+<h3 id="step-7-helpfulness-ratio">Step 7 — Helpfulness ratio</h3>
+<ul>
+<li><strong>WHAT:</strong>
+<code>helpful_ratio = votes_up / (votes_up + votes_funny + 1)</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;helpful_ratio&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;votes_up&#39;</span>] <span class="op">/</span> (df[<span class="st">&#39;votes_up&#39;</span>] <span class="op">+</span> df[<span class="st">&#39;votes_funny&#39;</span>] <span class="op">+</span> <span class="dv">1</span>)</span></code></pre></div></li>
+<li><p>The <code>+ 1</code> is to avoid division by zero.</p></li>
+</ul></li>
+<li><strong>WHY:</strong> This separates serious useful reviews (high
+helpful_ratio) from joke reviews (high votes_funny).</li>
+</ul>
+<h3 id="step-8-game-level-features-target-encoded-app_id">Step 8 —
+Game-level features (target-encoded <code>app_id</code>)</h3>
+<ul>
+<li><strong>WHAT:</strong> Replace <code>app_id</code> with the average
+recommend rate for that game.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>game_rates = df.groupby('app_id')['recommended'].mean()</code>.</li>
+<li><code>df['game_recommend_rate'] = df['app_id'].map(game_rates)</code>.</li>
+</ul></li>
+<li><strong>WARNING:</strong> This is LEAKAGE if you compute from all
+data including the row itself. In Module 4 we will fix this with proper
+cross-validation. For now, write a note in markdown saying “this is
+leakage, will fix later”.</li>
+<li><strong>WHY:</strong> Some games are loved by 95% of players. Some
+are hated. Knowing the average for the game is a strong signal.</li>
+</ul>
+<h3 id="step-9-botspam-flag-anomaly-angle">Step 9 — Bot/spam flag
+(anomaly angle)</h3>
+<p>Erik mentioned: very short review + 0 hours played + still
+“recommended” = probably a bot.</p>
+<ul>
+<li><strong>WHAT:</strong> Make a 0/1 column
+<code>is_suspicious_bot</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Conditions: <code>review_length &lt; 20</code> AND
+<code>hours_played &lt; 0.1</code> AND
+<code>recommended == 1</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;is_suspicious_bot&#39;</span>] <span class="op">=</span> ((df[<span class="st">&#39;review_length&#39;</span>] <span class="op">&lt;</span> ___) <span class="op">&amp;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                          (df[<span class="st">&#39;hours_played&#39;</span>] <span class="op">&lt;</span> ___) <span class="op">&amp;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                          (df[<span class="st">&#39;recommended&#39;</span>] <span class="op">==</span> ___)).astype(<span class="bu">int</span>)</span></code></pre></div></li>
+</ul></li>
+<li><strong>EXPECTED:</strong> A small percentage (1-3%) of rows
+flagged.</li>
+<li><strong>WHY:</strong> This helps us SEE the bot problem. In Module 5
+we will study these anomalies more.</li>
+</ul>
+<h3 id="step-10-save">Step 10 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/steam_lab/steam_step3.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-erik-1">Phase C — Make ONE chart for
+Erik</h2>
+<h3 id="eriks-chart-review-length-distribution">Erik’s chart — “Review
+length distribution”</h3>
+<p>A polished histogram of <code>review_length</code>.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>plt.hist(df['review_length'], bins=100)</code>.</li>
+<li>Use <code>plt.xlim(0, 2000)</code> to zoom in.</li>
+<li>Add a vertical line at the median.</li>
+</ul></li>
+<li><strong>Title:</strong> “Steam reviews vary wildly in length -
+median is 80 characters, but 5% of reviews are over 1000
+characters.”</li>
+<li><strong>X-label:</strong> Review length (characters).</li>
+<li><strong>Y-label:</strong> Number of reviews.</li>
+<li><strong>Takeaway for Erik:</strong> “The smart critical reviews are
+likely in the long tail (500+ characters). These are the reviews we want
+to surface on game pages.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-3">Common mistakes in Class 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Apply <code>TextBlob</code> without checking for
+<code>NaN</code></td>
+<td>Crash on non-string rows.</td>
+</tr>
+<tr>
+<td>Compute <code>game_recommend_rate</code> from ALL data without
+warning</td>
+<td>Leakage. Will look amazing in training, fail in production.</td>
+</tr>
+<tr>
+<td>Forget <code>+1</code> in <code>helpful_ratio</code></td>
+<td>Divide by zero error.</td>
+</tr>
+<tr>
+<td>Make <code>caps_ratio</code> divide by zero</td>
+<td>Crash on reviews with no letters (only symbols).</td>
+</tr>
+<tr>
+<td>Use <code>np.log</code> instead of <code>np.log1p</code> on
+<code>review_length</code></td>
+<td>Crash on length 0.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-4">Self-check before Class 4</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>review_year</code>,
+<code>review_month</code>, <code>review_dayofweek</code>
+exist.</label></li>
+<li><label><input type="checkbox" /><code>review_length</code>,
+<code>n_capital_words</code>, <code>caps_ratio</code>,
+<code>n_punctuation</code> exist.</label></li>
+<li><label><input type="checkbox" /><code>n_emoji_codes</code>
+exists.</label></li>
+<li><label><input type="checkbox" /><code>sentiment_score</code> exists
+(between -1 and +1).</label></li>
+<li><label><input type="checkbox" /><code>helpful_ratio</code> exists
+(between 0 and 1).</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 explanatory chart.</label></li>
+<li><label><input type="checkbox" /><code>steam_step3.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-4-feature-selection">Class 4 — Feature Selection</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Now you have ~25 columns. Erik
+says: “Too many. Some columns say the same thing. Some are useless. Pick
+the 12-15 BEST. The model trains faster, the answers are clearer.”</p>
+</blockquote>
+<h2 id="your-goal-3">Your goal</h2>
+<p>Pick the best 12-15 columns. Drop the rest. Justify every choice with
+numbers.</p>
+<h2 id="inputs-3">Inputs</h2>
+<ul>
+<li><code>steam_step3.parquet</code></li>
+</ul>
+<h2 id="outputs-3">Outputs</h2>
+<ul>
+<li><code>steam_step4.parquet</code> in Drive (only the selected columns
++ <code>recommended</code>)</li>
+<li>3+ exploratory charts (correlation heatmap, mutual info bars,
+importance bars)</li>
+<li>A short markdown report explaining your choices</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-2">Phase A — Explore the data
+first</h2>
+<h3
+id="exploratory-chart-1-correlation-heatmap-of-numeric-columns">Exploratory
+chart 1 — Correlation heatmap of numeric columns</h3>
+<ul>
+<li><strong>Question:</strong> “Which columns say the same thing as each
+other?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Pick the numeric columns:
+<code>numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()</code>.</li>
+<li>Compute <code>df[numeric_cols].corr()</code>.</li>
+<li>Plot with <code>sns.heatmap()</code>.</li>
+<li>Use <code>annot=True</code> and <code>fmt='.2f'</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> <code>hours_played</code> and
+<code>hours_played_log</code> will be 0.95+ correlated (we keep the
+log). <code>votes_up_log</code> and <code>weighted_vote_score</code> may
+be highly correlated. Pairs of columns with |corr| &gt; 0.9 are
+redundant.</li>
+</ul>
+<h3 id="exploratory-chart-2-mutual-information-bar-chart">Exploratory
+chart 2 — Mutual information bar chart</h3>
+<ul>
+<li>After you compute mutual info (Step 4 below), plot it.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Sort the values, then bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Which columns predict
+<code>recommended</code> strongest. Probably
+<code>sentiment_score</code>, <code>review_length</code>,
+<code>hours_played_log</code>, <code>game_recommend_rate</code>.</li>
+</ul>
+<h3
+id="exploratory-chart-3-random-forest-feature-importance">Exploratory
+chart 3 — Random Forest feature importance</h3>
+<ul>
+<li>After you train the RF (Step 5 below), plot the importances.</li>
+<li><strong>HINTS:</strong>
+<code>pd.Series(rf.feature_importances_, index=...).sort_values().plot.barh()</code>.</li>
+<li><strong>What you learn:</strong> A second opinion on feature
+importance.</li>
+</ul>
+<h3
+id="exploratory-chart-4-hours-played-vs-recommend-rate-eriks-chart-for-this-class">Exploratory
+chart 4 — Hours played vs recommend rate (Erik’s chart for THIS
+class)</h3>
+<ul>
+<li>We made it in Class 2 but with raw hours. Make it again with
+<code>hours_played_log</code> and 8 buckets.</li>
+<li><strong>HINTS:</strong>
+<code>pd.qcut(df['hours_played_log'], q=8)</code> then group and
+mean.</li>
+<li><strong>What you learn:</strong> Smooth, clean version of the chart
+that Erik can use in his next leadership meeting.</li>
+</ul>
+<hr />
+<h2 id="phase-b-select-features">Phase B — Select features</h2>
+<h3 id="step-1-split-into-train-and-test-first">Step 1 — Split into
+train and test FIRST</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>train_test_split</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.model_selection import train_test_split</code>.</li>
+<li><code>X = df.drop('recommended', axis=1); y = df['recommended']</code>.</li>
+<li>Pass: <code>test_size=0.2</code>, <code>random_state=42</code>,
+<code>stratify=y</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> All next steps use TRAIN ONLY. Otherwise
+leakage.</li>
+</ul>
+<h3 id="step-2-drop-the-text-column-for-this-step-only">Step 2 — Drop
+the text column FOR THIS STEP ONLY</h3>
+<ul>
+<li><strong>WHAT:</strong> Mutual info and RF do not eat text. Drop
+<code>review</code> for the selection step.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>X_train_num = X_train.drop(columns=['review', 'app_name', 'review_date'])</code>
+— drop strings and dates.</li>
+<li>Keep a copy of the full data; we will add <code>review</code> back
+in the final file.</li>
+</ul></li>
+<li><strong>WHY:</strong> We keep <code>review</code> for Module 7 (text
+mining). It is not a numeric feature for the predict model in Class 5.
+Module 4 will add TF-IDF on <code>review</code>.</li>
+</ul>
+<h3 id="step-3-remove-low-variance-columns">Step 3 — Remove low-variance
+columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop columns where almost all values are the
+same.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import VarianceThreshold</code>.</li>
+<li><code>VarianceThreshold(threshold=0.01).fit_transform(X_train_num)</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Maybe <code>is_suspicious_bot</code> is
+dropped (very few 1s).</li>
+</ul>
+<h3 id="step-4-remove-highly-correlated-columns">Step 4 — Remove highly
+correlated columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop one of each pair where |corr| &gt;
+0.9.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute correlation matrix.</li>
+<li>Get the upper triangle with <code>np.triu(...)</code>.</li>
+<li>For each column, if any of its upper-triangle correlations is &gt;
+0.9, mark it for dropping.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Probably drop <code>hours_played</code>
+(we have <code>hours_played_log</code>). Maybe drop one of
+<code>votes_up_log</code> or <code>weighted_vote_score</code>.</li>
+</ul>
+<h3 id="step-5-rank-by-mutual-information">Step 5 — Rank by mutual
+information</h3>
+<ul>
+<li><strong>WHAT:</strong> Score each column by how much it tells you
+about <code>recommended</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import mutual_info_classif</code>.</li>
+<li><code>mi = mutual_info_classif(X_train_num, y_train)</code>.</li>
+<li>Put in a Series, sort.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Top features:
+<code>sentiment_score</code>, <code>game_recommend_rate</code>,
+<code>hours_played_log</code>, <code>review_length</code>,
+<code>helpful_ratio</code>.</li>
+</ul>
+<h3 id="step-6-random-forest-importance-second-opinion">Step 6 — Random
+Forest importance (second opinion)</h3>
+<ul>
+<li><strong>WHAT:</strong> Train a small RF, look at
+<code>feature_importances_</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.ensemble import RandomForestClassifier</code>.</li>
+<li><code>RandomForestClassifier(n_estimators=50, max_depth=8, n_jobs=-1, random_state=42)</code>.</li>
+<li><code>.fit(X_train_num, y_train)</code>.</li>
+<li>Look at <code>.feature_importances_</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-7-pick-the-final-12-15-columns">Step 7 — Pick the final
+12-15 columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Combine the rankings. Pick columns that:
+<ul>
+<li>Are high in mutual info, AND</li>
+<li>Are high in RF importance, AND</li>
+<li>Were not dropped by variance/correlation pruning.</li>
+</ul></li>
+<li><strong>WRITE DOWN:</strong> In your notebook, list the columns.
+Explain in 1 sentence why each one is in.</li>
+</ul>
+<h3 id="step-8-save-1">Step 8 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong> Keep only the selected columns +
+<code>recommended</code> + <code>review</code> (for Module 7) +
+<code>review_id</code> (for tracking). Save as
+<code>steam_step4.parquet</code> to Drive.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-erik-2">Phase C — Make ONE chart for
+Erik</h2>
+<h3 id="eriks-chart-these-are-the-10-most-important-columns">Erik’s
+chart — “These are the 10 most important columns”</h3>
+<p>A horizontal bar chart of your top 10 features and their importance
+score.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use the RF importance.</li>
+<li><code>sort_values()</code> then <code>.head(10)</code> then
+<code>.plot.barh()</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Top 10 predictors of recommended -
+sentiment and game average together predict 60% of the answer.”</li>
+<li><strong>Y-axis:</strong> column names.</li>
+<li><strong>X-axis:</strong> Random Forest importance.</li>
+<li><strong>Takeaway:</strong> “Three things matter: how the player
+feels (sentiment), what the game average is (game_recommend_rate), and
+how much the player played (hours_played_log). Everything else is
+small.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-4">Common mistakes in Class 4</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compute mutual info on the FULL data</td>
+<td>Leakage.</td>
+</tr>
+<tr>
+<td>Drop columns without writing why</td>
+<td>Module 4 students will not understand.</td>
+</tr>
+<tr>
+<td>Keep too many columns (40+)</td>
+<td>Slow training. Overfitting risk.</td>
+</tr>
+<tr>
+<td>Drop a high-mutual-info column</td>
+<td>Big mistake. Check why it is high before dropping.</td>
+</tr>
+<tr>
+<td>Drop the <code>review</code> text column from the final file</td>
+<td>We need it for Module 7. Keep it.</td>
+</tr>
+<tr>
+<td>Forget <code>stratify=y</code> in train/test split</td>
+<td>Train and test get different recommend rates. Bad.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-5">Self-check before Class 5</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Train/test split done
+FIRST.</label></li>
+<li><label><input type="checkbox" />12-15 numeric columns remain +
+<code>recommended</code> + <code>review</code> +
+<code>review_id</code>.</label></li>
+<li><label><input type="checkbox" />You wrote down WHY for each kept
+column.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Erik.</label></li>
+<li><label><input type="checkbox" /><code>steam_step4.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-5-pipelines">Class 5 — Pipelines</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Erik says: “Your cleaning code is
+in 4 different notebooks. When a new review arrives tomorrow, the model
+needs to clean it the same way. You cannot copy 4 notebooks to a server.
+We need ONE object that does everything.”</p>
+</blockquote>
+<h2 id="your-goal-4">Your goal</h2>
+<p>Put EVERY cleaning step inside ONE Pipeline object. Production-ready
+code.</p>
+<h2 id="inputs-4">Inputs</h2>
+<ul>
+<li><code>steam_step4.parquet</code> (selected columns)</li>
+</ul>
+<h2 id="outputs-4">Outputs</h2>
+<ul>
+<li><code>steam_pipeline.joblib</code> saved in Drive</li>
+<li>1 confusion-matrix chart + 1 ROC curve chart</li>
+<li>A pipeline that takes RAW input and produces predictions</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-3">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-confusion-matrix-after-training">Exploratory
+chart 1 — Confusion matrix (after training)</h3>
+<ul>
+<li>After Step 6, build a confusion matrix.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay</code>.</li>
+<li><code>cm = confusion_matrix(y_test, y_pred)</code>.</li>
+<li><code>ConfusionMatrixDisplay(cm, display_labels=['Not recommended', 'Recommended']).plot()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> How many critical reviews did we
+CATCH? How many did we miss?</li>
+</ul>
+<h3 id="exploratory-chart-2-roc-curve">Exploratory chart 2 — ROC
+curve</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.metrics import RocCurveDisplay</code>.</li>
+<li><code>RocCurveDisplay.from_estimator(pipeline, X_test, y_test)</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The trade-off between catching
+critics and false alarms. The AUC number.</li>
+</ul>
+<h3
+id="exploratory-chart-3-hours-played-vs-recommend-rate-the-recurring-erik-chart">Exploratory
+chart 3 — Hours played vs recommend rate (the recurring Erik chart)</h3>
+<ul>
+<li>One more time, after the pipeline is trained. Compare the model’s
+prediction rate to the actual rate by hours bucket.</li>
+<li><strong>What you learn:</strong> Does the model agree with the data
+we saw in Classes 2-4?</li>
+</ul>
+<hr />
+<h2 id="phase-b-build-the-pipeline">Phase B — Build the pipeline</h2>
+<h3
+id="step-1-decide-which-columns-are-numeric-and-which-are-categorical">Step
+1 — Decide which columns are numeric and which are categorical</h3>
+<ul>
+<li><strong>HINTS:</strong> Make two lists.</li>
+<li><strong>EXAMPLE:</strong>
+<ul>
+<li>numeric: <code>hours_played_log</code>, <code>review_year</code>,
+<code>review_month</code>, <code>review_dayofweek</code>,
+<code>votes_up_log</code>, <code>votes_funny_log</code>,
+<code>weighted_vote_score</code>, <code>helpful_ratio</code>,
+<code>review_length</code>, <code>n_capital_words</code>,
+<code>caps_ratio</code>, <code>n_punctuation</code>,
+<code>n_emoji_codes</code>, <code>sentiment_score</code>.</li>
+<li>categorical: maybe none for this model — we already encoded
+everything. (Or <code>app_id</code> if we keep it.)</li>
+</ul></li>
+<li><strong>NOTE:</strong> <code>review</code> (the text) is NOT in
+either list for THIS class. Module 4 will add a third pipeline branch
+with TF-IDF for the text.</li>
+</ul>
+<h3 id="step-2-build-the-numeric-mini-pipeline">Step 2 — Build the
+numeric mini-pipeline</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer (fill missing) +
+scaler.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.pipeline import Pipeline</code>.</p></li>
+<li><p><code>from sklearn.impute import SimpleImputer</code>.</p></li>
+<li><p><code>from sklearn.preprocessing import StandardScaler</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>numeric_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;scaler&#39;</span>,  StandardScaler()),</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in the blank: best strategy for numeric?
+(<code>'median'</code>)</p></li>
+</ul></li>
+</ul>
+<h3 id="step-3-build-the-categorical-mini-pipeline-if-needed">Step 3 —
+Build the categorical mini-pipeline (if needed)</h3>
+<ul>
+<li><strong>WHAT:</strong> If you have categorical columns, 2 steps:
+imputer + one-hot encoder.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.preprocessing import OneHotEncoder</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>categorical_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;onehot&#39;</span>,  OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">&#39;___&#39;</span>, sparse_output<span class="op">=</span>___)),</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in blanks. (Strategy <code>'most_frequent'</code>,
+handle_unknown <code>'ignore'</code>, sparse_output
+<code>False</code>.)</p></li>
+</ul></li>
+<li><strong>WHY <code>handle_unknown='ignore'</code>?</strong> In
+production, a new app_id may appear. We do not want the code to
+crash.</li>
+</ul>
+<h3 id="step-4-combine-into-a-columntransformer">Step 4 — Combine into a
+ColumnTransformer</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.compose import ColumnTransformer</code>.</li>
+<li>It takes a list of tuples:
+<code>(name, transformer, list_of_columns)</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-5-add-the-model-on-top">Step 5 — Add the model on top</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.linear_model import LogisticRegression</code>.</li>
+<li><code>LogisticRegression(class_weight='balanced', max_iter=1000, random_state=42)</code>.</li>
+<li>Put it in a Pipeline with the preprocessor.</li>
+</ul></li>
+<li><strong>WHY <code>class_weight='balanced'</code>?</strong> Only 20%
+of reviews are “not recommended”. Without this, the model just predicts
+“recommended” for everyone and gets 80% accuracy — but it never catches
+the critics. Useless for Erik.</li>
+</ul>
+<h3 id="step-6-train-and-evaluate">Step 6 — Train and evaluate</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>full_pipeline.fit(X_train, y_train)</code>.</li>
+<li><code>y_pred = full_pipeline.predict(X_test)</code>.</li>
+<li><code>from sklearn.metrics import classification_report</code>.</li>
+<li>Read the F1 of the “0” class (not recommended). That is the number
+Erik cares about.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> F1 on the “not recommended” class around
+0.40-0.55. (Module 4 will improve this with TF-IDF on the text.)</li>
+</ul>
+<h3 id="step-7-save-the-trained-pipeline">Step 7 — Save the trained
+pipeline</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>import joblib</code>.</li>
+<li><code>joblib.dump(full_pipeline, '/content/drive/MyDrive/steam_lab/steam_pipeline.joblib')</code>.</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-erik-3">Phase C — Make ONE chart for
+Erik</h2>
+<h3 id="eriks-chart-how-many-critical-reviews-did-we-catch">Erik’s chart
+— “How many critical reviews did we catch?”</h3>
+<p>A simple confusion matrix with clear labels:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Predicted recommended</th>
+<th>Predicted not recommended</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Actually recommended</strong></td>
+<td>true positives</td>
+<td>false alarms</td>
+</tr>
+<tr>
+<td><strong>Actually not recommended</strong></td>
+<td>missed critics</td>
+<td>caught critics</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong> Print the confusion matrix with
+<code>sns.heatmap()</code> and <code>annot=True</code>.</li>
+<li><strong>Title:</strong> “Of 4,000 critical reviews in the test set,
+our baseline model catches ~2,200.”</li>
+<li><strong>Takeaway for Erik:</strong> “We catch about 55% of critical
+reviews using only numeric features. Module 4 will add the text (TF-IDF)
+and we expect this number to go up to 70-80%.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-5">Common mistakes in Class 5</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Build the pipeline AFTER you scaled the data manually</td>
+<td>Pipeline scales it twice. Numbers wrong.</td>
+</tr>
+<tr>
+<td>Forget <code>sparse_output=False</code> in OneHotEncoder</td>
+<td>Some downstream code breaks.</td>
+</tr>
+<tr>
+<td>Use <code>class_weight='balanced'</code> AND SMOTE</td>
+<td>Over-correction. Pick one.</td>
+</tr>
+<tr>
+<td>Forget <code>random_state</code></td>
+<td>Results change every run. Hard to debug.</td>
+</tr>
+<tr>
+<td>Try to fit <code>review</code> (text) into the numeric pipeline</td>
+<td>Crash. Save text for Module 4.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-6">Self-check before Class 6</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Pipeline has preprocessor +
+model.</label></li>
+<li><label><input type="checkbox" />Preprocessor has numeric
+transformer.</label></li>
+<li><label><input type="checkbox" /><code>class_weight='balanced'</code>
+set.</label></li>
+<li><label><input type="checkbox" />Confusion matrix + ROC curve
+charts.</label></li>
+<li><label><input type="checkbox" /><code>steam_pipeline.joblib</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-6-end-to-end-lab-the-big-one">Class 6 — End-to-End Lab
+(THE BIG ONE)</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Erik is in the meeting room. He
+wants the FINAL clean dataset on his desk in 90 minutes. This is the
+lab.</p>
+</blockquote>
+<h2 id="your-goal-5">Your goal</h2>
+<p>Take the 1 raw CSV file (6.4M rows). Produce ONE final
+<code>.parquet</code> file with the exact 19-column schema. Plus a
+1-page findings report.</p>
+<h2 id="time">Time</h2>
+<p><strong>90 minutes</strong> of focused work.</p>
+<h2 id="inputs-5">Inputs</h2>
+<ul>
+<li>The 1 raw CSV file (<code>dataset.csv</code>) in your Drive
+folder</li>
+</ul>
+<h2 id="outputs-5">Outputs</h2>
+<ul>
+<li><code>steam_reviews_clean.parquet</code> (~100,000 rows x 19
+columns) in Drive</li>
+<li><code>findings.md</code> (~1 page)</li>
+<li>Your full Colab notebook</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-10-minutes">Phase A — Explore the
+data first (10 minutes)</h2>
+<p>You will reuse charts from Classes 1-5. Pick 3 of them. Put them all
+on ONE PAGE of your notebook with markdown headers: 1. Language
+distribution before filtering (Class 1) 2. Hours played vs recommend
+rate (Class 2) 3. Top 10 most important features (Class 4)</p>
+<p>These 3 charts tell Erik the whole story.</p>
+<hr />
+<h2 id="phase-b-build-the-final-dataset-70-minutes">Phase B — Build the
+final dataset (70 minutes)</h2>
+<h3 id="required-output-schema">Required output schema</h3>
+<p>Your <code>steam_reviews_clean.parquet</code> MUST have these 19
+columns, with these names and types:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>Column</th>
+<th>Type</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>review_id</code></td>
+<td>int</td>
+<td>raw (tracking)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>app_id</code></td>
+<td>int</td>
+<td>raw (game id)</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>language</code></td>
+<td>string</td>
+<td>raw (will be all “english”)</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>review</code></td>
+<td>string</td>
+<td>raw text - kept for Module 7</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>hours_played_log</code></td>
+<td>float</td>
+<td>engineered (log of hours played)</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>review_year</code></td>
+<td>int</td>
+<td>engineered (from timestamp_created)</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>review_month</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>review_dayofweek</code></td>
+<td>int</td>
+<td>engineered (0=Mon, 6=Sun)</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>votes_up_log</code></td>
+<td>float</td>
+<td>engineered (log of votes_up)</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>votes_funny_log</code></td>
+<td>float</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>weighted_vote_score</code></td>
+<td>float</td>
+<td>raw (Steam’s helpfulness score)</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>helpful_ratio</code></td>
+<td>float</td>
+<td>engineered (votes_up / (votes_up + votes_funny + 1))</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>review_length</code></td>
+<td>int</td>
+<td>engineered (character count)</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>n_capital_words</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>caps_ratio</code></td>
+<td>float</td>
+<td>engineered (% of letters that are uppercase)</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>n_punctuation</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>n_emoji_codes</code></td>
+<td>int</td>
+<td>engineered (non-ASCII char count)</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>sentiment_score</code></td>
+<td>float</td>
+<td>engineered (TextBlob polarity)</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>recommended</code></td>
+<td>int (0/1)</td>
+<td>TARGET</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lab-phases-timed">Lab phases (timed)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Time</th>
+<th>What you do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Load + filter + sample</td>
+<td>15 min</td>
+<td>Read in chunks. Filter to English. Sample 100,000 with seed 42.</td>
+</tr>
+<tr>
+<td>2. Clean</td>
+<td>10 min</td>
+<td>Convert <code>timestamp_created</code> to date. Convert minutes to
+hours. Cast booleans to int. Drop missing reviews.</td>
+</tr>
+<tr>
+<td>3. Engineer time features</td>
+<td>10 min</td>
+<td><code>review_year</code>, <code>review_month</code>,
+<code>review_dayofweek</code>.</td>
+</tr>
+<tr>
+<td>4. Engineer text features</td>
+<td>25 min</td>
+<td><code>review_length</code>, <code>n_capital_words</code>,
+<code>caps_ratio</code>, <code>n_punctuation</code>,
+<code>n_emoji_codes</code>, <code>sentiment_score</code>. (Sentiment is
+slow.)</td>
+</tr>
+<tr>
+<td>5. Engineer numeric features</td>
+<td>10 min</td>
+<td>Log-transforms. <code>helpful_ratio</code>.</td>
+</tr>
+<tr>
+<td>6. Validate + save</td>
+<td>10 min</td>
+<td>Check schema. 19 columns. Right dtypes. Save
+<code>.parquet</code>.</td>
+</tr>
+<tr>
+<td>7. Findings</td>
+<td>10 min</td>
+<td>Write <code>findings.md</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total: 90 minutes.</strong></p>
+<p>NOTE: 90 minutes is tight, especially because
+<code>sentiment_score</code> is slow on 100,000 rows. Start that cell
+EARLY. While it runs, work on the other features in parallel cells.</p>
+<hr />
+<h2 id="phase-c-findings-report-for-erik-10-minutes">Phase C — Findings
+report for Erik (10 minutes)</h2>
+<p>Write <code>findings.md</code> with these sections:</p>
+<h3 id="final-numbers">Final numbers</h3>
+<ul>
+<li>Final row count: ____</li>
+<li><code>recommended</code> rate: ____% (should be 75-82%)</li>
+<li>Most common review length bucket: ____</li>
+<li>Median hours played: ____</li>
+</ul>
+<h3 id="top-3-insights">Top 3 insights</h3>
+<ol type="1">
+<li><hr /></li>
+<li><hr /></li>
+<li><hr /></li>
+</ol>
+<h3 id="one-question-to-investigate-in-module-4">One question to
+investigate in Module 4</h3>
+<ul>
+<li><hr /></li>
+</ul>
+<h3 id="one-chart-that-summarizes-everything">One chart that summarizes
+everything</h3>
+<p>Embed your most important chart (hours played vs recommend rate, or
+review length distribution).</p>
+<hr />
+<h2 id="grading-rubric-100-points">Grading rubric (100 points)</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Item</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All 19 columns exist with the right names and dtypes</td>
+<td>25</td>
+</tr>
+<tr>
+<td>Cleaning decisions written in markdown</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Pipeline is reproducible (re-run from the raw CSV in ONE
+command)</td>
+<td>15</td>
+</tr>
+<tr>
+<td>English filter applied BEFORE sampling</td>
+<td>10</td>
+</tr>
+<tr>
+<td><code>random_state=42</code> used in <code>.sample()</code></td>
+<td>5</td>
+</tr>
+<tr>
+<td><code>recommended</code> rate is between 75-82%</td>
+<td>5</td>
+</tr>
+<tr>
+<td><code>hours_played_log</code> exists and looks reasonable (no
+infinity)</td>
+<td>5</td>
+</tr>
+<tr>
+<td><strong>At least 3 exploratory + 1 explanatory chart per
+class</strong></td>
+<td><strong>15</strong></td>
+</tr>
+<tr>
+<td><code>findings.md</code> has insights, not just numbers</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<h2 id="submit">Submit</h2>
+<p>Upload to
+<code>module-3/class_6/submissions/&lt;YourTeamName&gt;/</code>: -
+<code>steam_reviews_clean.parquet</code> - Your Colab notebook
+(<code>File &gt; Download &gt; Download .ipynb</code>) -
+<code>findings.md</code></p>
+<hr />
+<h1 id="tips-for-the-whole-module">Tips for the whole module</h1>
+<ol type="1">
+<li><strong>Do NOT copy-paste code from this guide.</strong> This guide
+gives you HINTS only. Write the code yourself. You will learn much
+faster.</li>
+<li><strong>Save your notebook to Drive often.</strong> Colab
+disconnects after 12 hours.</li>
+<li><strong>Save intermediate <code>.parquet</code> files to
+Drive</strong> (steam_step1, steam_step2, etc.). If something breaks,
+you do not redo everything.</li>
+<li><strong>Pair-program.</strong> One student types, one reads. Switch
+every 20 minutes.</li>
+<li><strong>Make a chart BEFORE you write cleaning code.</strong> You
+must SEE the problem before you can fix it.</li>
+<li><strong>Make a chart AFTER each step.</strong> Confirm your code did
+what you expected.</li>
+<li><strong>Ask the mentor early.</strong> If you are stuck for 20
+minutes, ask. Do not waste an afternoon.</li>
+<li><strong>Filter before sampling.</strong> Always. The order matters:
+first reduce to English, then take 100,000 rows.</li>
+<li><strong>Always use <code>random_state=42</code>.</strong>
+Reproducibility is a job skill, not just a class rule.</li>
+<li><strong>Sentiment analysis is slow.</strong> Start it early. Use it
+as background while you write other code.</li>
+</ol>
+<p>Good luck.</p>
+</main>
+
+<footer class="scenario-footer">
+  <p><a href="../../#/module/3/class/6">&larr; Back to all 15 scenarios</a></p>
+</footer>
+
+</body>
+</html>

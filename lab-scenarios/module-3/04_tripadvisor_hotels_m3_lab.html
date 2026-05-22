@@ -1,0 +1,2387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>04_tripadvisor_hotels_m3_lab</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --text: #e6e8ec;
+    --text-dim: #9aa0aa;
+    --accent: #7aa2f7;
+    --accent-hover: #a5c0ff;
+    --border: #2a2f3a;
+    --code-bg: #11141a;
+    --table-header: #232732;
+    --quote-bar: #7aa2f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(26, 29, 36, 0.92);
+  }
+  .topbar-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .back-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .back-link:hover { color: var(--accent-hover); }
+  .pdf-link {
+    background: var(--accent);
+    color: #0f1115;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pdf-link:hover { background: var(--accent-hover); }
+  .pdf-link svg { width: 14px; height: 14px; }
+
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 56px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  p { margin-bottom: 16px; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+  strong { color: #fff; font-weight: 600; }
+  em { color: var(--text); font-style: italic; }
+
+  ul, ol { margin-bottom: 18px; padding-left: 28px; }
+  li { margin-bottom: 6px; }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 36px 0;
+  }
+
+  blockquote {
+    border-left: 4px solid var(--quote-bar);
+    background: var(--card);
+    padding: 14px 22px;
+    margin: 18px 0;
+    color: var(--text);
+    border-radius: 0 8px 8px 0;
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  blockquote strong { color: var(--accent); }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    font-size: 0.88em;
+    color: #f0a3b5;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 18px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text);
+    font-size: 1em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.94rem;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  thead { background: var(--table-header); }
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+
+  /* Checkboxes in self-check lists */
+  input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+
+  /* Anchored sections for nav */
+  h2[id], h3[id] { scroll-margin-top: 80px; }
+
+  footer.scenario-footer {
+    max-width: 920px;
+    margin: 60px auto 40px;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+  footer.scenario-footer a {
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    main { padding: 24px 16px 60px; }
+    h1 { font-size: 1.7rem; }
+    h2 { font-size: 1.35rem; }
+    h3 { font-size: 1.1rem; }
+    .topbar { padding: 10px 16px; }
+    pre { font-size: 0.8rem; padding: 12px 14px; }
+    table { font-size: 0.85rem; }
+    th, td { padding: 9px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="../../#/module/3/class/6">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <span style="display:inline-block;transform:translateY(-1px)">&larr;</span> Back to all scenarios
+    </a>
+    <a class="pdf-link" href="04_tripadvisor_hotels_m3_lab.pdf" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-4-4h3V4h2v8h3l-4 4zm-8 4v-2h16v2H4z"/></svg>
+      Download as PDF
+    </a>
+  </div>
+</div>
+
+<main>
+<h1 id="tripadvisor-hotels-module-3-lab-guide">TripAdvisor Hotels —
+Module 3 Lab Guide</h1>
+<p><strong>Scenario:</strong> TripAdvisor Hotel Reviews. Predict the
+star rating from the text. <strong>Module:</strong> 3 (Data Preparation
+and Feature Engineering) <strong>Audience:</strong> Adult learners, A2
+English. New to AI. <strong>Tools:</strong> Google Colab (no install
+needed).</p>
+<hr />
+<h1 id="the-scenario-your-mission">The Scenario — Your Mission</h1>
+<h2 id="where-you-work">Where you work</h2>
+<p>You and your team are new data analysts at
+<strong>TripAdvisor</strong>. TripAdvisor is the biggest travel review
+website in the world. Tourists write reviews about hotels, restaurants,
+and tours.</p>
+<p>Every month: - <strong>Millions of travellers</strong> read
+TripAdvisor before they book a hotel. - Hotels see their score and their
+text reviews. - Hotel managers must read the reviews and fix
+problems.</p>
+<h2 id="the-problem">The problem</h2>
+<p>Hotels get <strong>~100 reviews per month</strong>. Some hotels in
+big cities get <strong>1,000+ reviews per month.</strong></p>
+<p>The hotel manager: - Has <strong>zero time</strong> to read all of
+them. - Misses common complaints (wifi slow, breakfast cold, room
+noisy). - Sees only the average score (4.2 out of 5) — and that does not
+tell her WHY guests are unhappy.</p>
+<p>Result: small problems become big problems. Bad reviews continue. The
+hotel loses bookings.</p>
+<h2 id="your-managers-request">Your manager’s request</h2>
+<p>Your manager, <strong>Emma</strong> (Head of Hotel Partnerships,
+EMEA), tells you:</p>
+<blockquote>
+<p>“Our hotel managers get 100 reviews per month and zero time to read
+them.</p>
+<p>Give me a tool. <strong>Read each review. Auto-tag it with star
+rating + main complaint topic.</strong> The manager opens the dashboard,
+sees: ‘this week, 12 reviews complained about wifi, 8 about
+breakfast.’</p>
+<p>Then she fixes wifi on Monday morning. She fixes breakfast on
+Tuesday. Next month her score goes up.</p>
+<p>This is the tool I want. Build it.”</p>
+</blockquote>
+<h2 id="your-teams-job-for-the-next-2-weeks-module-3">Your team’s job
+for the next 2 weeks (Module 3)</h2>
+<p>Emma cannot do this alone. She has <strong>one CSV file with 20,000
+reviews</strong>. The text is messy: HTML codes like
+<code>&amp;amp;</code>, smart quotes, duplicates, very short reviews,
+very long reviews.</p>
+<p>Your job in Module 3: &gt; <strong>Turn one messy CSV file with raw
+English text into ONE clean file with 20+ engineered columns. The clean
+file will be used to train the model in Module 4.</strong></p>
+<p>The clean file is called <code>tripadvisor_clean.parquet</code>. It
+must have <strong>~21 specific columns</strong> (we will see them in
+Class 6).</p>
+<h2 id="after-module-3">After Module 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Module</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Module 4</strong></td>
+<td>Train the model. Predict the star rating (1 to 5) from the
+text.</td>
+</tr>
+<tr>
+<td><strong>Module 5</strong></td>
+<td>Find groups of reviews (very happy / very angry / mixed). For Emma’s
+dashboard.</td>
+</tr>
+<tr>
+<td><strong>Module 7</strong></td>
+<td>Real NLP: TF-IDF + sentiment + topic mining on the same
+<code>Review</code> column.</td>
+</tr>
+</tbody>
+</table>
+<p>You use the <strong>same TripAdvisor dataset</strong> until the end
+of Module 7.</p>
+<hr />
+<h1 id="why-this-scenario-is-special">Why This Scenario is Special</h1>
+<p>Most data has many columns. This dataset has <strong>only 2
+columns</strong>: <code>Review</code> (text) and <code>Rating</code> (1
+to 5).</p>
+<p>This is on purpose. It teaches you the most important lesson in
+modern AI:</p>
+<blockquote>
+<p><strong>When you only have text, you must MAKE the columns
+yourself.</strong></p>
+</blockquote>
+<p>This is called <strong>text feature engineering</strong>. You will
+count words, count exclamation marks, count capital letters, check if
+the word “wifi” appears, check if the word “not” appears, and so on.</p>
+<p>Each count becomes one column. By the end of Module 3 you will have
+<strong>20+ columns from text alone.</strong> Then in Module 4, the
+model can learn from them.</p>
+<hr />
+<h1 id="how-this-guide-works-read-this-first">How This Guide Works (Read
+This First!)</h1>
+<h2 id="we-do-not-give-you-the-full-code">We do NOT give you the full
+code</h2>
+<p>In this guide you will see two kinds of content:</p>
+<h3 id="what-why-expected-explained-in-words">1. WHAT / WHY / EXPECTED —
+explained in words</h3>
+<p>For every step you read: - <strong>WHAT</strong> you have to do (in
+normal language) - <strong>WHY</strong> you do it (the reason) -
+<strong>HINTS</strong> — the function names, the arguments to remember -
+<strong>EXPECTED</strong> — the result you should see if you did it
+right</p>
+<h3 id="sometimes-a-tiny-code-skeleton-with-blanks">2. Sometimes a tiny
+code skeleton with blanks</h3>
+<p>For the harder steps we give you a code skeleton with
+<code>___</code> blanks. <strong>You fill in the blanks.</strong></p>
+<h3 id="why-no-full-code">Why no full code?</h3>
+<p>Because you will NOT learn if you copy-paste. - In Module 4, the
+model only works if YOU understand each step. - In your future job,
+nobody will give you the code. - Writing the code yourself takes 10
+minutes more today, but saves 10 hours later.</p>
+<p><strong>Rule:</strong> If you finish a step in 30 seconds by
+copy-pasting from a teammate’s notebook, do it AGAIN by yourself.
+Different variable names, same logic.</p>
+<hr />
+<h1 id="visualizations-two-modes">Visualizations — Two Modes</h1>
+<p>In every class you will make charts. There are <strong>two
+reasons</strong> to make a chart:</p>
+<h2 id="exploratory-charts-for-you">1. Exploratory charts (for YOU)</h2>
+<p>Made BEFORE you clean the data. To understand what the data looks
+like. - Fast, ugly, no labels needed. - Examples:
+<code>df.hist()</code>,
+<code>df['column'].value_counts().plot.bar()</code>.</p>
+<blockquote>
+<p>Goal: <strong>“What does this data look like?”</strong></p>
+</blockquote>
+<h2 id="explanatory-charts-for-emma">2. Explanatory charts (for
+EMMA)</h2>
+<p>Made AFTER you understand. To EXPLAIN something to your manager. -
+Clean, labeled, one clear message. - Must have: title, x-label, y-label,
+source, and a 1-sentence takeaway.</p>
+<blockquote>
+<p>Goal: <strong>“Emma, look at this. This is the problem.”</strong></p>
+</blockquote>
+<p>In every class you make BOTH kinds.</p>
+<h2 id="your-plotting-toolkit-you-learned-this-in-module-2-class-5">Your
+plotting toolkit (you learned this in Module 2 Class 5)</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Plot</th>
+<th>When to use it</th>
+<th>Function name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Histogram</td>
+<td>See the SHAPE of a numeric column</td>
+<td><code>plt.hist()</code> or <code>sns.histplot()</code></td>
+</tr>
+<tr>
+<td>Bar chart</td>
+<td>Count of each category</td>
+<td><code>df['col'].value_counts().plot.bar()</code></td>
+</tr>
+<tr>
+<td>Box plot</td>
+<td>See outliers in a numeric column</td>
+<td><code>sns.boxplot()</code></td>
+</tr>
+<tr>
+<td>Scatter plot</td>
+<td>See the relationship between 2 numbers</td>
+<td><code>plt.scatter()</code> or <code>sns.scatterplot()</code></td>
+</tr>
+<tr>
+<td>Heatmap</td>
+<td>See correlation between many columns</td>
+<td><code>sns.heatmap(df.corr())</code></td>
+</tr>
+<tr>
+<td>Line plot</td>
+<td>See change over time</td>
+<td><code>plt.plot()</code></td>
+</tr>
+<tr>
+<td>Word cloud</td>
+<td>See most common words</td>
+<td><code>WordCloud().generate(text)</code></td>
+</tr>
+</tbody>
+</table>
+<p>Before you start: <code>import matplotlib.pyplot as plt</code> and
+<code>import seaborn as sns</code>.</p>
+<hr />
+<h1 id="before-you-start-google-colab-setup">Before You Start — Google
+Colab Setup</h1>
+<p>You will work in <strong>Google Colab</strong>. That means: - You do
+NOT install Python. - You do NOT install pandas, scikit-learn, or
+anything heavy. - You just open a notebook in your web browser.</p>
+<h2 id="step-1-open-a-new-colab-notebook">Step 1 — Open a new Colab
+notebook</h2>
+<ol type="1">
+<li>Go to https://colab.research.google.com</li>
+<li>Sign in with your Google account.</li>
+<li>Click <strong>“New notebook”</strong> (top left).</li>
+<li>Name it <code>tripadvisor_module_3.ipynb</code>.</li>
+</ol>
+<h2 id="step-2-connect-to-google-drive">Step 2 — Connect to Google
+Drive</h2>
+<p>Colab files <strong>disappear</strong> when you close the browser. So
+you must save your work to <strong>Google Drive</strong>.</p>
+<p>In the first cell:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> drive</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>drive.mount(<span class="st">&#39;/content/drive&#39;</span>)</span></code></pre></div>
+<p>A pop-up asks for permission. Click “Allow”. After this, Drive is
+available at <code>/content/drive/MyDrive/</code>.</p>
+<h2 id="step-3-create-a-project-folder">Step 3 — Create a project
+folder</h2>
+<p>In a new cell:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&#39;/content/drive/MyDrive/tripadvisor_lab&#39;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>cd <span class="op">/</span>content<span class="op">/</span>drive<span class="op">/</span>MyDrive<span class="op">/</span>tripadvisor_lab</span></code></pre></div>
+<p>Your team will save ALL files in this folder.</p>
+<h2 id="step-4-get-the-data">Step 4 — Get the data</h2>
+<p><strong>Option A — Direct from Kaggle (recommended):</strong></p>
+<ol type="1">
+<li>Make a free Kaggle account.</li>
+<li>Go to kaggle.com/settings/account, scroll to “API”, click “Create
+New Token”. Save the <code>kaggle.json</code> file.</li>
+<li>In Colab:</li>
+</ol>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> files</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>files.upload()    <span class="co"># pick kaggle.json</span></span></code></pre></div>
+<ol start="4" type="1">
+<li>Then:</li>
+</ol>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>mkdir <span class="op">-</span>p <span class="op">~/</span>.kaggle <span class="op">&amp;&amp;</span> mv kaggle.json <span class="op">~/</span>.kaggle<span class="op">/</span> <span class="op">&amp;&amp;</span> chmod <span class="dv">600</span> <span class="op">~/</span>.kaggle<span class="op">/</span>kaggle.json</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install kaggle <span class="op">-</span>q</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kaggle datasets download <span class="op">-</span>d andrewmvd<span class="op">/</span>trip<span class="op">-</span>advisor<span class="op">-</span>hotel<span class="op">-</span>reviews</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>unzip <span class="op">-</span>q trip<span class="op">-</span>advisor<span class="op">-</span>hotel<span class="op">-</span>reviews.<span class="bu">zip</span> <span class="op">-</span>d data</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ls data<span class="op">/</span></span></code></pre></div>
+<p>You should see <strong>1 CSV file</strong> inside <code>data/</code>:
+<code>tripadvisor_hotel_reviews.csv</code>.</p>
+<p><strong>Option B — Upload by hand:</strong></p>
+<ol type="1">
+<li>Download the zip from
+kaggle.com/datasets/andrewmvd/trip-advisor-hotel-reviews on your
+laptop.</li>
+<li>Unzip it.</li>
+<li>In Colab’s file panel (left sidebar), upload the CSV file.</li>
+</ol>
+<h2 id="step-5-test-it">Step 5 — Test it</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;data/tripadvisor_hotel_reviews.csv&#39;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.shape)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.columns.tolist())</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head(<span class="dv">2</span>))</span></code></pre></div>
+<p>Should print <code>(20491, 2)</code> and the columns
+<code>['Review', 'Rating']</code>. You are ready.</p>
+<h2 id="step-6-install-a-few-nlp-helpers">Step 6 — Install a few NLP
+helpers</h2>
+<p>You will use small libraries to count sentences and score sentiment.
+Install them once:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install nltk vaderSentiment wordcloud <span class="op">-</span>q</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> nltk</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>nltk.download(<span class="st">&#39;punkt&#39;</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>nltk.download(<span class="st">&#39;punkt_tab&#39;</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>nltk.download(<span class="st">&#39;stopwords&#39;</span>)</span></code></pre></div>
+<p>This takes about 30 seconds.</p>
+<h2 id="colab-tips">Colab tips</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Save your notebook to Drive often</td>
+<td>Colab disconnects after 12 hours.</td>
+</tr>
+<tr>
+<td>Save intermediate <code>.parquet</code> files to Drive</td>
+<td>Files in <code>/content/</code> disappear when Colab
+disconnects.</td>
+</tr>
+<tr>
+<td>Share the notebook with teammates (Share button, top right)</td>
+<td>Editor access. Like Google Docs for code.</td>
+</tr>
+<tr>
+<td>Restart runtime if memory full</td>
+<td>Runtime &gt; Restart runtime.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="class-1-data-cleaning">Class 1 — Data Cleaning</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Emma drops one messy CSV on your
+desk. The text has HTML codes like <code>&amp;amp;</code>, smart quotes,
+duplicate reviews, and a few very short reviews (“Great!”). Your job
+today: clean the text and decide which rows to keep.</p>
+</blockquote>
+<h2 id="your-goal">Your goal</h2>
+<p>Make the file USABLE. Fix the HTML. Remove duplicates. Drop empty /
+tiny reviews. Look at the rating distribution.</p>
+<h2 id="inputs">Inputs</h2>
+<ul>
+<li><code>data/tripadvisor_hotel_reviews.csv</code></li>
+</ul>
+<h2 id="outputs">Outputs</h2>
+<ul>
+<li><code>reviews_step1.parquet</code> saved in your Drive folder</li>
+<li>3+ exploratory charts in your notebook</li>
+<li>1 explanatory chart for Emma</li>
+<li>Notes in markdown about every decision you made</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-15-minutes">Phase A — Explore the
+data first (15 minutes)</h2>
+<p>Before you clean anything, <strong>LOOK</strong> at the data.</p>
+<h3
+id="exploratory-chart-1-how-many-reviews-per-star-rating">Exploratory
+chart 1 — How many reviews per star rating?</h3>
+<ul>
+<li><strong>Question:</strong> “Of 20,491 reviews, how many are 5-star,
+how many 4-star, etc.?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>df['Rating'].value_counts().sort_index()</code>.</li>
+<li>Then <code>.plot.bar()</code> on the result.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The data is <strong>very
+unbalanced</strong>. About 50% are 5-star and only ~5% are 1-star.
+Remember this — it will be a problem in Module 4.</li>
+</ul>
+<h3 id="exploratory-chart-2-length-of-the-reviews">Exploratory chart 2 —
+Length of the reviews</h3>
+<ul>
+<li><strong>Question:</strong> “Are reviews short (‘Great!’) or long (a
+full essay)?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>First make a new column:
+<code>df['review_length'] = df['Review'].str.len()</code>.</li>
+<li>Histogram with <code>bins=50</code>.</li>
+<li>Try <code>plt.xlim(0, 4000)</code> to ignore very long
+outliers.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Most reviews are 500-2000
+characters. A few are huge (10,000+).</li>
+</ul>
+<h3 id="exploratory-chart-3-how-many-duplicate-reviews">Exploratory
+chart 3 — How many duplicate reviews?</h3>
+<ul>
+<li><strong>Question:</strong> “Did some users copy the same text
+twice?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>df['Review'].duplicated().sum()</code>.</li>
+<li>Print the number.</li>
+<li>Print a few of the duplicate texts:
+<code>df[df['Review'].duplicated(keep=False)].head(10)</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Some reviews are template text
+(“Nice hotel, good staff.”). You will drop them.</li>
+</ul>
+<h3 id="exploratory-chart-4-spot-the-html-noise">Exploratory chart 4 —
+Spot the HTML noise</h3>
+<ul>
+<li><strong>Question:</strong> “Is the text dirty?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Print 5 random reviews:
+<code>df['Review'].sample(5).tolist()</code>.</li>
+<li>Look for: <code>&amp;amp;</code> (means <code>&amp;</code>),
+<code>&amp;#39;</code> (means <code>'</code>), weird quotes
+<code>"</code> <code>"</code>, line breaks <code>\n</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Yes, the text is dirty. You will
+clean it in Phase B.</li>
+</ul>
+<hr />
+<h2 id="phase-b-clean-the-reviews-45-minutes">Phase B — Clean the
+reviews (45 minutes)</h2>
+<h3 id="step-1-load-the-file">Step 1 — Load the file</h3>
+<ul>
+<li><strong>WHAT:</strong> Load the CSV into a DataFrame called
+<code>df</code>.</li>
+<li><strong>HINTS:</strong>
+<code>pd.read_csv('data/tripadvisor_hotel_reviews.csv')</code>.</li>
+<li><strong>EXPECTED:</strong> Shape <code>(20491, 2)</code>.</li>
+</ul>
+<h3 id="step-2-look-at-the-file">Step 2 — Look at the file</h3>
+<ul>
+<li><strong>WHAT:</strong> Check <code>.shape</code>,
+<code>.info()</code>, <code>.head()</code>, and
+<code>.isna().sum()</code>.</li>
+<li><strong>HINTS:</strong> Just call them in different cells.</li>
+<li><strong>EXPECTED:</strong>
+<ul>
+<li>2 columns: <code>Review</code> (object / text), <code>Rating</code>
+(int).</li>
+<li>Missing values: 0 (this dataset is complete — lucky for you).</li>
+</ul></li>
+</ul>
+<h3 id="step-3-add-a-review_id-column">Step 3 — Add a
+<code>review_id</code> column</h3>
+<ul>
+<li><strong>WHAT:</strong> Every row needs a unique ID. You will use it
+later.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>df.reset_index(drop=True)</code>.</li>
+<li>Then
+<code>df['review_id'] = 'r_' + df.index.astype(str)</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> When you join tables in Module 5 / 7, you need
+a key.</li>
+<li><strong>EXPECTED:</strong> A new column with values like
+<code>r_0</code>, <code>r_1</code>, …, <code>r_20490</code>.</li>
+</ul>
+<h3 id="step-4-fix-the-html-entities">Step 4 — Fix the HTML
+entities</h3>
+<ul>
+<li><strong>WHAT:</strong> Replace <code>&amp;amp;</code> with
+<code>&amp;</code>, <code>&amp;#39;</code> with <code>'</code>,
+<code>&amp;quot;</code> with <code>"</code>, etc.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Python has a built-in helper: <code>import html</code> and then
+<code>html.unescape(text)</code>.</li>
+<li>Apply it to every row:
+<code>df['Review'] = df['Review'].apply(___)</code>.</li>
+<li>Fill in the blank with the function name.</li>
+</ul></li>
+<li><strong>WHY:</strong> The text <code>it&amp;#39;s</code> should
+become <code>it's</code>. The model will treat them as different words
+otherwise.</li>
+<li><strong>EXPECTED:</strong> Print 5 reviews again. The
+<code>&amp;amp;</code> and <code>&amp;#39;</code> are gone.</li>
+</ul>
+<h3 id="step-5-strip-and-normalize-whitespace">Step 5 — Strip and
+normalize whitespace</h3>
+<ul>
+<li><strong>WHAT:</strong> Remove leading/trailing spaces. Replace
+<code>\n</code> and <code>\t</code> with a single space. Replace
+multiple spaces with one space.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> clean_whitespace(text):</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    text <span class="op">=</span> text.replace(<span class="st">&#39;</span><span class="ch">\n</span><span class="st">&#39;</span>, <span class="st">&#39; &#39;</span>).replace(<span class="st">&#39;</span><span class="ch">\t</span><span class="st">&#39;</span>, ___)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    text <span class="op">=</span> re.sub(<span class="vs">r&#39;</span><span class="dv">\s</span><span class="op">+</span><span class="vs">&#39;</span>, ___, text)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> text.___()      <span class="co"># strip</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;Review&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;Review&#39;</span>].<span class="bu">apply</span>(___)</span></code></pre></div></li>
+<li><p>Fill in the 4 blanks.</p></li>
+</ul></li>
+<li><strong>WHY:</strong> A space is a space is a space. The model
+should not see <code>"good  hotel"</code> and <code>"good hotel"</code>
+as different.</li>
+</ul>
+<h3 id="step-6-lowercase-a-copy-keep-the-original">Step 6 — Lowercase a
+copy (KEEP the original!)</h3>
+<ul>
+<li><strong>WHAT:</strong> Make a new column <code>review_lower</code>
+with everything in lowercase.</li>
+<li><strong>HINTS:</strong>
+<code>df['review_lower'] = df['Review'].str.lower()</code>.</li>
+<li><strong>WHY KEEP BOTH?</strong>
+<ul>
+<li>The lowercased version is for counting words (“WIFI”, “Wifi”, “wifi”
+are the same thing).</li>
+<li>The original is for counting CAPS — angry reviewers often shout in
+capitals (“THIS HOTEL IS HORRIBLE!”). You will use this in Class 3.</li>
+</ul></li>
+</ul>
+<h3 id="step-7-drop-empty-and-very-short-reviews">Step 7 — Drop empty
+and very short reviews</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop rows where the review is empty or has
+less than 10 characters.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Make a mask:
+<code>mask = df['Review'].str.len() &gt;= 10</code>.</li>
+<li>Apply it: <code>df = df[mask].copy()</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> “Great!” or “Bad” tells you almost nothing.
+Drop them.</li>
+<li><strong>EXPECTED:</strong> You lose ~20 rows. Now ~20,471.</li>
+</ul>
+<h3 id="step-8-drop-duplicate-reviews">Step 8 — Drop duplicate
+reviews</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop rows where the <code>Review</code> text
+is exactly the same as another row.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df = df.drop_duplicates(subset=['Review']).copy()</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Same text = same training example twice = the
+model overfits.</li>
+<li><strong>EXPECTED:</strong> You lose ~1,400 rows. Now ~19,000.</li>
+</ul>
+<h3 id="step-9-write-down-what-you-did">Step 9 — Write down what you
+did</h3>
+<p>In a markdown cell, write: - Starting rows: ~20,491 - After dropping
+empty/short: ~20,471 - After dropping duplicates: ~19,000 (your final
+number) - WHY for each step.</p>
+<h3 id="step-10-save-to-drive">Step 10 — Save to Drive</h3>
+<ul>
+<li><strong>WHAT:</strong> Save the cleaned DataFrame as parquet, inside
+your Drive folder.</li>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/tripadvisor_lab/reviews_step1.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-emma-15-minutes">Phase C — Make ONE
+chart for Emma (15 minutes)</h2>
+<p>She does not have time to read your code. She wants ONE picture.</p>
+<h3 id="emmas-chart-how-unbalanced-is-the-rating-data">Emma’s chart —
+“How unbalanced is the rating data?”</h3>
+<p>Make a bar chart showing the count of reviews per star rating (1 to
+5).</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>df['Rating'].value_counts().sort_index().plot.bar()</code>.</li>
+<li>On top of each bar, write the percentage. Use
+<code>plt.text(...)</code> in a loop.</li>
+<li>Title:
+<code>"50% of reviews are 5-star — only 5% are 1-star"</code>.</li>
+<li>X-label: Star rating.</li>
+<li>Y-label: Number of reviews.</li>
+</ul></li>
+<li><strong>Takeaway for Emma:</strong> “Most guests are happy. But that
+means our model will see very few unhappy reviews. We must handle this
+imbalance in Module 4 (using
+<code>class_weight='balanced'</code>).”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-1">Common mistakes in Class 1</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lowercase the original column directly</td>
+<td>You lose the CAPS information forever.</td>
+</tr>
+<tr>
+<td>Forget <code>html.unescape</code></td>
+<td>Words like <code>it&amp;#39;s</code> stay broken.</td>
+</tr>
+<tr>
+<td>Forget <code>.copy()</code> after a filter</td>
+<td>Pandas warns “SettingWithCopyWarning”.</td>
+</tr>
+<tr>
+<td>Drop duplicates BEFORE adding <code>review_id</code></td>
+<td>The IDs in your file no longer match your raw line numbers.</td>
+</tr>
+<tr>
+<td>Save to <code>/content/</code> instead of Drive</td>
+<td>File disappears when Colab disconnects.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-2">Self-check before Class 2</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />File loaded. Shape
+<code>(20491, 2)</code>.</label></li>
+<li><label><input type="checkbox" /><code>review_id</code> column
+added.</label></li>
+<li><label><input type="checkbox" />HTML entities removed.</label></li>
+<li><label><input type="checkbox" />Whitespace normalized.</label></li>
+<li><label><input type="checkbox" />Lowercased copy
+<code>review_lower</code> added.</label></li>
+<li><label><input type="checkbox" />Empty / very short reviews
+dropped.</label></li>
+<li><label><input type="checkbox" />Duplicates dropped.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory charts in
+your notebook.</label></li>
+<li><label><input type="checkbox" />1 polished chart for
+Emma.</label></li>
+<li><label><input type="checkbox" />You saved
+<code>reviews_step1.parquet</code> to your Drive folder.</label></li>
+<li><label><input type="checkbox" />You wrote down (in markdown) what
+you did and WHY.</label></li>
+</ul>
+<hr />
+<h1 id="class-2-encoding-and-scaling">Class 2 — Encoding and
+Scaling</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Emma looks at your cleaned data.
+She is happy. But she says: “the model is a math model. The column
+<code>Review</code> is one big sentence. The model does not understand
+sentences. Turn the sentence into numbers.”</p>
+</blockquote>
+<h2 id="your-goal-1">Your goal</h2>
+<p>Turn the text into NUMBERS. Start simple: counts. Length.
+Punctuation. Capital letters.</p>
+<h2 id="inputs-1">Inputs</h2>
+<ul>
+<li><code>reviews_step1.parquet</code> from Class 1</li>
+</ul>
+<h2 id="outputs-1">Outputs</h2>
+<ul>
+<li><code>reviews_step2.parquet</code> in Drive (with ~10 new numeric
+columns)</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Emma</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-review-length-by-star-rating">Exploratory
+chart 1 — Review length by star rating</h3>
+<ul>
+<li><strong>Question:</strong> “Are angry reviewers longer or shorter
+than happy reviewers?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>sns.boxplot(x='Rating', y='review_length', data=df)</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Often the 1-star and 2-star reviews
+are LONGER. Unhappy people write more.</li>
+</ul>
+<h3 id="exploratory-chart-2-histogram-of-review_length">Exploratory
+chart 2 — Histogram of review_length</h3>
+<ul>
+<li><strong>Question:</strong> “What is the typical length?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>plt.hist(df['review_length'], bins=60)</code>.</li>
+<li>Add <code>plt.xlim(0, 5000)</code> to ignore the few huge ones.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Most reviews are 200-1500
+characters.</li>
+</ul>
+<h3
+id="exploratory-chart-3-distribution-of-review_length-after-np.log1p">Exploratory
+chart 3 — Distribution of <code>review_length</code> AFTER
+<code>np.log1p</code></h3>
+<ul>
+<li><strong>Question:</strong> “Does log-transform make the shape more
+normal?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Make a new column:
+<code>log_length = np.log1p(df['review_length'])</code>.</li>
+<li>Histogram it.</li>
+<li>Compare to chart 2.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Log makes the long tail manageable
+for the model.</li>
+</ul>
+<h3
+id="exploratory-chart-4-number-of-exclamation-marks-vs-rating">Exploratory
+chart 4 — Number of exclamation marks vs Rating</h3>
+<ul>
+<li><strong>Question:</strong> “Do happy reviews use more <code>!</code>
+than angry reviews?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>First make
+<code>df['n_exclamation_marks'] = df['Review'].str.count('!')</code>.</li>
+<li><code>df.groupby('Rating')['n_exclamation_marks'].mean().plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Yes — 5-star reviews use many
+<code>!</code> (“Amazing! Loved it! Will return!”). 1-star reviews use
+<code>!</code> too but with anger. Interesting feature.</li>
+</ul>
+<hr />
+<h2 id="phase-b-encode-and-scale">Phase B — Encode and scale</h2>
+<h3 id="step-1-word-count-and-sentence-count">Step 1 — Word count and
+sentence count</h3>
+<ul>
+<li><strong>WHAT:</strong> Add 2 columns:
+<ul>
+<li><code>n_words</code>: number of words.</li>
+<li><code>n_sentences</code>: number of sentences.</li>
+</ul></li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>For words:
+<code>df['n_words'] = df['Review'].str.split().str.len()</code>.</p></li>
+<li><p>For sentences: install nltk (you did this already), then:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> nltk.tokenize <span class="im">import</span> sent_tokenize</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;n_sentences&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;Review&#39;</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> t: <span class="bu">len</span>(sent_tokenize(___)))</span></code></pre></div></li>
+<li><p>Fill in the blank.</p></li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Most reviews have 5-30 sentences.</li>
+</ul>
+<h3 id="step-2-average-word-length">Step 2 — Average word length</h3>
+<ul>
+<li><strong>WHAT:</strong>
+<code>avg_word_length = (number of letters) / (number of words)</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> avg_word_len(text):</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    words <span class="op">=</span> text.___()</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(words) <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">sum</span>(<span class="bu">len</span>(w) <span class="cf">for</span> w <span class="kw">in</span> words) <span class="op">/</span> <span class="bu">len</span>(___)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;avg_word_length&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;Review&#39;</span>].<span class="bu">apply</span>(___)</span></code></pre></div></li>
+<li><p>Fill in the 3 blanks.</p></li>
+</ul></li>
+<li><strong>WHY:</strong> Longer words can be a sign of more careful or
+formal language.</li>
+</ul>
+<h3 id="step-3-number-of-unique-words">Step 3 — Number of unique
+words</h3>
+<ul>
+<li><strong>WHAT:</strong> <code>n_unique_words</code> = how many
+DIFFERENT words are in the review.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['n_unique_words'] = df['review_lower'].apply(lambda t: len(set(t.split())))</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> A long review with only 50 unique words is
+more repetitive than a long review with 200 unique words.</li>
+</ul>
+<h3 id="step-4-punctuation-counts">Step 4 — Punctuation counts</h3>
+<p>Make these columns:</p>
+<table>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it counts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>n_exclamation_marks</code></td>
+<td>Number of <code>!</code> in the review</td>
+</tr>
+<tr>
+<td><code>n_question_marks</code></td>
+<td>Number of <code>?</code> in the review</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['n_exclamation_marks'] = df['Review'].str.count('!')</code>.</li>
+<li><code>df['n_question_marks']   = df['Review'].str.count('\\?')</code>.</li>
+<li>NOTE: <code>?</code> is a special regex character. So you must write
+<code>\\?</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-5-capital-letters-features">Step 5 — Capital letters
+features</h3>
+<p>Make these columns from the ORIGINAL <code>Review</code> (NOT the
+lowercased one):</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it counts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>n_capital_words</code></td>
+<td>Number of WORDS that are all UPPERCASE (length &gt;= 2)</td>
+</tr>
+<tr>
+<td><code>caps_ratio</code></td>
+<td>Number of capital letters / total letters</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Skeleton for <code>n_capital_words</code>:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> count_caps_words(text):</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> w <span class="kw">in</span> text.split() <span class="cf">if</span> <span class="bu">len</span>(w) <span class="op">&gt;=</span> <span class="dv">2</span> <span class="kw">and</span> w.___())</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;n_capital_words&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;Review&#39;</span>].<span class="bu">apply</span>(___)</span></code></pre></div></li>
+<li><p>For <code>caps_ratio</code>: count uppercase letters with a
+comprehension <code>sum(1 for c in text if c.isupper())</code>. Divide
+by total letters.</p></li>
+</ul></li>
+<li><strong>WHY:</strong> “THE WORST HOTEL EVER!!!” is a strong signal
+for 1-star. The model needs the count.</li>
+</ul>
+<h3 id="step-6-log-transform-review_length-and-n_words">Step 6 —
+Log-transform <code>review_length</code> and <code>n_words</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Both have very long tails. Apply
+<code>np.log1p()</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['log_length'] = np.log1p(df['review_length'])</code>.</li>
+</ul></li>
+<li><strong>WHY <code>log1p</code> and not <code>log</code>?</strong>
+<code>log(0)</code> is <code>-inf</code>.
+<code>log1p(x) = log(x + 1)</code> is safe for zeros.</li>
+</ul>
+<h3 id="step-7-encode-the-target-column-rating-preview">Step 7 — Encode
+the target column <code>Rating</code> (preview)</h3>
+<ul>
+<li><strong>WHAT:</strong> <code>Rating</code> is already a number (1 to
+5). For now, do nothing.</li>
+<li><strong>WHY think about it?</strong>
+<ul>
+<li>For Module 4 you have a choice:
+<ul>
+<li>Treat as <strong>multi-class</strong> (5 classes). Predict the most
+likely class.</li>
+<li>Treat as <strong>regression</strong>. Predict 3.7 stars. Round if
+you must.</li>
+</ul></li>
+<li>Both are valid. Talk to your team. Write your choice in
+markdown.</li>
+</ul></li>
+</ul>
+<h3 id="step-8-scale-numeric-columns-preview-only">Step 8 — Scale
+numeric columns (preview only)</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>StandardScaler</code> to make every
+numeric column have mean = 0, std = 1.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.preprocessing import StandardScaler</code>.</li>
+<li><code>scaler = StandardScaler()</code>.</li>
+<li><code>scaler.fit_transform(df[numeric_cols])</code>.</li>
+</ul></li>
+<li><strong>WARNING:</strong> This is for inspection only. In Class 5,
+scaling goes INSIDE the Pipeline. Do NOT save the scaled version as your
+final file.</li>
+</ul>
+<h3 id="step-9-save">Step 9 — Save</h3>
+<ul>
+<li><strong>WHAT:</strong> Save to Drive.
+<code>df.to_parquet('/content/drive/MyDrive/tripadvisor_lab/reviews_step2.parquet')</code>.</li>
+<li><strong>Save the UNSCALED version.</strong> Scaling will happen
+inside the Pipeline later.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-emma">Phase C — Make ONE chart for
+Emma</h2>
+<h3 id="emmas-chart-do-angry-guests-shout-in-capitals">Emma’s chart —
+“Do angry guests SHOUT in capitals?”</h3>
+<p>A bar chart showing the average <code>caps_ratio</code> for each star
+rating.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df.groupby('Rating')['caps_ratio'].mean().plot.bar()</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Angry guests use 3x more CAPITAL LETTERS
+than happy guests.”</li>
+<li><strong>X-label:</strong> Star rating.</li>
+<li><strong>Y-label:</strong> Average ratio of capital letters.</li>
+<li><strong>Takeaway:</strong> “When the model sees a review full of
+caps, it should suspect 1-star. This feature alone is a strong
+signal.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-2">Common mistakes in Class 2</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compute <code>caps_ratio</code> on the lowercased text</td>
+<td>You get 0 every time. Use the original.</td>
+</tr>
+<tr>
+<td>Forget <code>\\?</code> in <code>str.count</code></td>
+<td>Regex error. Or counts everything.</td>
+</tr>
+<tr>
+<td>Save the scaled version</td>
+<td>Class 5 will scale again inside the pipeline. Double scaling = wrong
+numbers.</td>
+</tr>
+<tr>
+<td>Forget <code>np.log1p</code> and use <code>np.log</code> on
+zeros</td>
+<td><code>np.log(0) = -inf</code>. Crash.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-3">Self-check before Class 3</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>n_words</code>,
+<code>n_sentences</code>, <code>avg_word_length</code>,
+<code>n_unique_words</code> exist.</label></li>
+<li><label><input type="checkbox" /><code>n_exclamation_marks</code>,
+<code>n_question_marks</code> exist.</label></li>
+<li><label><input type="checkbox" /><code>n_capital_words</code>,
+<code>caps_ratio</code> exist.</label></li>
+<li><label><input type="checkbox" /><code>log_length</code>
+exists.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory
+charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Emma.</label></li>
+<li><label><input type="checkbox" /><code>reviews_step2.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-3-feature-engineering">Class 3 — Feature Engineering</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Emma says: “Counts and lengths
+are nice. But Emma wants the DASHBOARD: ‘this week, 12 reviews
+complained about wifi, 8 about breakfast.’ So you must MAKE columns that
+detect topics and emotion. This is the heart of the project.”</p>
+</blockquote>
+<h2 id="your-goal-2">Your goal</h2>
+<p>Make NEW columns from the text. Topics. Sentiment. Negation. These
+are the columns the model will love.</p>
+<h2 id="inputs-2">Inputs</h2>
+<ul>
+<li><code>reviews_step2.parquet</code></li>
+</ul>
+<h2 id="outputs-2">Outputs</h2>
+<ul>
+<li><code>reviews_step3.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Emma</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-1">Phase A — Explore the data
+first</h2>
+<h3
+id="exploratory-chart-1-most-common-words-in-1-star-reviews">Exploratory
+chart 1 — Most common words in 1-star reviews</h3>
+<ul>
+<li><strong>Question:</strong> “What words appear in angry
+reviews?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Filter: <code>bad = df[df['Rating'] == 1]</code>.</li>
+<li>Join all the lowercased text:
+<code>' '.join(bad['review_lower'])</code>.</li>
+<li>Split into words, count, take top 30 (ignore common words like
+“the”, “and”).</li>
+<li>Use <code>from collections import Counter</code>.</li>
+<li>Or use a word cloud:
+<code>from wordcloud import WordCloud</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Words like “room”, “dirty”,
+“smell”, “rude”, “wifi”, “noise” will appear a lot.</li>
+</ul>
+<h3
+id="exploratory-chart-2-most-common-words-in-5-star-reviews">Exploratory
+chart 2 — Most common words in 5-star reviews</h3>
+<ul>
+<li>Same as chart 1 but for <code>df['Rating'] == 5</code>.</li>
+<li><strong>What you learn:</strong> “great”, “love”, “perfect”,
+“staff”, “clean”, “wonderful”.</li>
+</ul>
+<h3
+id="exploratory-chart-3-mentions_wifi-rate-by-star-rating">Exploratory
+chart 3 — <code>mentions_wifi</code> rate by star rating</h3>
+<ul>
+<li>After Step 3 below, plot:
+<ul>
+<li><code>df.groupby('Rating')['mentions_wifi'].mean().plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Wifi is mentioned mostly in 1-2
+star reviews. The dashboard idea is real.</li>
+</ul>
+<h3
+id="exploratory-chart-4-vader-sentiment-score-vs-star-rating">Exploratory
+chart 4 — VADER sentiment score vs star rating</h3>
+<ul>
+<li>After Step 6 below, plot:
+<ul>
+<li><code>sns.boxplot(x='Rating', y='vader_compound', data=df)</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The line goes up from 1-star to
+5-star — VADER works.</li>
+</ul>
+<hr />
+<h2 id="phase-b-engineer-the-features">Phase B — Engineer the
+features</h2>
+<h3 id="step-1-try-to-find-a-year-if-possible">Step 1 — Try to find a
+year (if possible)</h3>
+<p>This dataset does NOT have a clear date column. BUT some reviews
+mention a year like “stayed in 2015” or “visited Aug 2017”.</p>
+<ul>
+<li><strong>WHAT:</strong> Try to extract the year from the text. If not
+found, leave as missing.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Use a regex: <code>r'\b(20[0-2][0-9])\b'</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> find_year(text):</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> re.search(<span class="vs">r&#39;</span><span class="dv">\b</span><span class="kw">(</span><span class="vs">20</span><span class="pp">[0-2][0-9]</span><span class="kw">)</span><span class="dv">\b</span><span class="vs">&#39;</span>, ___)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">int</span>(m.group(<span class="dv">1</span>)) <span class="cf">if</span> m <span class="cf">else</span> <span class="va">None</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;review_year&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;Review&#39;</span>].<span class="bu">apply</span>(___)</span></code></pre></div></li>
+<li><p>Fill in the blanks.</p></li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Around 30-40% of reviews have a year. The
+rest are NaN. That is OK.</li>
+<li><strong>WHY:</strong> Hotel quality changes over time. The year can
+help the model.</li>
+</ul>
+<h3 id="step-2-build-a-topic-dictionary">Step 2 — Build a topic
+dictionary</h3>
+<p>Emma wants the dashboard to know <strong>which topics are
+mentioned</strong>. You will check 5 topics:</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Keywords (lowercase)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mentions_clean</code></td>
+<td>“clean”, “dirty”, “smell”, “stain”, “filthy”, “spotless”</td>
+</tr>
+<tr>
+<td><code>mentions_breakfast</code></td>
+<td>“breakfast”, “buffet”, “coffee”, “morning meal”</td>
+</tr>
+<tr>
+<td><code>mentions_wifi</code></td>
+<td>“wifi”, “internet”, “wi-fi”, “wi fi”, “connection”</td>
+</tr>
+<tr>
+<td><code>mentions_noise</code></td>
+<td>“noise”, “noisy”, “quiet”, “loud”, “soundproof”</td>
+</tr>
+<tr>
+<td><code>mentions_location</code></td>
+<td>“location”, “downtown”, “central”, “near”, “walking distance”</td>
+</tr>
+</tbody>
+</table>
+<p>Plan: for each topic, the column is <code>1</code> if ANY of the
+keywords appear in <code>review_lower</code>, else <code>0</code>.</p>
+<h3 id="step-3-compute-the-5-mentions-columns">Step 3 — Compute the 5
+mentions columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Make 5 new columns using the dictionary
+above.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>topic_dict <span class="op">=</span> {</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;mentions_clean&#39;</span>:     [<span class="st">&#39;clean&#39;</span>, <span class="st">&#39;dirty&#39;</span>, <span class="st">&#39;smell&#39;</span>, <span class="st">&#39;stain&#39;</span>, <span class="st">&#39;filthy&#39;</span>, <span class="st">&#39;spotless&#39;</span>],</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;mentions_breakfast&#39;</span>: [___],</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;mentions_wifi&#39;</span>:      [___],</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;mentions_noise&#39;</span>:     [___],</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;mentions_location&#39;</span>:  [___],</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> has_any(text, keywords):</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">int</span>(<span class="bu">any</span>(kw <span class="kw">in</span> text <span class="cf">for</span> kw <span class="kw">in</span> ___))</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col, kws <span class="kw">in</span> topic_dict.items():</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    df[col] <span class="op">=</span> df[<span class="st">&#39;review_lower&#39;</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> t: has_any(___, ___))</span></code></pre></div></li>
+<li><p>Fill in the blanks.</p></li>
+</ul></li>
+<li><strong>WHY:</strong> These columns are the BACKBONE of Emma’s
+dashboard. The dashboard will sum each column per week: “this week, 12
+reviews had <code>mentions_wifi == 1</code>.”</li>
+</ul>
+<h3 id="step-4-negation-detection">Step 4 — Negation detection</h3>
+<ul>
+<li><strong>WHAT:</strong> A column <code>has_negation</code> = 1 if any
+of <code>"not"</code>, <code>"no"</code>, <code>"never"</code>,
+<code>"nothing"</code>, <code>"don't"</code>, <code>"didn't"</code>,
+<code>"won't"</code> appears.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Make a list of negation words.</p></li>
+<li><p>Check if any appears in the lowercased text.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>neg_words <span class="op">=</span> [<span class="st">&#39;not &#39;</span>, <span class="st">&#39; no &#39;</span>, <span class="st">&#39;never&#39;</span>, ___, ___, ___]</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;has_negation&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;review_lower&#39;</span>].<span class="bu">apply</span>(</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">lambda</span> t: <span class="bu">int</span>(<span class="bu">any</span>(w <span class="kw">in</span> t <span class="cf">for</span> w <span class="kw">in</span> ___))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div></li>
+</ul></li>
+<li><strong>WHY:</strong> “The room was clean” vs “The room was NOT
+clean” mean opposite things. Negation is critical.</li>
+</ul>
+<h3 id="step-5-lexicon-based-polarity-score">Step 5 — Lexicon-based
+polarity score</h3>
+<p>A <strong>lexicon</strong> is a dictionary of positive and negative
+words. We count how many of each appear.</p>
+<ul>
+<li><strong>WHAT:</strong> Build a tiny lexicon yourself. Count words.
+Compute a score:
+<code>(positive - negative) / (positive + negative + 1)</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>positive_words <span class="op">=</span> {<span class="st">&#39;great&#39;</span>, <span class="st">&#39;amazing&#39;</span>, <span class="st">&#39;love&#39;</span>, <span class="st">&#39;wonderful&#39;</span>, <span class="st">&#39;perfect&#39;</span>,</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&#39;clean&#39;</span>, <span class="st">&#39;friendly&#39;</span>, <span class="st">&#39;comfortable&#39;</span>, <span class="st">&#39;excellent&#39;</span>, <span class="st">&#39;best&#39;</span>}</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>negative_words <span class="op">=</span> {<span class="st">&#39;bad&#39;</span>, <span class="st">&#39;horrible&#39;</span>, <span class="st">&#39;dirty&#39;</span>, <span class="st">&#39;rude&#39;</span>, <span class="st">&#39;terrible&#39;</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&#39;worst&#39;</span>, <span class="st">&#39;awful&#39;</span>, <span class="st">&#39;broken&#39;</span>, <span class="st">&#39;noisy&#39;</span>, <span class="st">&#39;cold&#39;</span>}</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> polarity(text):</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    words <span class="op">=</span> text.split()</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    pos <span class="op">=</span> <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> w <span class="kw">in</span> words <span class="cf">if</span> w <span class="kw">in</span> ___)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    neg <span class="op">=</span> <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> w <span class="kw">in</span> words <span class="cf">if</span> w <span class="kw">in</span> ___)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (pos <span class="op">-</span> neg) <span class="op">/</span> (pos <span class="op">+</span> neg <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;polarity_lexicon_score&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;review_lower&#39;</span>].<span class="bu">apply</span>(___)</span></code></pre></div></li>
+<li><p>Fill in the 3 blanks.</p></li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Score between -1 (very negative) and +1
+(very positive).</li>
+</ul>
+<h3 id="step-6-vader-sentiment-score-ready-made-library">Step 6 — VADER
+sentiment score (ready-made library)</h3>
+<p>VADER is a famous sentiment tool for English. You do not need to
+train anything.</p>
+<ul>
+<li><strong>WHAT:</strong> Add a column <code>vader_compound</code> =
+the VADER score for each review.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> vaderSentiment.vaderSentiment <span class="im">import</span> SentimentIntensityAnalyzer</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>analyzer <span class="op">=</span> SentimentIntensityAnalyzer()</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> vader_score(text):</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> analyzer.polarity_scores(___)[<span class="st">&#39;compound&#39;</span>]</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;vader_compound&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;Review&#39;</span>].<span class="bu">apply</span>(___)</span></code></pre></div></li>
+<li><p>Fill in the blanks.</p></li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Score between -1 and +1. Takes ~30
+seconds for 19,000 reviews.</li>
+<li><strong>WHY:</strong> VADER understands “not good” (negation) better
+than your simple lexicon. Two scores are better than one — the model can
+compare them.</li>
+</ul>
+<h3 id="step-7-sanity-check-correlation">Step 7 — Sanity-check
+correlation</h3>
+<ul>
+<li><strong>WHAT:</strong> Check that your engineered features actually
+correlate with <code>Rating</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df[['Rating', 'vader_compound', 'polarity_lexicon_score', 'caps_ratio', 'has_negation']].corr()</code>.</li>
+<li>Look at the <code>Rating</code> row.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong>
+<ul>
+<li><code>vader_compound</code> correlation with <code>Rating</code>:
+~+0.6 (strong positive).</li>
+<li><code>caps_ratio</code> correlation: negative.</li>
+<li><code>has_negation</code> correlation: negative.</li>
+</ul></li>
+<li>If your numbers look wrong, fix them BEFORE Class 4.</li>
+</ul>
+<h3 id="step-8-save">Step 8 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/tripadvisor_lab/reviews_step3.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-emma-1">Phase C — Make ONE chart for
+Emma</h2>
+<h3 id="emmas-chart-what-do-guests-complain-about-most">Emma’s chart —
+“What do guests complain about most?”</h3>
+<p>A horizontal bar chart showing the % of 1-star and 2-star reviews
+that mention each topic.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Filter: <code>bad = df[df['Rating'] &lt;= 2]</code>.</li>
+<li>For each <code>mentions_*</code> column, compute
+<code>bad[col].mean()</code>.</li>
+<li>Put in a Series. Sort. Bar chart (horizontal).</li>
+</ul></li>
+<li><strong>Title:</strong> “Top complaints in 1-2 star reviews (% of
+reviews that mention each topic).”</li>
+<li><strong>X-label:</strong> % of bad reviews mentioning topic.</li>
+<li><strong>Y-label:</strong> Topic.</li>
+<li><strong>Takeaway for Emma:</strong> “Cleanliness is the #1
+complaint. Wifi is #2. This IS the dashboard you asked for. We just need
+to refresh it every week.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-3">Common mistakes in Class 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Use original <code>Review</code> for keywords (not lowercased)</td>
+<td>“WIFI” is missed because you search for “wifi”.</td>
+</tr>
+<tr>
+<td>Use <code>' no '</code> without spaces around</td>
+<td>You match the word “now” too. Wrong negation count.</td>
+</tr>
+<tr>
+<td>Run VADER on a huge column without saving</td>
+<td>If Colab disconnects, you lose 30 minutes. Save often.</td>
+</tr>
+<tr>
+<td>Forget that <code>review_year</code> is mostly NaN</td>
+<td>Don’t drop the column — just leave the NaNs for the imputer in Class
+5.</td>
+</tr>
+<tr>
+<td>Use <code>mentions_*</code> columns as the only features</td>
+<td>The text has MUCH more signal. These are just for the
+dashboard.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-4">Self-check before Class 4</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>review_year</code> attempted.
+Most rows are NaN, some have a year.</label></li>
+<li><label><input type="checkbox" />5 <code>mentions_*</code> columns
+exist (0/1 each).</label></li>
+<li><label><input type="checkbox" /><code>has_negation</code>
+exists.</label></li>
+<li><label><input type="checkbox" /><code>polarity_lexicon_score</code>
+between -1 and +1.</label></li>
+<li><label><input type="checkbox" /><code>vader_compound</code> between
+-1 and +1.</label></li>
+<li><label><input type="checkbox" /><code>vader_compound</code>
+correlates positively with <code>Rating</code>.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 explanatory chart.</label></li>
+<li><label><input type="checkbox" /><code>reviews_step3.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-4-feature-selection">Class 4 — Feature Selection</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Now you have ~22 columns. Emma
+says: “Some columns are duplicates. Some are useless. I want the BEST
+15-18 columns for the model. Pick them. Tell me why.”</p>
+</blockquote>
+<h2 id="your-goal-3">Your goal</h2>
+<p>Pick the best columns. Drop the rest. Justify every choice.</p>
+<h2 id="inputs-3">Inputs</h2>
+<ul>
+<li><code>reviews_step3.parquet</code></li>
+</ul>
+<h2 id="outputs-3">Outputs</h2>
+<ul>
+<li><code>reviews_step4.parquet</code> in Drive (only the selected
+columns + <code>Rating</code> + <code>review_id</code> +
+<code>Review</code>)</li>
+<li>3+ exploratory charts (correlation heatmap, mutual info bars,
+importance bars)</li>
+<li>A short markdown report explaining your choices</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-2">Phase A — Explore the data
+first</h2>
+<h3
+id="exploratory-chart-1-correlation-heatmap-of-numeric-columns">Exploratory
+chart 1 — Correlation heatmap of numeric columns</h3>
+<ul>
+<li><strong>Question:</strong> “Which columns say the same thing as each
+other?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>First make a list of numeric columns:
+<code>numeric_cols = df.select_dtypes(include='number').columns.tolist()</code>.</li>
+<li>Compute <code>df[numeric_cols].corr()</code>.</li>
+<li>Plot with <code>sns.heatmap()</code>.</li>
+<li>Use <code>annot=True</code> and <code>fmt='.2f'</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Pairs with |corr| &gt; 0.9 are
+redundant. Probably: <code>review_length</code> and <code>n_words</code>
+(almost the same thing). Probably: <code>log_length</code> and
+<code>review_length</code> too.</li>
+</ul>
+<h3 id="exploratory-chart-2-mutual-information-bar-chart">Exploratory
+chart 2 — Mutual information bar chart</h3>
+<ul>
+<li>After you compute mutual info (Step 4 below), plot it.</li>
+<li><strong>HINTS:</strong> Sort the values, then bar chart.</li>
+<li><strong>What you learn:</strong> Which columns predict
+<code>Rating</code> strongest. Expect <code>vader_compound</code> at the
+top.</li>
+</ul>
+<h3
+id="exploratory-chart-3-random-forest-feature-importance">Exploratory
+chart 3 — Random Forest feature importance</h3>
+<ul>
+<li>After you train the RF (Step 5 below), plot the importances.</li>
+<li><strong>HINTS:</strong>
+<code>pd.Series(rf.feature_importances_, index=...).sort_values().plot.barh()</code>.</li>
+<li><strong>What you learn:</strong> A second opinion on feature
+importance.</li>
+</ul>
+<hr />
+<h2 id="phase-b-select-features">Phase B — Select features</h2>
+<h3 id="step-1-split-into-train-and-test-first">Step 1 — Split into
+train and test FIRST</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>train_test_split</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.model_selection import train_test_split</code>.</li>
+<li><code>X = df.drop(['Rating', 'Review', 'review_lower', 'review_id'], axis=1)</code>.</li>
+<li><code>y = df['Rating']</code>.</li>
+<li>Pass: <code>test_size=0.2</code>, <code>random_state=42</code>,
+<code>stratify=y</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> All next steps use TRAIN ONLY. Otherwise
+leakage.</li>
+<li><strong>WHY drop <code>Review</code>?</strong> It is text. The model
+in Module 4 will use TF-IDF on it separately. For now, the numeric
+features are the focus.</li>
+</ul>
+<h3 id="step-2-handle-missing-review_year">Step 2 — Handle missing
+<code>review_year</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Many rows have NaN for
+<code>review_year</code>. For now, fill with a sentinel: <code>-1</code>
+(means “unknown”).</li>
+<li><strong>HINTS:</strong>
+<code>X_train['review_year'] = X_train['review_year'].fillna(-1)</code>.
+Same for <code>X_test</code>.</li>
+<li><strong>WARNING:</strong> In Class 5 the proper imputer will go
+inside the pipeline. This is just for ranking.</li>
+</ul>
+<h3 id="step-3-remove-low-variance-columns">Step 3 — Remove low-variance
+columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop columns where almost all values are the
+same.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import VarianceThreshold</code>.</li>
+<li><code>VarianceThreshold(threshold=0.01)</code>. Then
+<code>.fit_transform(X_train_numeric)</code>.</li>
+</ul></li>
+<li><strong>WHAT TO LOOK FOR:</strong> A <code>mentions_*</code> column
+with 99.9% zeros (almost no one mentions the topic) is a candidate to
+drop.</li>
+</ul>
+<h3 id="step-4-rank-by-mutual-information">Step 4 — Rank by mutual
+information</h3>
+<ul>
+<li><strong>WHAT:</strong> Score each column by how much it tells you
+about <code>Rating</code>. Because <code>Rating</code> has 5 classes,
+use the classification version.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import mutual_info_classif</code>.</li>
+<li><code>mi = mutual_info_classif(X_train_numeric, y_train, random_state=42)</code>.</li>
+<li>Put in a Series, sort.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> <code>vader_compound</code>,
+<code>polarity_lexicon_score</code>, <code>caps_ratio</code>,
+<code>has_negation</code> should be at the top.</li>
+</ul>
+<h3 id="step-5-random-forest-importance-second-opinion">Step 5 — Random
+Forest importance (second opinion)</h3>
+<ul>
+<li><strong>WHAT:</strong> Train a small RF. Look at
+<code>feature_importances_</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.ensemble import RandomForestClassifier</code>.</li>
+<li><code>RandomForestClassifier(n_estimators=80, max_depth=10, n_jobs=-1, random_state=42)</code>.</li>
+<li><code>.fit(X_train_numeric, y_train)</code>.</li>
+<li>Look at <code>.feature_importances_</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-6-remove-highly-correlated-columns">Step 6 — Remove highly
+correlated columns</h3>
+<ul>
+<li><strong>WHAT:</strong> From any pair where |corr| &gt; 0.9, drop the
+LESS important one (by RF importance).</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute correlation matrix.</li>
+<li>For each pair &gt; 0.9, compare RF importance of the two
+columns.</li>
+<li>Drop the lower one.</li>
+</ul></li>
+<li><strong>TYPICAL OUTCOME:</strong> Drop <code>n_words</code> (keep
+<code>review_length</code>). Drop <code>log_length</code> (keep
+<code>review_length</code>). Or the opposite — your choice.</li>
+</ul>
+<h3 id="step-7-pick-the-final-15-18-columns">Step 7 — Pick the final
+15-18 columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Combine the rankings. Pick columns that:
+<ul>
+<li>Are high in mutual info, AND</li>
+<li>Are high in RF importance, AND</li>
+<li>Were not dropped by variance / correlation pruning.</li>
+</ul></li>
+<li><strong>WRITE DOWN:</strong> In your notebook, list the columns.
+Explain in 1 sentence why each one is in.</li>
+<li><strong>A GOOD SHORTLIST (example, not the answer):</strong>
+<ul>
+<li><code>vader_compound</code>, <code>polarity_lexicon_score</code>,
+<code>caps_ratio</code>, <code>has_negation</code>,</li>
+<li><code>review_length</code>, <code>n_sentences</code>,
+<code>avg_word_length</code>, <code>n_unique_words</code>,</li>
+<li><code>n_exclamation_marks</code>, <code>n_question_marks</code>,
+<code>n_capital_words</code>,</li>
+<li><code>mentions_clean</code>, <code>mentions_breakfast</code>,
+<code>mentions_wifi</code>, <code>mentions_noise</code>,
+<code>mentions_location</code>,</li>
+<li><code>review_year</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-8-save-1">Step 8 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong> Keep selected columns + <code>Rating</code>
++ <code>review_id</code> + <code>Review</code> (you keep
+<code>Review</code> for Module 7 TF-IDF). Save as
+<code>reviews_step4.parquet</code> to Drive.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-emma-2">Phase C — Make ONE chart for
+Emma</h2>
+<h3 id="emmas-chart-these-are-the-10-most-important-signals.">Emma’s
+chart — “These are the 10 most important signals.”</h3>
+<p>A horizontal bar chart of your top 10 features and their importance
+score.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use the RF importance.</li>
+<li><code>sort_values()</code> then <code>.head(10)</code> then
+<code>.plot.barh()</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Top 10 predictors of hotel rating.”</li>
+<li><strong>Y-axis:</strong> column names.</li>
+<li><strong>X-axis:</strong> Random Forest importance.</li>
+<li><strong>Takeaway for Emma:</strong> “Sentiment score (VADER) and
+caps ratio together explain most of the signal. Topic-mention columns
+are smaller but they POWER YOUR DASHBOARD — keep them all.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-4">Common mistakes in Class 4</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compute mutual info on the FULL data</td>
+<td>Leakage.</td>
+</tr>
+<tr>
+<td>Drop the <code>mentions_*</code> columns because they have low
+MI</td>
+<td>Emma’s DASHBOARD breaks. Keep them.</td>
+</tr>
+<tr>
+<td>Forget to drop the text <code>Review</code> before MI</td>
+<td>Crash: <code>mutual_info_classif</code> cannot handle strings.</td>
+</tr>
+<tr>
+<td>Drop columns without writing why</td>
+<td>Module 4 students will not understand.</td>
+</tr>
+<tr>
+<td>Drop a high-mutual-info column</td>
+<td>Big mistake. Check why it is high before dropping.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-5">Self-check before Class 5</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Train/test split done
+FIRST.</label></li>
+<li><label><input type="checkbox" />15-18 columns remain +
+<code>Rating</code> + <code>review_id</code> +
+<code>Review</code>.</label></li>
+<li><label><input type="checkbox" />You wrote down WHY for each kept
+column.</label></li>
+<li><label><input type="checkbox" /><code>mentions_*</code> columns kept
+(Emma’s dashboard).</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Emma.</label></li>
+<li><label><input type="checkbox" /><code>reviews_step4.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-5-pipelines">Class 5 — Pipelines</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Emma says: “Your cleaning code is
+in 4 different notebooks. When a new review arrives tomorrow, you cannot
+copy 4 notebooks to the server. We need ONE object that does
+everything.”</p>
+</blockquote>
+<h2 id="your-goal-4">Your goal</h2>
+<p>Put EVERY cleaning step inside ONE Pipeline object. Production-ready
+code.</p>
+<h2 id="inputs-4">Inputs</h2>
+<ul>
+<li><code>reviews_step4.parquet</code> (selected columns)</li>
+</ul>
+<h2 id="outputs-4">Outputs</h2>
+<ul>
+<li><code>tripadvisor_pipeline.joblib</code> saved in Drive</li>
+<li>1 confusion-matrix chart (5x5 because 5 classes)</li>
+<li>A pipeline that takes RAW input and produces predictions</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-3">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-confusion-matrix-after-training">Exploratory
+chart 1 — Confusion matrix (after training)</h3>
+<ul>
+<li>After Step 6, build a confusion matrix. Because there are 5 classes
+(1, 2, 3, 4, 5), it is a 5x5 grid.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay</code>.</li>
+<li><code>cm = confusion_matrix(y_test, y_pred)</code>.</li>
+<li><code>ConfusionMatrixDisplay(cm, display_labels=[1,2,3,4,5]).plot()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Which star ratings are EASY to
+predict (probably 5-star) and which are HARD (probably 3-star, the
+in-between).</li>
+</ul>
+<h3 id="exploratory-chart-2-per-class-f1-score">Exploratory chart 2 —
+Per-class F1 score</h3>
+<ul>
+<li>After Step 6, look at <code>classification_report</code>.</li>
+<li><strong>HINTS:</strong>
+<code>from sklearn.metrics import classification_report</code> then
+print.</li>
+<li><strong>What you learn:</strong> F1 for 5-star is high. F1 for
+1-star is medium. F1 for 3-star is LOW. This is normal.</li>
+</ul>
+<hr />
+<h2 id="phase-b-build-the-pipeline">Phase B — Build the pipeline</h2>
+<h3
+id="step-1-decide-which-columns-are-numeric-and-which-are-categorical">Step
+1 — Decide which columns are numeric and which are categorical</h3>
+<ul>
+<li><strong>HINTS:</strong> Make two lists.</li>
+<li><strong>EXAMPLE:</strong>
+<ul>
+<li>numeric: <code>vader_compound</code>,
+<code>polarity_lexicon_score</code>, <code>caps_ratio</code>,
+<code>review_length</code>, <code>n_sentences</code>,
+<code>avg_word_length</code>, <code>n_unique_words</code>,
+<code>n_exclamation_marks</code>, <code>n_question_marks</code>,
+<code>n_capital_words</code>, <code>review_year</code>.</li>
+<li>categorical (0/1, but treat as numeric is also OK):
+<code>has_negation</code>, <code>mentions_clean</code>,
+<code>mentions_breakfast</code>, <code>mentions_wifi</code>,
+<code>mentions_noise</code>, <code>mentions_location</code>.</li>
+</ul></li>
+<li><strong>NOTE:</strong> Because all your columns are already numeric,
+you may not need a categorical branch at all. Your team can decide.</li>
+</ul>
+<h3 id="step-2-build-the-numeric-mini-pipeline">Step 2 — Build the
+numeric mini-pipeline</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer (fill missing) +
+scaler.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.pipeline import Pipeline</code>.</p></li>
+<li><p><code>from sklearn.impute import SimpleImputer</code>.</p></li>
+<li><p><code>from sklearn.preprocessing import StandardScaler</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>numeric_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;scaler&#39;</span>,  StandardScaler()),</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in the blank: best strategy for numeric?
+(<code>'median'</code>)</p></li>
+</ul></li>
+<li><strong>WHY median?</strong> <code>review_year</code> has many NaNs.
+The median is more stable than the mean.</li>
+</ul>
+<h3 id="step-3-build-the-categorical-mini-pipeline-optional">Step 3 —
+Build the categorical mini-pipeline (optional)</h3>
+<ul>
+<li><strong>WHAT:</strong> If you separated the 0/1 mentions into a
+“categorical” group, fill missing with <code>0</code> (the most
+frequent), then leave them.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>categorical_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>, fill_value<span class="op">=</span><span class="dv">0</span>)),</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Or just put them in the numeric branch — they are already
+0/1.</p></li>
+</ul></li>
+</ul>
+<h3 id="step-4-combine-into-a-columntransformer">Step 4 — Combine into a
+ColumnTransformer</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.compose import ColumnTransformer</code>.</p></li>
+<li><p>It takes a list of tuples:
+<code>(name, transformer, list_of_columns)</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>preprocessor <span class="op">=</span> ColumnTransformer(transformers<span class="op">=</span>[</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;num&#39;</span>, numeric_transformer, ___),</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># (&#39;cat&#39;, categorical_transformer, ___),    # optional</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in the column lists.</p></li>
+</ul></li>
+</ul>
+<h3 id="step-5-add-the-model-on-top">Step 5 — Add the model on top</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.linear_model import LogisticRegression</code>.</li>
+<li><code>LogisticRegression(class_weight='balanced', max_iter=2000, random_state=42, multi_class='auto')</code>.</li>
+<li>Put it in a Pipeline with the preprocessor.</li>
+</ul></li>
+<li><strong>WHY <code>class_weight='balanced'</code>?</strong> Only 5%
+of reviews are 1-star. Without this, the model just predicts “5-star”
+for everyone and gets ~50% accuracy (but useless for Emma — she needs to
+find the bad reviews).</li>
+</ul>
+<h3 id="step-6-train-and-evaluate">Step 6 — Train and evaluate</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>full_pipeline.fit(X_train, y_train)</code>.</li>
+<li><code>y_pred = full_pipeline.predict(X_test)</code>.</li>
+<li><code>from sklearn.metrics import classification_report</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Macro F1 around 0.35-0.45. (Module 4 with
+TF-IDF improves this a lot.)</li>
+</ul>
+<h3 id="step-7-save-the-trained-pipeline">Step 7 — Save the trained
+pipeline</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>import joblib</code>.</li>
+<li><code>joblib.dump(full_pipeline, '/content/drive/MyDrive/tripadvisor_lab/tripadvisor_pipeline.joblib')</code>.</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-emma-3">Phase C — Make ONE chart for
+Emma</h2>
+<h3 id="emmas-chart-how-well-does-our-baseline-guess-the-rating">Emma’s
+chart — “How well does our baseline guess the rating?”</h3>
+<p>A clean confusion matrix (5x5) with star labels.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>ConfusionMatrixDisplay(cm, display_labels=['1 star','2 star','3 star','4 star','5 star']).plot(cmap='Blues')</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Baseline model — confusion matrix on 19,000
+reviews.”</li>
+<li><strong>Takeaway for Emma:</strong> “Our model is best at finding
+5-star and 1-star reviews. It struggles with 3-star (the middle ones).
+Module 4 will fix this by reading the actual TEXT, not just our
+counts.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-5">Common mistakes in Class 5</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Build the pipeline AFTER you scaled the data manually</td>
+<td>Pipeline scales it twice. Numbers wrong.</td>
+</tr>
+<tr>
+<td>Forget <code>class_weight='balanced'</code></td>
+<td>Model predicts 5-star always. Useless for Emma.</td>
+</tr>
+<tr>
+<td>Use <code>class_weight='balanced'</code> AND oversampling</td>
+<td>Over-correction. Pick one.</td>
+</tr>
+<tr>
+<td>Forget <code>random_state</code></td>
+<td>Results change every run. Hard to debug.</td>
+</tr>
+<tr>
+<td>Include <code>Review</code> (text) in the pipeline input</td>
+<td>Crash: scaler cannot scale text. Drop it first or add a TF-IDF
+branch.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-6">Self-check before Class 6</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Pipeline has preprocessor +
+model.</label></li>
+<li><label><input type="checkbox" />Preprocessor has numeric (and maybe
+categorical) transformer.</label></li>
+<li><label><input type="checkbox" /><code>class_weight='balanced'</code>
+set.</label></li>
+<li><label><input type="checkbox" />Confusion matrix chart.</label></li>
+<li><label><input type="checkbox" />Per-class F1 printed.</label></li>
+<li><label><input
+type="checkbox" /><code>tripadvisor_pipeline.joblib</code> saved to
+Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-6-end-to-end-lab-the-big-one">Class 6 — End-to-End Lab
+(THE BIG ONE)</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Emma is in the meeting room. She
+wants the FINAL clean dataset on her desk in 90 minutes. This is the
+lab.</p>
+</blockquote>
+<h2 id="your-goal-5">Your goal</h2>
+<p>Take 1 raw CSV file. Produce ONE final <code>.parquet</code> file
+with the exact ~21-column schema. Plus a 1-page findings report for
+Emma.</p>
+<h2 id="time">Time</h2>
+<p><strong>90 minutes</strong> of focused work.</p>
+<h2 id="inputs-5">Inputs</h2>
+<ul>
+<li><code>data/tripadvisor_hotel_reviews.csv</code> in your Drive
+folder</li>
+</ul>
+<h2 id="outputs-5">Outputs</h2>
+<ul>
+<li><code>tripadvisor_clean.parquet</code> (~19,000 rows × ~21 columns)
+in Drive</li>
+<li><code>findings.md</code> (~1 page)</li>
+<li>Your full Colab notebook</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-10-minutes">Phase A — Explore the
+data first (10 minutes)</h2>
+<p>You will reuse charts from Classes 1-5. Pick 3 of them. Put them all
+on ONE PAGE of your notebook with markdown headers: 1. Rating
+distribution (the 50% / 5% imbalance problem). 2. Top complaints in 1-2
+star reviews (Emma’s dashboard preview). 3. Top 10 most important
+features.</p>
+<p>These 3 charts tell Emma the whole story.</p>
+<hr />
+<h2 id="phase-b-build-the-final-dataset-70-minutes">Phase B — Build the
+final dataset (70 minutes)</h2>
+<h3 id="required-output-schema">Required output schema</h3>
+<p>Your <code>tripadvisor_clean.parquet</code> MUST have these columns,
+with these names and types:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Column</th>
+<th>Type</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>review_id</code></td>
+<td>string</td>
+<td>engineered (Class 1)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>Review</code></td>
+<td>string</td>
+<td>original cleaned text (kept for Module 7!)</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>review_length</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>n_words</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>n_sentences</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>n_exclamation_marks</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>n_question_marks</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>n_capital_words</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>caps_ratio</code></td>
+<td>float</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>avg_word_length</code></td>
+<td>float</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>n_unique_words</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>mentions_clean</code></td>
+<td>int (0/1)</td>
+<td>engineered (topic dict)</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>mentions_breakfast</code></td>
+<td>int (0/1)</td>
+<td>engineered (topic dict)</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>mentions_wifi</code></td>
+<td>int (0/1)</td>
+<td>engineered (topic dict)</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>mentions_noise</code></td>
+<td>int (0/1)</td>
+<td>engineered (topic dict)</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>mentions_location</code></td>
+<td>int (0/1)</td>
+<td>engineered (topic dict)</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>has_negation</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>polarity_lexicon_score</code></td>
+<td>float</td>
+<td>engineered (lexicon)</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>vader_compound</code></td>
+<td>float</td>
+<td>engineered (VADER)</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>review_year</code></td>
+<td>float (with NaN allowed)</td>
+<td>engineered (regex)</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>Rating</code></td>
+<td>int 1-5</td>
+<td>TARGET (original)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lab-phases-timed">Lab phases (timed)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Time</th>
+<th>What you do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Load + IDs</td>
+<td>5 min</td>
+<td>Load CSV. Add <code>review_id</code>.</td>
+</tr>
+<tr>
+<td>2. Clean text</td>
+<td>15 min</td>
+<td>HTML entities, whitespace, drop empty / duplicates, lowercased
+copy.</td>
+</tr>
+<tr>
+<td>3. Basic counts</td>
+<td>15 min</td>
+<td>review_length, n_words, n_sentences, avg_word_length,
+n_unique_words, n_exclamation_marks, n_question_marks, n_capital_words,
+caps_ratio.</td>
+</tr>
+<tr>
+<td>4. Topic mentions</td>
+<td>10 min</td>
+<td>The 5 <code>mentions_*</code> columns from the keyword
+dictionary.</td>
+</tr>
+<tr>
+<td>5. Negation + lexicon + VADER</td>
+<td>15 min</td>
+<td><code>has_negation</code>, <code>polarity_lexicon_score</code>,
+<code>vader_compound</code>.</td>
+</tr>
+<tr>
+<td>6. Year + validate schema + save</td>
+<td>5 min</td>
+<td><code>review_year</code> regex. Check column names. Save
+<code>.parquet</code>.</td>
+</tr>
+<tr>
+<td>7. Findings</td>
+<td>25 min</td>
+<td>Three charts on one page. Write <code>findings.md</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total: 90 minutes.</strong></p>
+<h3 id="validation-step-do-this-before-you-say-done">Validation step (do
+this BEFORE you say “done”)</h3>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_parquet(<span class="st">&#39;tripadvisor_clean.parquet&#39;</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.shape)              <span class="co"># ~19000 rows, ~21 columns</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.columns.tolist())   <span class="co"># match the schema above</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.dtypes)             <span class="co"># check types</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">&#39;Rating&#39;</span>].value_counts().sort_index())   <span class="co"># 1..5 present</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.isna().<span class="bu">sum</span>())       <span class="co"># only review_year should have NaN</span></span></code></pre></div>
+<p>If any line is wrong: fix it before submitting.</p>
+<hr />
+<h2 id="phase-c-findings-report-for-emma-10-minutes">Phase C — Findings
+report for Emma (10 minutes)</h2>
+<p>Write <code>findings.md</code> with these sections:</p>
+<h3 id="final-numbers">Final numbers</h3>
+<ul>
+<li>Final row count: ____</li>
+<li>Number of columns: ____</li>
+<li>Most common rating: ____ (% ____)</li>
+<li>Least common rating: ____ (% ____)</li>
+</ul>
+<h3 id="top-3-insights">Top 3 insights</h3>
+<ol type="1">
+<li><hr /></li>
+<li><hr /></li>
+<li><hr /></li>
+</ol>
+<h3 id="one-question-to-investigate-in-module-4">One question to
+investigate in Module 4</h3>
+<ul>
+<li><hr /></li>
+</ul>
+<h3 id="one-chart-that-summarizes-everything">One chart that summarizes
+everything</h3>
+<p>Embed your most important chart (the “top complaints in 1-2 star
+reviews” one). Emma will put it on her dashboard.</p>
+<hr />
+<h2 id="grading-rubric-100-points">Grading rubric (100 points)</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All ~21 columns exist with the right names and dtypes</td>
+<td>25</td>
+</tr>
+<tr>
+<td>Cleaning decisions written in markdown</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Pipeline is reproducible (re-run from raw CSV in ONE command)</td>
+<td>10</td>
+</tr>
+<tr>
+<td>VADER + lexicon scores are between -1 and +1</td>
+<td>5</td>
+</tr>
+<tr>
+<td>5 <code>mentions_*</code> columns all present and 0/1 only</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Duplicates and very short reviews removed</td>
+<td>5</td>
+</tr>
+<tr>
+<td><strong>At least 3 exploratory + 1 explanatory chart per
+class</strong></td>
+<td><strong>20</strong></td>
+</tr>
+<tr>
+<td><code>findings.md</code> has insights, not just numbers</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Code is clean (comments, sensible variable names)</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<h2 id="submit">Submit</h2>
+<p>Upload to
+<code>module-3/class_6/submissions/&lt;YourTeamName&gt;/</code>: -
+<code>tripadvisor_clean.parquet</code> - Your Colab notebook
+(<code>File &gt; Download &gt; Download .ipynb</code>) -
+<code>findings.md</code></p>
+<hr />
+<h1 id="tips-for-the-whole-module">Tips for the whole module</h1>
+<ol type="1">
+<li><strong>Do NOT copy-paste code from this guide.</strong> This guide
+gives you HINTS only. Write the code yourself. You will learn much
+faster.</li>
+<li><strong>Save your notebook to Drive often.</strong> Colab
+disconnects after 12 hours.</li>
+<li><strong>Save intermediate <code>.parquet</code> files to
+Drive</strong> (reviews_step1, reviews_step2, etc.). If something
+breaks, you do not redo everything.</li>
+<li><strong>Pair-program.</strong> One student types, one reads. Switch
+every 20 minutes.</li>
+<li><strong>Make a chart BEFORE you write cleaning code.</strong> You
+must SEE the problem before you can fix it.</li>
+<li><strong>Make a chart AFTER each step.</strong> Confirm your code did
+what you expected.</li>
+<li><strong>Read 10 random reviews every class.</strong> A model is only
+as good as the data you understand. Look at 5-star AND 1-star examples.
+Notice the patterns. Then turn the patterns into columns.</li>
+<li><strong>Ask the mentor early.</strong> If you are stuck for 20
+minutes, ask. Do not waste an afternoon.</li>
+</ol>
+<p>Good luck.</p>
+</main>
+
+<footer class="scenario-footer">
+  <p><a href="../../#/module/3/class/6">&larr; Back to all 15 scenarios</a></p>
+</footer>
+
+</body>
+</html>

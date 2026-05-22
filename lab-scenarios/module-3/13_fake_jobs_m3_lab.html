@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>13_fake_jobs_m3_lab</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --text: #e6e8ec;
+    --text-dim: #9aa0aa;
+    --accent: #7aa2f7;
+    --accent-hover: #a5c0ff;
+    --border: #2a2f3a;
+    --code-bg: #11141a;
+    --table-header: #232732;
+    --quote-bar: #7aa2f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(26, 29, 36, 0.92);
+  }
+  .topbar-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .back-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .back-link:hover { color: var(--accent-hover); }
+  .pdf-link {
+    background: var(--accent);
+    color: #0f1115;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pdf-link:hover { background: var(--accent-hover); }
+  .pdf-link svg { width: 14px; height: 14px; }
+
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 56px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  p { margin-bottom: 16px; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+  strong { color: #fff; font-weight: 600; }
+  em { color: var(--text); font-style: italic; }
+
+  ul, ol { margin-bottom: 18px; padding-left: 28px; }
+  li { margin-bottom: 6px; }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 36px 0;
+  }
+
+  blockquote {
+    border-left: 4px solid var(--quote-bar);
+    background: var(--card);
+    padding: 14px 22px;
+    margin: 18px 0;
+    color: var(--text);
+    border-radius: 0 8px 8px 0;
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  blockquote strong { color: var(--accent); }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    font-size: 0.88em;
+    color: #f0a3b5;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 18px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text);
+    font-size: 1em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.94rem;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  thead { background: var(--table-header); }
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+
+  /* Checkboxes in self-check lists */
+  input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+
+  /* Anchored sections for nav */
+  h2[id], h3[id] { scroll-margin-top: 80px; }
+
+  footer.scenario-footer {
+    max-width: 920px;
+    margin: 60px auto 40px;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+  footer.scenario-footer a {
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    main { padding: 24px 16px 60px; }
+    h1 { font-size: 1.7rem; }
+    h2 { font-size: 1.35rem; }
+    h3 { font-size: 1.1rem; }
+    .topbar { padding: 10px 16px; }
+    pre { font-size: 0.8rem; padding: 12px 14px; }
+    table { font-size: 0.85rem; }
+    th, td { padding: 9px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="../../#/module/3/class/6">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <span style="display:inline-block;transform:translateY(-1px)">&larr;</span> Back to all scenarios
+    </a>
+    <a class="pdf-link" href="13_fake_jobs_m3_lab.pdf" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-4-4h3V4h2v8h3l-4 4zm-8 4v-2h16v2H4z"/></svg>
+      Download as PDF
+    </a>
+  </div>
+</div>
+
+<main>
+<h1 id="fake-job-postings-module-3-lab-guide">Fake Job Postings — Module
+3 Lab Guide</h1>
+<p><strong>Scenario:</strong> Trust &amp; safety. Detect fake job
+postings before they reach job seekers. <strong>Module:</strong> 3 (Data
+Preparation and Feature Engineering) <strong>Audience:</strong> Adult
+learners, A2 English. New to AI. <strong>Tools:</strong> Google Colab
+(no install needed).</p>
+<hr />
+<h1 id="the-scenario-your-mission">The Scenario — Your Mission</h1>
+<h2 id="where-you-work">Where you work</h2>
+<p>You and your team are new data analysts at a <strong>job search
+website</strong> (like Indeed or LinkedIn). Companies post job openings.
+Job seekers apply.</p>
+<p>Every week: - <strong>50,000 new job postings</strong> are submitted
+to your platform. - About <strong>200 are SCAMS.</strong> They want to
+steal money, identity, or personal information.</p>
+<h2 id="the-problem">The problem</h2>
+<p>When a fake posting reaches job seekers: - People send their CV with
+their full address, ID, phone number. - Some send “training fees” or
+“background-check fees” to scam companies. - Your platform brand
+suffers.</p>
+<p>Carlos is worried. He calls your team into a meeting.</p>
+<h2 id="your-managers-request">Your manager’s request</h2>
+<p>Your manager, <strong>Carlos</strong> (Head of Trust &amp; Safety),
+tells you:</p>
+<blockquote>
+<p>“Every week 200 fake postings slip through our manual review. They
+steal money from desperate job seekers.</p>
+<p>I need a model. Detect fake postings BEFORE we publish them. Then we
+automatically block or flag them for review.</p>
+<p>Two warnings: 1. The catch: only <strong>5%</strong> of postings are
+fake. If you build a model that always says ‘real’, you get 95% accuracy
+and ZERO catches. <strong>Accuracy is a trap here.</strong> Use F1. 2.
+Do NOT block REAL jobs by mistake. Every wrong block is a real company
+that goes to our competitor.”</p>
+</blockquote>
+<h2 id="your-teams-job-for-the-next-2-weeks-module-3">Your team’s job
+for the next 2 weeks (Module 3)</h2>
+<p>Carlos sends you a CSV with <strong>18,000 postings</strong>. About
+900 of them are fake.</p>
+<p>Your job in Module 3: &gt; <strong>Turn this CSV into ONE clean file.
+The clean file will be used to train the fake-detector in Module
+4.</strong></p>
+<p>The clean file is called <code>fake_jobs_clean.parquet</code>. It
+must have <strong>21 specific columns</strong> (we will see them in
+Class 6).</p>
+<h2 id="after-module-3">After Module 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Module</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Module 4</strong></td>
+<td>Train the fraud detector. Carlos gets his blocker.</td>
+</tr>
+<tr>
+<td><strong>Module 5</strong></td>
+<td>Find groups of similar legitimate jobs (industry clusters). Also:
+find anomalies.</td>
+</tr>
+<tr>
+<td><strong>Module 7</strong></td>
+<td>Use the description text alone. Find “scam phrases”.</td>
+</tr>
+</tbody>
+</table>
+<p>You use the <strong>same fake-jobs dataset</strong> until the end of
+Module 7.</p>
+<hr />
+<h1 id="how-this-guide-works-read-this-first">How This Guide Works (Read
+This First!)</h1>
+<h2 id="we-do-not-give-you-the-full-code">We do NOT give you the full
+code</h2>
+<p>You will see:</p>
+<h3 id="what-why-expected-explained-in-words">1. WHAT / WHY / EXPECTED —
+explained in words</h3>
+<h3 id="sometimes-a-code-skeleton-with-blanks-___">2. Sometimes a code
+skeleton with blanks (<code>___</code>)</h3>
+<h3 id="why-no-full-code">Why no full code?</h3>
+<p>You will NOT learn if you copy-paste. <strong>Rule:</strong> Redo
+every copy-pasted step by yourself.</p>
+<hr />
+<h1 id="visualizations-two-modes">Visualizations — Two Modes</h1>
+<h2 id="exploratory-charts-for-you">1. Exploratory charts (for YOU)</h2>
+<p>Fast, ugly. Goal: “What does this data look like?”</p>
+<h2 id="explanatory-charts-for-carlos">2. Explanatory charts (for
+CARLOS)</h2>
+<p>Clean, labeled, one clear message.</p>
+<h2 id="your-plotting-toolkit">Your plotting toolkit</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Plot</th>
+<th>When to use it</th>
+<th>Function name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Histogram</td>
+<td>Shape of a numeric column</td>
+<td><code>plt.hist()</code></td>
+</tr>
+<tr>
+<td>Bar chart</td>
+<td>Count of each category</td>
+<td><code>df['col'].value_counts().plot.bar()</code></td>
+</tr>
+<tr>
+<td>Box plot</td>
+<td>Outliers</td>
+<td><code>sns.boxplot()</code></td>
+</tr>
+<tr>
+<td>Heatmap</td>
+<td>Correlation between columns</td>
+<td><code>sns.heatmap(df.corr())</code></td>
+</tr>
+<tr>
+<td>Stacked bar</td>
+<td>Compare fraud vs real</td>
+<td><code>df.groupby('fraudulent')['col'].mean().plot.bar()</code></td>
+</tr>
+</tbody>
+</table>
+<p>Before you start: <code>import matplotlib.pyplot as plt</code> and
+<code>import seaborn as sns</code>.</p>
+<hr />
+<h1 id="before-you-start-google-colab-setup">Before You Start — Google
+Colab Setup</h1>
+<h2 id="step-1-open-a-new-colab-notebook">Step 1 — Open a new Colab
+notebook</h2>
+<ol type="1">
+<li>Go to https://colab.research.google.com</li>
+<li>Sign in with your Google account.</li>
+<li>Click <strong>“New notebook”</strong>.</li>
+<li>Name it <code>fake_jobs_module_3.ipynb</code>.</li>
+</ol>
+<h2 id="step-2-connect-to-google-drive">Step 2 — Connect to Google
+Drive</h2>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> drive</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>drive.mount(<span class="st">&#39;/content/drive&#39;</span>)</span></code></pre></div>
+<h2 id="step-3-create-a-project-folder">Step 3 — Create a project
+folder</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&#39;/content/drive/MyDrive/fake_jobs_lab&#39;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>cd <span class="op">/</span>content<span class="op">/</span>drive<span class="op">/</span>MyDrive<span class="op">/</span>fake_jobs_lab</span></code></pre></div>
+<h2 id="step-4-get-the-data">Step 4 — Get the data</h2>
+<p><strong>Option A — Direct from Kaggle:</strong></p>
+<ol type="1">
+<li>Free Kaggle account.</li>
+<li>Upload <code>kaggle.json</code>:</li>
+</ol>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> files</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>files.upload()</span></code></pre></div>
+<ol start="3" type="1">
+<li>Then:</li>
+</ol>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>mkdir <span class="op">-</span>p <span class="op">~/</span>.kaggle <span class="op">&amp;&amp;</span> mv kaggle.json <span class="op">~/</span>.kaggle<span class="op">/</span> <span class="op">&amp;&amp;</span> chmod <span class="dv">600</span> <span class="op">~/</span>.kaggle<span class="op">/</span>kaggle.json</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install kaggle <span class="op">-</span>q</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kaggle datasets download <span class="op">-</span>d shivamb<span class="op">/</span>real<span class="op">-</span><span class="kw">or</span><span class="op">-</span>fake<span class="op">-</span>fake<span class="op">-</span>jobposting<span class="op">-</span>prediction</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>unzip <span class="op">-</span>q real<span class="op">-</span><span class="kw">or</span><span class="op">-</span>fake<span class="op">-</span>fake<span class="op">-</span>jobposting<span class="op">-</span>prediction.<span class="bu">zip</span> <span class="op">-</span>d data</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ls data<span class="op">/</span></span></code></pre></div>
+<p><strong>Option B — Upload by hand</strong> in Colab’s file panel.</p>
+<h2 id="step-5-test-it">Step 5 — Test it</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;data/fake_job_postings.csv&#39;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.shape)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&#39;Fraudulent:&#39;</span>, df[<span class="st">&#39;fraudulent&#39;</span>].<span class="bu">sum</span>(), <span class="st">&#39;out of&#39;</span>, <span class="bu">len</span>(df))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>df.head()</span></code></pre></div>
+<p>Should print about <code>(17880, 18)</code> and
+<code>Fraudulent: 866 out of 17880</code>. About 5% fraudulent.</p>
+<h2 id="colab-tips">Colab tips</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Save your notebook to Drive often</td>
+<td>Colab disconnects after 12 hours.</td>
+</tr>
+<tr>
+<td>Save intermediate <code>.parquet</code> files to Drive</td>
+<td>Files in <code>/content/</code> disappear when Colab
+disconnects.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="class-1-data-cleaning">Class 1 — Data Cleaning</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Carlos drops the CSV on your
+desk. Many columns have missing values. The location column is one big
+string. Your job today: clean and explore the imbalance.</p>
+</blockquote>
+<h2 id="your-goal">Your goal</h2>
+<p>Look at missing values. Parse the location. Understand the
+imbalance.</p>
+<h2 id="inputs">Inputs</h2>
+<ul>
+<li><code>data/fake_job_postings.csv</code></li>
+</ul>
+<h2 id="outputs">Outputs</h2>
+<ul>
+<li><code>jobs_step1.parquet</code> saved in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 chart for Carlos</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-15-min">Phase A — Explore the
+data first (15 min)</h2>
+<h3 id="exploratory-chart-1-class-imbalance">Exploratory chart 1 — Class
+imbalance</h3>
+<ul>
+<li><strong>Question:</strong> “How many fraudulent vs real?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['fraudulent'].value_counts().plot.bar()</code>.</li>
+<li>Add the percentage as text on the bar.</li>
+</ul></li>
+<li><strong>What you learn:</strong> ~95% real, ~5% fraudulent.
+<strong>Big imbalance.</strong></li>
+</ul>
+<h3 id="exploratory-chart-2-missing-values-per-column">Exploratory chart
+2 — Missing values per column</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df.isna().sum().sort_values(ascending=False).plot.barh()</code>.</li>
+<li><strong>What you learn:</strong> Some columns are missing &gt;60% of
+the time. Examples: <code>salary_range</code>, <code>department</code>,
+<code>benefits</code>.</li>
+</ul>
+<h3 id="exploratory-chart-3-missing-values-vs-fraudulent">Exploratory
+chart 3 — Missing values vs fraudulent</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Count missing columns per row:
+<code>df['n_missing'] = df.isna().sum(axis=1)</code>.</li>
+<li>GroupBy <code>fraudulent</code>, mean of
+<code>n_missing</code>.</li>
+<li>Bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Fake postings tend to have MORE
+missing fields. (Scammers are lazy.)</li>
+</ul>
+<hr />
+<h2 id="phase-b-clean-the-jobs-table-45-min">Phase B — Clean the jobs
+table (45 min)</h2>
+<h3 id="step-1-load-the-csv">Step 1 — Load the CSV</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>pd.read_csv('data/fake_job_postings.csv')</code>.</li>
+<li><strong>EXPECTED:</strong> ~17,880 rows × 18 columns.</li>
+</ul>
+<h3 id="step-2-look-at-the-dataframe">Step 2 — Look at the
+DataFrame</h3>
+<ul>
+<li><strong>WHAT:</strong> Run <code>.info()</code>,
+<code>.head()</code>, <code>.shape</code>, <code>.dtypes</code>.</li>
+<li><strong>EXPECTED:</strong> All text columns are <code>object</code>.
+The numeric columns <code>has_company_logo</code>,
+<code>has_questions</code>, <code>telecommuting</code>,
+<code>fraudulent</code> are all int 0/1.</li>
+</ul>
+<h3 id="step-3-parse-location">Step 3 — Parse <code>location</code></h3>
+<ul>
+<li><strong>WHAT:</strong> <code>location</code> is “US, NY, New York”.
+Comma-separated.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Split by comma:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>loc_parts <span class="op">=</span> df[<span class="st">&#39;location&#39;</span>].fillna(<span class="st">&#39;&#39;</span>).<span class="bu">str</span>.split(<span class="st">&#39;,&#39;</span>, expand<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;country&#39;</span>] <span class="op">=</span> loc_parts[<span class="dv">0</span>].<span class="bu">str</span>.strip()</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;state&#39;</span>] <span class="op">=</span> loc_parts[<span class="dv">1</span>].<span class="bu">str</span>.strip() <span class="cf">if</span> loc_parts.shape[<span class="dv">1</span>] <span class="op">&gt;</span> <span class="dv">1</span> <span class="cf">else</span> <span class="va">None</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;city&#39;</span>] <span class="op">=</span> loc_parts[<span class="dv">2</span>].<span class="bu">str</span>.strip() <span class="cf">if</span> loc_parts.shape[<span class="dv">1</span>] <span class="op">&gt;</span> <span class="dv">2</span> <span class="cf">else</span> <span class="va">None</span></span></code></pre></div></li>
+</ul></li>
+</ul>
+<h3 id="step-4-count-missing-fields-per-row">Step 4 — Count missing
+fields per row</h3>
+<ul>
+<li><strong>WHAT:</strong> This is a STRONG signal (scammers often leave
+fields blank).</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['missing_field_count'] = df.isna().sum(axis=1)</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-5-replace-missing-text-fields-with-empty-string">Step 5 —
+Replace missing text fields with empty string</h3>
+<ul>
+<li><strong>WHAT:</strong> For each text column
+(<code>description</code>, <code>requirements</code>,
+<code>benefits</code>, <code>company_profile</code>,
+<code>title</code>).</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['description'] = df['description'].fillna('')</code>.</li>
+<li>Repeat for the others.</li>
+</ul></li>
+<li><strong>WHY:</strong> TF-IDF in M7 cannot handle NaN.</li>
+</ul>
+<h3 id="step-6-decide-what-to-do-with-salary_range">Step 6 — Decide what
+to do with <code>salary_range</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Mostly missing (~85%). Two options:
+<ul>
+<li><strong>A</strong> Drop the column.</li>
+<li><strong>B</strong> Make a binary flag:
+<code>has_salary_listed = (salary_range.notna()).astype(int)</code>.</li>
+</ul></li>
+<li><strong>YOUR CHOICE:</strong> B is safer. The presence/absence of
+salary is itself a signal.</li>
+</ul>
+<h3 id="step-7-write-down-what-you-did">Step 7 — Write down what you
+did</h3>
+<p>In a markdown cell, list each decision.</p>
+<h3 id="step-8-save-to-drive">Step 8 — Save to Drive</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/fake_jobs_lab/jobs_step1.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-carlos-15-min">Phase C — Make ONE
+chart for Carlos (15 min)</h2>
+<h3
+id="carloss-chart-fake-postings-have-30-more-missing-fields-than-real-ones">Carlos’s
+chart — “Fake postings have 30% more missing fields than real ones”</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>GroupBy <code>fraudulent</code>, mean of
+<code>missing_field_count</code>.</li>
+<li>Bar chart.</li>
+</ul></li>
+<li><strong>Title:</strong> “Missing field count by class — fake
+postings have 7.3 missing fields on average vs 5.6 for real.”</li>
+<li><strong>Takeaway for Carlos:</strong> “Auto-flag any posting with
+&gt;7 missing fields. That alone catches ~30% of fakes with low false
+positives.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-1">Common mistakes in Class 1</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Use accuracy to measure performance</td>
+<td>95% baseline by always saying “real”. Useless. Use F1.</td>
+</tr>
+<tr>
+<td>Drop rows with missing text columns</td>
+<td>You lose data. Replace with <code>''</code> instead.</td>
+</tr>
+<tr>
+<td>Forget to parse <code>location</code></td>
+<td>Country/state/city info is wasted.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-2">Self-check before Class 2</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Loaded 17,880 rows.</label></li>
+<li><label><input type="checkbox" /><code>location</code> is parsed into
+country, state, city.</label></li>
+<li><label><input type="checkbox" /><code>missing_field_count</code>
+exists.</label></li>
+<li><label><input type="checkbox" />Empty text fields are
+<code>''</code> not NaN.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Carlos.</label></li>
+<li><label><input type="checkbox" /><code>jobs_step1.parquet</code>
+saved.</label></li>
+</ul>
+<hr />
+<h1 id="class-2-encoding-and-scaling">Class 2 — Encoding and
+Scaling</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Carlos says: “The
+<code>industry</code> column has 130 different values. The
+<code>employment_type</code> has 5 (full-time, part-time, etc.). The
+<code>country</code> has 90+ values. Make these usable for the
+model.”</p>
+</blockquote>
+<h2 id="your-goal-1">Your goal</h2>
+<p>Encode the categorical columns. Decide which to one-hot and which to
+target-encode.</p>
+<h2 id="inputs-1">Inputs</h2>
+<ul>
+<li><code>jobs_step1.parquet</code></li>
+</ul>
+<h2 id="outputs-1">Outputs</h2>
+<ul>
+<li><code>jobs_step2.parquet</code> in Drive</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-top-20-industries">Exploratory chart 1 — Top
+20 industries</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>value_counts().head(20).plot.barh()</code>.</li>
+<li><strong>What you learn:</strong> IT and Marketing dominate. Many
+small industries.</li>
+</ul>
+<h3 id="exploratory-chart-2-fraud-rate-by-industry">Exploratory chart 2
+— Fraud rate by industry</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Filter to industries with &gt;50 postings.</li>
+<li>GroupBy industry, mean of <code>fraudulent</code>.</li>
+<li>Sort descending, head 10.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Some industries have much higher
+fraud rate (e.g., Marketing). Scammers favor them.</li>
+</ul>
+<h3 id="exploratory-chart-3-employment-type-distribution">Exploratory
+chart 3 — Employment type distribution</h3>
+<ul>
+<li><strong>HINTS:</strong> <code>value_counts().plot.bar()</code>.</li>
+<li><strong>What you learn:</strong> Most are full-time. A few “Other” —
+suspicious.</li>
+</ul>
+<hr />
+<h2 id="phase-b-encode-and-scale">Phase B — Encode and scale</h2>
+<h3 id="step-1-one-hot-encode-employment_type">Step 1 — One-hot encode
+<code>employment_type</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Only 5 values. Safe to one-hot.</li>
+<li><strong>HINTS:</strong>
+<code>pd.get_dummies(df, columns=['employment_type'], prefix='emp')</code>.</li>
+</ul>
+<h3
+id="step-2-one-hot-encode-required_experience-and-required_education">Step
+2 — One-hot encode <code>required_experience</code> and
+<code>required_education</code></h3>
+<ul>
+<li><strong>HINTS:</strong> Same pattern. Both have ~5-7 values.</li>
+</ul>
+<h3 id="step-3-target-encode-industry">Step 3 — Target-encode
+<code>industry</code></h3>
+<ul>
+<li><strong>WHAT:</strong> 130 industries. One-hot would add 130
+columns.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute mean fraud rate per industry.</li>
+<li>WARNING: Only on TRAIN data in Class 4. For EDA:
+<code>df['industry_fraud_rate'] = df.groupby('industry')['fraudulent'].transform('mean')</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-4-target-encode-function">Step 4 — Target-encode
+<code>function</code></h3>
+<ul>
+<li><strong>HINTS:</strong> Same as industry. ~40 unique values.</li>
+</ul>
+<h3 id="step-5-one-hot-encode-country-top-10-only">Step 5 — One-hot
+encode <code>country</code> (top 10 only)</h3>
+<ul>
+<li><strong>WHAT:</strong> Most postings are “US”. Keep top 10 +
+“Other”.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Find top 10 countries.</li>
+<li>For each:
+<code>df[f'country_{c}'] = (df['country'] == c).astype(int)</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-6-save">Step 6 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/fake_jobs_lab/jobs_step2.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-carlos">Phase C — Make ONE chart for
+Carlos</h2>
+<h3 id="carloss-chart-top-10-highest-risk-industries">Carlos’s chart —
+“Top 10 highest-risk industries”</h3>
+<p>A horizontal bar chart of the top 10 industries by fraud rate (with
+&gt;50 postings filter).</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Filter, GroupBy, mean, sort, head 10.</li>
+<li>Plot horizontally.</li>
+</ul></li>
+<li><strong>Title:</strong> “Industries with the highest fraud
+rates.”</li>
+<li><strong>Takeaway for Carlos:</strong> “Add extra manual review for
+these 10 industries. Quick win.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-2">Common mistakes in Class 2</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Target-encode on FULL data</td>
+<td>Leakage.</td>
+</tr>
+<tr>
+<td>One-hot encode <code>industry</code> directly</td>
+<td>130 new columns. Slow.</td>
+</tr>
+<tr>
+<td>Drop missing <code>industry</code> rows</td>
+<td>You lose data. Fill with “unknown” instead.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-3">Self-check before Class 3</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>employment_type</code>,
+<code>required_experience</code>, <code>required_education</code> are
+one-hot.</label></li>
+<li><label><input type="checkbox" /><code>industry</code> and
+<code>function</code> are target-encoded.</label></li>
+<li><label><input type="checkbox" />Top-10 countries are
+one-hot.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Carlos.</label></li>
+<li><label><input type="checkbox" /><code>jobs_step2.parquet</code>
+saved.</label></li>
+</ul>
+<hr />
+<h1 id="class-3-feature-engineering">Class 3 — Feature Engineering</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Carlos says: “Now make me the
+SMART columns. Does the description contain a phone number? An email? A
+dollar sign with too many digits? These are scam signals.”</p>
+</blockquote>
+<h2 id="your-goal-2">Your goal</h2>
+<p>Engineer signals from the text columns. Find fraud fingerprints.</p>
+<h2 id="inputs-2">Inputs</h2>
+<ul>
+<li><code>jobs_step2.parquet</code></li>
+</ul>
+<h2 id="outputs-2">Outputs</h2>
+<ul>
+<li><code>jobs_step3.parquet</code> in Drive</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-1">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-description_length-by-class">Exploratory
+chart 1 — <code>description_length</code> by class</h3>
+<ul>
+<li>After Step 1 below.</li>
+<li><strong>HINTS:</strong> GroupBy <code>fraudulent</code>, mean of
+<code>description_length</code>, bar chart.</li>
+<li><strong>What you learn:</strong> Fake descriptions tend to be
+SHORTER or strangely structured.</li>
+</ul>
+<h3 id="exploratory-chart-2-has_phone_in_text-by-class">Exploratory
+chart 2 — <code>has_phone_in_text</code> by class</h3>
+<ul>
+<li>After Step 3 below.</li>
+<li><strong>What you learn:</strong> Real jobs RARELY put a phone in the
+description (they use the platform). Fake jobs often do (they want
+direct contact).</li>
+</ul>
+<h3 id="exploratory-chart-3-n_exclamations_in_text-by-class">Exploratory
+chart 3 — <code>n_exclamations_in_text</code> by class</h3>
+<ul>
+<li><strong>What you learn:</strong> Fake postings often have many “!” —
+“GREAT OPPORTUNITY!!! APPLY NOW!!!”</li>
+</ul>
+<hr />
+<h2 id="phase-b-engineer-the-features">Phase B — Engineer the
+features</h2>
+<h3 id="step-1-length-features">Step 1 — Length features</h3>
+<p>For each text column (<code>description</code>,
+<code>requirements</code>, <code>benefits</code>,
+<code>company_profile</code>, <code>title</code>):</p>
+<table>
+<thead>
+<tr>
+<th>New column</th>
+<th>How to make it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>description_length</code></td>
+<td><code>df['description'].str.len()</code></td>
+</tr>
+<tr>
+<td><code>requirements_length</code></td>
+<td><code>df['requirements'].str.len()</code></td>
+</tr>
+<tr>
+<td><code>benefits_length</code></td>
+<td><code>df['benefits'].str.len()</code></td>
+</tr>
+<tr>
+<td><code>company_profile_length</code></td>
+<td><code>df['company_profile'].str.len()</code></td>
+</tr>
+<tr>
+<td><code>title_length</code></td>
+<td><code>df['title'].str.len()</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-2-title-caps-signals">Step 2 — Title caps signals</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>New column</th>
+<th>How to make it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>n_caps_in_title</code></td>
+<td><code>df['title'].str.findall(r'\b[A-Z]{2,}\b').apply(len)</code></td>
+</tr>
+<tr>
+<td><code>title_all_caps_ratio</code></td>
+<td>Ratio of CAPS letters to total letters in title</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>WHY:</strong> “URGENT HIRING NOW!!!” all-caps = fraud
+signal.</li>
+</ul>
+<h3
+id="step-3-in-text-contact-signals-combine-all-text-columns-first">Step
+3 — In-text contact signals (combine all text columns first)</h3>
+<p>Combine all text into one big string per row:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;all_text&#39;</span>] <span class="op">=</span> (df[<span class="st">&#39;title&#39;</span>].fillna(<span class="st">&#39;&#39;</span>) <span class="op">+</span> <span class="st">&#39; &#39;</span> <span class="op">+</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                  df[<span class="st">&#39;description&#39;</span>].fillna(<span class="st">&#39;&#39;</span>) <span class="op">+</span> <span class="st">&#39; &#39;</span> <span class="op">+</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                  df[<span class="st">&#39;requirements&#39;</span>].fillna(<span class="st">&#39;&#39;</span>) <span class="op">+</span> <span class="st">&#39; &#39;</span> <span class="op">+</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                  df[<span class="st">&#39;benefits&#39;</span>].fillna(<span class="st">&#39;&#39;</span>) <span class="op">+</span> <span class="st">&#39; &#39;</span> <span class="op">+</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                  df[<span class="st">&#39;company_profile&#39;</span>].fillna(<span class="st">&#39;&#39;</span>))</span></code></pre></div>
+<p>Then:</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>New column</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>has_phone_in_text</code></td>
+<td>regex for phone numbers
+(<code>\d{3}[-.\s]?\d{3}[-.\s]?\d{4}</code>)</td>
+</tr>
+<tr>
+<td><code>has_email_in_text</code></td>
+<td>regex for emails (<code>\S+@\S+\.\S+</code>)</td>
+</tr>
+<tr>
+<td><code>has_url_in_text</code></td>
+<td>regex for URLs (<code>http\S+</code>)</td>
+</tr>
+<tr>
+<td><code>n_exclamations_in_text</code></td>
+<td><code>df['all_text'].str.count('!')</code></td>
+</tr>
+<tr>
+<td><code>n_dollar_signs</code></td>
+<td><code>df['all_text'].str.count(r'\$')</code></td>
+</tr>
+<tr>
+<td><code>mentions_money_now</code></td>
+<td>regex for “$1000+ weekly”, “earn money fast”, etc.</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>WHY:</strong> Each is a scam fingerprint.</li>
+</ul>
+<h3 id="step-4-save">Step 4 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/fake_jobs_lab/jobs_step3.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-carlos-1">Phase C — Make ONE chart
+for Carlos</h2>
+<h3 id="carloss-chart-scam-fingerprints">Carlos’s chart — “Scam
+fingerprints”</h3>
+<p>A grouped bar chart showing the rate of each signal in real vs fake
+postings: - has_phone_in_text - has_email_in_text -
+n_exclamations_in_text &gt; 3 - title_all_caps</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>GroupBy <code>fraudulent</code>, mean of each binary signal.</li>
+<li>Grouped bar chart.</li>
+</ul></li>
+<li><strong>Title:</strong> “Scam fingerprints — fake postings are 8x
+more likely to include a phone in the text.”</li>
+<li><strong>Takeaway for Carlos:</strong> “Any 2+ of these signals
+together = block immediately.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-3">Common mistakes in Class 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Forget <code>.fillna('')</code> before <code>.str.len()</code></td>
+<td>Crashes on NaN.</td>
+</tr>
+<tr>
+<td>Use a regex without <code>\b</code> boundary</td>
+<td>Matches “EU” inside “BUREAU”. False positives.</td>
+</tr>
+<tr>
+<td>Compute keyword flags per column separately</td>
+<td>Miss cross-column scams. Combine first.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-4">Self-check before Class 4</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Length features for all 5 text
+columns.</label></li>
+<li><label><input type="checkbox" />Title caps signals.</label></li>
+<li><label><input type="checkbox" />In-text contact signals (phone,
+email, URL).</label></li>
+<li><label><input type="checkbox" />Exclamation and dollar-sign
+counts.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Carlos.</label></li>
+<li><label><input type="checkbox" /><code>jobs_step3.parquet</code>
+saved.</label></li>
+</ul>
+<hr />
+<h1 id="class-4-feature-selection">Class 4 — Feature Selection</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Carlos says: “You have ~30
+columns. Pick the best 12-15. Tell me which signals matter most.”</p>
+</blockquote>
+<h2 id="your-goal-3">Your goal</h2>
+<p>Pick the best 12-15 columns.</p>
+<h2 id="inputs-3">Inputs</h2>
+<ul>
+<li><code>jobs_step3.parquet</code></li>
+</ul>
+<h2 id="outputs-3">Outputs</h2>
+<ul>
+<li><code>jobs_step4.parquet</code> in Drive</li>
+<li>A short markdown report</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-2">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-correlation-heatmap">Exploratory chart 1 —
+Correlation heatmap</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>sns.heatmap(df[numeric_cols].corr(), annot=True, fmt='.2f')</code>.</li>
+</ul>
+<h3 id="exploratory-chart-2-mutual-information-bars">Exploratory chart 2
+— Mutual information bars</h3>
+<ul>
+<li>After Step 4 below.</li>
+</ul>
+<h3 id="exploratory-chart-3-random-forest-importance-bars">Exploratory
+chart 3 — Random Forest importance bars</h3>
+<ul>
+<li>After Step 5 below.</li>
+</ul>
+<hr />
+<h2 id="phase-b-select-features">Phase B — Select features</h2>
+<h3 id="step-1-split-into-train-and-test-first">Step 1 — Split into
+train and test FIRST</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)</code>.</li>
+<li><strong>CRITICAL:</strong> <code>stratify=y</code> because we have
+only 5% positives. Otherwise the test set might have very few
+fakes.</li>
+</ul></li>
+</ul>
+<h3 id="step-2-variance-threshold">Step 2 — Variance threshold</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>VarianceThreshold(threshold=0.01)</code>.</li>
+</ul>
+<h3 id="step-3-correlation-pruning">Step 3 — Correlation pruning</h3>
+<ul>
+<li><strong>HINTS:</strong> Drop pairs with |corr| &gt; 0.9. Common
+candidates: lengths and word-counts of the same column.</li>
+</ul>
+<h3 id="step-4-mutual-information">Step 4 — Mutual information</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>mutual_info_classif(X_train[numeric_cols], y_train)</code>.</li>
+</ul>
+<h3 id="step-5-random-forest-importance">Step 5 — Random Forest
+importance</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>RandomForestClassifier(n_estimators=100, max_depth=10, n_jobs=-1, class_weight='balanced')</code>.</li>
+<li><code>class_weight='balanced'</code> is critical here because of the
+imbalance.</li>
+</ul></li>
+</ul>
+<h3 id="step-6-pick-the-final-12-15-columns">Step 6 — Pick the final
+12-15 columns</h3>
+<ul>
+<li><strong>WRITE DOWN</strong> WHY for each.</li>
+<li><strong>EXPECTED TOP FEATURES:</strong>
+<ul>
+<li><code>missing_field_count</code>, <code>has_phone_in_text</code>,
+<code>industry_fraud_rate</code>, <code>has_company_logo</code>,
+<code>n_exclamations_in_text</code>,
+<code>description_length</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-7-save">Step 7 — Save</h3>
+<ul>
+<li>Keep only selected + <code>fraudulent</code>. Save as
+<code>jobs_step4.parquet</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-carlos-2">Phase C — Make ONE chart
+for Carlos</h2>
+<h3 id="carloss-chart-top-10-fraud-predictors">Carlos’s chart — “Top 10
+fraud predictors”</h3>
+<p>A horizontal bar chart.</p>
+<ul>
+<li><strong>Title:</strong> “Top 10 predictors of fraud.”</li>
+<li><strong>Takeaway:</strong> “Missing fields, phone in text, and
+missing company logo are the top 3. Build the model around these.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-4">Common mistakes in Class 4</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Forget <code>stratify=y</code></td>
+<td>Test set may have ZERO fakes. Useless test.</td>
+</tr>
+<tr>
+<td>Use accuracy to validate</td>
+<td>95% trivial baseline. Use F1.</td>
+</tr>
+<tr>
+<td>Drop a column because it has 30% missing</td>
+<td>Missing-ness IS the signal here.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-5">Self-check before Class 5</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Train/test split with
+<code>stratify=y</code> done FIRST.</label></li>
+<li><label><input type="checkbox" />12-15 columns +
+<code>fraudulent</code>.</label></li>
+<li><label><input type="checkbox" />WHY for each column
+written.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Carlos.</label></li>
+<li><label><input type="checkbox" /><code>jobs_step4.parquet</code>
+saved.</label></li>
+</ul>
+<hr />
+<h1 id="class-5-pipelines">Class 5 — Pipelines</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Carlos says: “Your code is in 4
+notebooks. When a new posting arrives, will you copy 4 notebooks? No. We
+need ONE Pipeline. And remember: this is an IMBALANCED problem. Build
+for F1, not accuracy.”</p>
+</blockquote>
+<h2 id="your-goal-4">Your goal</h2>
+<p>Build ONE Pipeline that handles the 5% imbalance correctly.</p>
+<h2 id="inputs-4">Inputs</h2>
+<ul>
+<li><code>jobs_step4.parquet</code></li>
+</ul>
+<h2 id="outputs-4">Outputs</h2>
+<ul>
+<li><code>fake_jobs_pipeline.joblib</code> in Drive</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-3">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-confusion-matrix">Exploratory chart 1 —
+Confusion matrix</h3>
+<ul>
+<li>After training.</li>
+<li><strong>HINTS:</strong>
+<code>ConfusionMatrixDisplay.from_estimator(pipeline, X_test, y_test)</code>.</li>
+</ul>
+<h3 id="exploratory-chart-2-precision-recall-curve">Exploratory chart 2
+— Precision-Recall curve</h3>
+<ul>
+<li><strong>WHAT:</strong> With imbalanced data, PR curve is MORE useful
+than ROC curve.</li>
+<li><strong>HINTS:</strong>
+<code>from sklearn.metrics import PrecisionRecallDisplay</code>.
+<code>PrecisionRecallDisplay.from_estimator(pipeline, X_test, y_test)</code>.</li>
+</ul>
+<h3 id="exploratory-chart-3-roc-curve">Exploratory chart 3 — ROC
+curve</h3>
+<ul>
+<li>For completeness.</li>
+</ul>
+<hr />
+<h2 id="phase-b-build-the-pipeline">Phase B — Build the pipeline</h2>
+<h3 id="step-1-decide-numeric-vs-categorical-columns">Step 1 — Decide
+numeric vs categorical columns</h3>
+<ul>
+<li><strong>EXAMPLE:</strong>
+<ul>
+<li>numeric: <code>description_length</code>,
+<code>requirements_length</code>, <code>company_profile_length</code>,
+<code>title_length</code>, <code>missing_field_count</code>,
+<code>has_phone_in_text</code>, <code>has_email_in_text</code>,
+<code>n_exclamations_in_text</code>, <code>n_caps_in_title</code>,
+<code>industry_fraud_rate</code>, <code>function_fraud_rate</code>.</li>
+<li>categorical: <code>country</code> (one-hot top 10),
+<code>employment_type</code> (one-hot), <code>required_experience</code>
+(one-hot).</li>
+</ul></li>
+</ul>
+<h3 id="step-2-numeric-mini-pipeline">Step 2 — Numeric
+mini-pipeline</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>numeric_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;scaler&#39;</span>,  StandardScaler()),</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in: <code>'median'</code>.</p></li>
+</ul></li>
+</ul>
+<h3 id="step-3-categorical-mini-pipeline">Step 3 — Categorical
+mini-pipeline</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>categorical_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;onehot&#39;</span>,  OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">&#39;___&#39;</span>, sparse_output<span class="op">=</span>___)),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in: <code>'most_frequent'</code>, <code>'ignore'</code>,
+<code>False</code>.</p></li>
+</ul></li>
+</ul>
+<h3 id="step-4-columntransformer">Step 4 — ColumnTransformer</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>ColumnTransformer(transformers=[('num', ..., numeric_cols), ('cat', ..., categorical_cols)])</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-5-add-the-model-imbalance-aware">Step 5 — Add the model —
+IMBALANCE-AWARE</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>LogisticRegression(class_weight='balanced', max_iter=1000, random_state=42)</code>.</li>
+</ul></li>
+<li><strong>WHY <code>class_weight='balanced'</code>?</strong> Without
+this, the model says “real” for everyone. 95% accuracy. ZERO catches.
+With this, the model cares equally about both classes.</li>
+</ul>
+<h3 id="step-6-train-and-evaluate">Step 6 — Train and evaluate</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>full_pipeline.fit(X_train, y_train)</code>.</li>
+<li><code>from sklearn.metrics import classification_report, f1_score</code>.</li>
+<li>Print <code>classification_report(y_test, y_pred)</code>.</li>
+<li>Look at F1 on the FRAUD class (class 1).</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> F1 around 0.40-0.60. Recall on fraud
+class around 0.60-0.80. Precision lower (lots of false alarms).</li>
+</ul>
+<h3 id="step-7-discuss-the-trade-off">Step 7 — Discuss the
+trade-off</h3>
+<ul>
+<li><strong>WHAT:</strong> If recall is too low, fake postings slip
+through. If precision is too low, you block too many real jobs.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Try a few thresholds (e.g., 0.3, 0.5, 0.7) using
+<code>predict_proba</code>.</li>
+<li>For each, print precision and recall on the fraud class.</li>
+</ul></li>
+<li><strong>WRITE DOWN:</strong> Which threshold you would deploy and
+WHY.</li>
+</ul>
+<h3 id="step-8-save-the-trained-pipeline">Step 8 — Save the trained
+pipeline</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>joblib.dump(full_pipeline, '/content/drive/MyDrive/fake_jobs_lab/fake_jobs_pipeline.joblib')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-carlos-3">Phase C — Make ONE chart
+for Carlos</h2>
+<h3 id="carloss-chart-precision-vs-recall-trade-off">Carlos’s chart —
+“Precision vs Recall trade-off”</h3>
+<p>A line plot of precision vs recall as the threshold changes.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>precision_recall_curve</code> from sklearn.</li>
+<li>Plot precision on y-axis, recall on x-axis.</li>
+</ul></li>
+<li><strong>Title:</strong> “At our chosen threshold (0.4), we catch 65%
+of fakes and wrongly block 8% of real jobs.”</li>
+<li><strong>Takeaway for Carlos:</strong> “Each percentage point of
+recall = ~10 more fakes blocked per week. Each point of precision lost =
+~50 more real jobs falsely flagged. We chose recall.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-5">Common mistakes in Class 5</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Forget <code>class_weight='balanced'</code></td>
+<td>Model says “real” for everyone. F1 on fraud = 0.</td>
+</tr>
+<tr>
+<td>Use accuracy in <code>classification_report</code></td>
+<td>Looks great (95%) but USELESS. Look at F1 on fraud class.</td>
+</tr>
+<tr>
+<td>Use a default threshold of 0.5 without trade-off discussion</td>
+<td>Skipped the most important step for an imbalanced problem.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-6">Self-check before Class 6</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Pipeline has preprocessor + model
+with <code>class_weight='balanced'</code>.</label></li>
+<li><label><input type="checkbox" />F1 on fraud class above
+0.40.</label></li>
+<li><label><input type="checkbox" />You tested 3+ thresholds and chose
+one.</label></li>
+<li><label><input type="checkbox" />Confusion matrix + PR curve + ROC
+curve charts.</label></li>
+<li><label><input
+type="checkbox" /><code>fake_jobs_pipeline.joblib</code>
+saved.</label></li>
+</ul>
+<hr />
+<h1 id="class-6-end-to-end-lab-the-big-one">Class 6 — End-to-End Lab
+(THE BIG ONE)</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Carlos is in the meeting room. He
+wants the FINAL clean dataset in 90 minutes.</p>
+</blockquote>
+<h2 id="your-goal-5">Your goal</h2>
+<p>Take the raw CSV. Produce ONE final <code>.parquet</code> file with
+the exact 21-column schema. Plus a 1-page findings report.</p>
+<h2 id="time">Time</h2>
+<p><strong>90 minutes</strong> of focused work.</p>
+<h2 id="outputs-5">Outputs</h2>
+<ul>
+<li><code>fake_jobs_clean.parquet</code> (~17,880 rows × 21 columns) in
+Drive</li>
+<li><code>findings.md</code> (~1 page)</li>
+<li>Your Colab notebook</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-10-min">Phase A — Explore the
+data first (10 min)</h2>
+<p>Reuse 3 of your best charts: 1. Class imbalance (5% fraud). 2.
+Missing field count by class. 3. Top 10 fraud predictors.</p>
+<hr />
+<h2 id="phase-b-build-the-final-dataset-70-min">Phase B — Build the
+final dataset (70 min)</h2>
+<h3 id="required-output-schema">Required output schema</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Column</th>
+<th>Type</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>job_id</code></td>
+<td>int</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>has_company_logo</code></td>
+<td>int (0/1)</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>has_questions</code></td>
+<td>int (0/1)</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>telecommuting</code></td>
+<td>int (0/1)</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>country</code></td>
+<td>string</td>
+<td>parsed from location</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>state</code></td>
+<td>string</td>
+<td>parsed from location</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>employment_type</code></td>
+<td>string</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>required_experience</code></td>
+<td>string</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>required_education</code></td>
+<td>string</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>industry_target_encoded</code></td>
+<td>float</td>
+<td>engineered (train-only)</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>function_target_encoded</code></td>
+<td>float</td>
+<td>engineered (train-only)</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>description_length</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>requirements_length</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>company_profile_length</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>title_length</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>n_caps_in_title</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>has_phone_in_text</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>has_email_in_text</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>n_exclamations_in_text</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>missing_field_count</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>fraudulent</code></td>
+<td>int (0/1)</td>
+<td>TARGET (raw)</td>
+</tr>
+</tbody>
+</table>
+<p>(Keep the raw <code>description</code> text in a separate file for
+Module 7.)</p>
+<h3 id="lab-phases-timed">Lab phases (timed)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Time</th>
+<th>What you do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Load</td>
+<td>10 min</td>
+<td>Load CSV. Confirm 17,880 rows + 866 fraud.</td>
+</tr>
+<tr>
+<td>2. Clean</td>
+<td>15 min</td>
+<td>Parse location. Fill empty text. Count missing per row.</td>
+</tr>
+<tr>
+<td>3. Encode</td>
+<td>15 min</td>
+<td>Target-encode industry/function. One-hot top-10 country,
+employment_type, etc.</td>
+</tr>
+<tr>
+<td>4. Engineer</td>
+<td>20 min</td>
+<td>Lengths, caps signals, contact signals (phone/email/URL),
+exclamation counts.</td>
+</tr>
+<tr>
+<td>5. Validate + save</td>
+<td>10 min</td>
+<td>Check 21 columns + dtypes. Save <code>.parquet</code>.</td>
+</tr>
+<tr>
+<td>6. Findings</td>
+<td>10 min</td>
+<td>Write <code>findings.md</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total: 90 minutes.</strong></p>
+<hr />
+<h2 id="phase-c-findings-report-for-carlos-10-min">Phase C — Findings
+report for Carlos (10 min)</h2>
+<p>Write <code>findings.md</code> with these sections:</p>
+<h3 id="final-numbers">Final numbers</h3>
+<ul>
+<li>Final row count: ____</li>
+<li>Fraud rate: ____% (should be ~5%)</li>
+</ul>
+<h3 id="top-3-insights">Top 3 insights</h3>
+<ol type="1">
+<li><hr /></li>
+<li><hr /></li>
+<li><hr /></li>
+</ol>
+<h3 id="one-question-to-investigate-in-module-4">One question to
+investigate in Module 4</h3>
+<ul>
+<li><hr /></li>
+</ul>
+<h3 id="one-chart-that-summarizes-everything">One chart that summarizes
+everything</h3>
+<p>Embed your most important chart.</p>
+<hr />
+<h2 id="grading-rubric-100-points">Grading rubric (100 points)</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Item</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All 21 columns exist with right names and dtypes</td>
+<td>25</td>
+</tr>
+<tr>
+<td>Cleaning decisions in markdown</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Pipeline reproducible (one command, raw CSV to
+<code>.parquet</code>)</td>
+<td>15</td>
+</tr>
+<tr>
+<td>Target encoding on TRAIN ONLY</td>
+<td>10</td>
+</tr>
+<tr>
+<td><code>class_weight='balanced'</code> used in Class 5 baseline</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Threshold trade-off documented</td>
+<td>5</td>
+</tr>
+<tr>
+<td><strong>At least 3 exploratory + 1 explanatory chart per
+class</strong></td>
+<td><strong>15</strong></td>
+</tr>
+<tr>
+<td><code>findings.md</code> discusses imbalance and trade-offs (not
+just numbers)</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Code is clean</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<h2 id="submit">Submit</h2>
+<p>Upload to
+<code>module-3/class_6/submissions/&lt;YourTeamName&gt;/</code>: -
+<code>fake_jobs_clean.parquet</code> - Your Colab notebook -
+<code>findings.md</code></p>
+<hr />
+<h1 id="tips-for-the-whole-module">Tips for the whole module</h1>
+<ol type="1">
+<li><strong>Do NOT copy-paste code from this guide.</strong></li>
+<li><strong>Save your notebook to Drive often.</strong></li>
+<li><strong>Save intermediate <code>.parquet</code> files to
+Drive.</strong></li>
+<li><strong>Pair-program.</strong> Switch every 20 minutes.</li>
+<li><strong>Accuracy is a TRAP.</strong> Use F1. Memorize this.</li>
+<li><strong>Missing-ness IS a signal.</strong> Do not drop columns just
+because they have many missing values.</li>
+<li><strong>Test multiple thresholds.</strong> Default 0.5 is rarely the
+best.</li>
+<li><strong>Ask the mentor early.</strong> If stuck for 20 minutes,
+ask.</li>
+</ol>
+<p>Good luck.</p>
+</main>
+
+<footer class="scenario-footer">
+  <p><a href="../../#/module/3/class/6">&larr; Back to all 15 scenarios</a></p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,2278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02_airbnb_nyc_m3_lab</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --text: #e6e8ec;
+    --text-dim: #9aa0aa;
+    --accent: #7aa2f7;
+    --accent-hover: #a5c0ff;
+    --border: #2a2f3a;
+    --code-bg: #11141a;
+    --table-header: #232732;
+    --quote-bar: #7aa2f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(26, 29, 36, 0.92);
+  }
+  .topbar-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .back-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .back-link:hover { color: var(--accent-hover); }
+  .pdf-link {
+    background: var(--accent);
+    color: #0f1115;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pdf-link:hover { background: var(--accent-hover); }
+  .pdf-link svg { width: 14px; height: 14px; }
+
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 56px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  p { margin-bottom: 16px; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+  strong { color: #fff; font-weight: 600; }
+  em { color: var(--text); font-style: italic; }
+
+  ul, ol { margin-bottom: 18px; padding-left: 28px; }
+  li { margin-bottom: 6px; }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 36px 0;
+  }
+
+  blockquote {
+    border-left: 4px solid var(--quote-bar);
+    background: var(--card);
+    padding: 14px 22px;
+    margin: 18px 0;
+    color: var(--text);
+    border-radius: 0 8px 8px 0;
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  blockquote strong { color: var(--accent); }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    font-size: 0.88em;
+    color: #f0a3b5;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 18px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text);
+    font-size: 1em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.94rem;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  thead { background: var(--table-header); }
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+
+  /* Checkboxes in self-check lists */
+  input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+
+  /* Anchored sections for nav */
+  h2[id], h3[id] { scroll-margin-top: 80px; }
+
+  footer.scenario-footer {
+    max-width: 920px;
+    margin: 60px auto 40px;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+  footer.scenario-footer a {
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    main { padding: 24px 16px 60px; }
+    h1 { font-size: 1.7rem; }
+    h2 { font-size: 1.35rem; }
+    h3 { font-size: 1.1rem; }
+    .topbar { padding: 10px 16px; }
+    pre { font-size: 0.8rem; padding: 12px 14px; }
+    table { font-size: 0.85rem; }
+    th, td { padding: 9px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="../../#/module/3/class/6">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <span style="display:inline-block;transform:translateY(-1px)">&larr;</span> Back to all scenarios
+    </a>
+    <a class="pdf-link" href="02_airbnb_nyc_m3_lab.pdf" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-4-4h3V4h2v8h3l-4 4zm-8 4v-2h16v2H4z"/></svg>
+      Download as PDF
+    </a>
+  </div>
+</div>
+
+<main>
+<h1 id="airbnb-nyc-module-3-lab-guide">Airbnb NYC — Module 3 Lab
+Guide</h1>
+<p><strong>Scenario:</strong> New York short-term rentals. Predict the
+right price per night. <strong>Module:</strong> 3 (Data Preparation and
+Feature Engineering) <strong>Audience:</strong> Adult learners, A2
+English. New to AI. <strong>Tools:</strong> Google Colab (no install
+needed).</p>
+<hr />
+<h1 id="the-scenario-your-mission">The Scenario — Your Mission</h1>
+<h2 id="where-you-work">Where you work</h2>
+<p>You and your team are new data analysts at <strong>Airbnb New
+York</strong>. Airbnb is a website where people rent rooms or whole
+apartments to tourists. A host puts a listing online. A guest books it
+for one or more nights.</p>
+<p>In New York City: - <strong>About 40,000 listings</strong> are active
+right now. - <strong>About 500,000 reviews</strong> were written by past
+guests. - Every host picks their own price per night.</p>
+<h2 id="the-problem">The problem</h2>
+<p>Hosts do not know the right price.</p>
+<ul>
+<li>Some hosts <strong>over-price.</strong> Their listing is too
+expensive. Nobody books it. The room stays empty. The host loses
+money.</li>
+<li>Some hosts <strong>under-price.</strong> Their listing is cheap.
+They get bookings, but they earn less than they could.</li>
+</ul>
+<p>Both groups complain to Airbnb support every day. Support cannot
+answer all the calls. The Head of Host Operations is worried.</p>
+<h2 id="your-managers-request">Your manager’s request</h2>
+<p>Your manager, <strong>Marcus</strong> (Head of Host Operations,
+Airbnb NYC), tells you in a Monday meeting:</p>
+<blockquote>
+<p>“I do not want to set the price for the host. The host is free.</p>
+<p>But I want to <strong>help</strong> the host. When a new host posts a
+listing, I want to show one number on their screen: <strong>‘similar
+listings in your area charge $X per night.’</strong></p>
+<p>The host can pick a higher price, or a lower price. That is their
+choice. But they will know what the market looks like.</p>
+<p>If we give 10,000 new hosts a good price hint this year, we will save
+them from empty calendars and angry support calls.”</p>
+</blockquote>
+<h2 id="your-teams-job-for-the-next-2-weeks-module-3">Your team’s job
+for the next 2 weeks (Module 3)</h2>
+<p>Marcus cannot do this alone. The data is <strong>two big
+files</strong> plus some quirks. The price column is dirty. Some
+addresses are missing. The bathrooms column has weird text.</p>
+<p>Your job in Module 3: &gt; <strong>Turn the raw Inside Airbnb files
+into ONE clean file. The clean file will be used to train the price
+model in Module 4.</strong></p>
+<p>The clean file is called <code>airbnb_clean.parquet</code>. It must
+have <strong>21 specific columns</strong> (we will see them in Class 6).
+It will have about <strong>38,000 rows</strong>.</p>
+<h2 id="after-module-3">After Module 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Module</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Module 4</strong></td>
+<td>Train the price prediction model. Marcus finally gets his “fair
+price hint”.</td>
+</tr>
+<tr>
+<td><strong>Module 5</strong></td>
+<td>Find groups of listings (cheap rooms, luxury whole apartments,
+etc.).</td>
+</tr>
+<tr>
+<td><strong>Module 7</strong></td>
+<td>Read the guest review comments. Find common praise and
+complaints.</td>
+</tr>
+</tbody>
+</table>
+<p>You use the <strong>same Airbnb NYC dataset</strong> until the end of
+Module 7.</p>
+<hr />
+<h1 id="how-this-guide-works-read-this-first">How This Guide Works (Read
+This First!)</h1>
+<h2 id="we-do-not-give-you-the-full-code">We do NOT give you the full
+code</h2>
+<p>In this guide you will see two kinds of content:</p>
+<h3 id="what-why-expected-explained-in-words">1. WHAT / WHY / EXPECTED —
+explained in words</h3>
+<p>For every step you read: - <strong>WHAT</strong> you have to do (in
+normal language) - <strong>WHY</strong> you do it (the reason) -
+<strong>HINTS</strong> — the function names, the arguments to remember -
+<strong>EXPECTED</strong> — the result you should see if you did it
+right</p>
+<h3 id="sometimes-a-tiny-code-skeleton-with-blanks">2. Sometimes a tiny
+code skeleton with blanks</h3>
+<p>For the harder steps we give you a code skeleton with
+<code>___</code> blanks. <strong>You fill in the blanks.</strong></p>
+<h3 id="why-no-full-code">Why no full code?</h3>
+<p>Because you will NOT learn if you copy-paste. - In Module 4, the
+model only works if YOU understand each step. - In your future job,
+nobody will give you the code. - Writing the code yourself takes 10
+minutes more today, but saves 10 hours later.</p>
+<p><strong>Rule:</strong> If you finish a step in 30 seconds by
+copy-pasting from a teammate’s notebook, do it AGAIN by yourself.
+Different variable names, same logic.</p>
+<hr />
+<h1 id="visualizations-two-modes">Visualizations — Two Modes</h1>
+<p>In every class you will make charts. There are <strong>two
+reasons</strong> to make a chart:</p>
+<h2 id="exploratory-charts-for-you">1. Exploratory charts (for YOU)</h2>
+<p>Made BEFORE you clean the data. To understand what the data looks
+like. - Fast, ugly, no labels needed. - Examples:
+<code>df.hist()</code>,
+<code>df['column'].value_counts().plot.bar()</code>.</p>
+<blockquote>
+<p>Goal: <strong>“What does this data look like?”</strong></p>
+</blockquote>
+<h2 id="explanatory-charts-for-marcus">2. Explanatory charts (for
+MARCUS)</h2>
+<p>Made AFTER you understand. To EXPLAIN something to your manager. -
+Clean, labeled, one clear message. - Must have: title, x-label, y-label,
+source, and a 1-sentence takeaway.</p>
+<blockquote>
+<p>Goal: <strong>“Marcus, look at this. This is the
+pattern.”</strong></p>
+</blockquote>
+<p>In every class you make BOTH kinds.</p>
+<h2 id="your-plotting-toolkit-you-learned-this-in-module-2-class-5">Your
+plotting toolkit (you learned this in Module 2 Class 5)</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Plot</th>
+<th>When to use it</th>
+<th>Function name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Histogram</td>
+<td>See the SHAPE of a numeric column</td>
+<td><code>plt.hist()</code> or <code>sns.histplot()</code></td>
+</tr>
+<tr>
+<td>Bar chart</td>
+<td>Count of each category</td>
+<td><code>df['col'].value_counts().plot.bar()</code></td>
+</tr>
+<tr>
+<td>Box plot</td>
+<td>See outliers in a numeric column</td>
+<td><code>sns.boxplot()</code></td>
+</tr>
+<tr>
+<td>Scatter plot</td>
+<td>See the relationship between 2 numbers</td>
+<td><code>plt.scatter()</code> or <code>sns.scatterplot()</code></td>
+</tr>
+<tr>
+<td>Heatmap</td>
+<td>See correlation between many columns</td>
+<td><code>sns.heatmap(df.corr())</code></td>
+</tr>
+<tr>
+<td>Map scatter</td>
+<td>See points on a real map</td>
+<td><code>plt.scatter(lon, lat, c=price)</code></td>
+</tr>
+</tbody>
+</table>
+<p>Before you start: <code>import matplotlib.pyplot as plt</code> and
+<code>import seaborn as sns</code>.</p>
+<hr />
+<h1 id="before-you-start-google-colab-setup">Before You Start — Google
+Colab Setup</h1>
+<p>You will work in <strong>Google Colab</strong>. That means: - You do
+NOT install Python. - You do NOT install pandas, scikit-learn, or
+anything. - You just open a notebook in your web browser.</p>
+<h2 id="step-1-open-a-new-colab-notebook">Step 1 — Open a new Colab
+notebook</h2>
+<ol type="1">
+<li>Go to https://colab.research.google.com</li>
+<li>Sign in with your Google account.</li>
+<li>Click <strong>“New notebook”</strong> (top left).</li>
+<li>Name it <code>airbnb_module_3.ipynb</code>.</li>
+</ol>
+<h2 id="step-2-connect-to-google-drive">Step 2 — Connect to Google
+Drive</h2>
+<p>Colab files <strong>disappear</strong> when you close the browser. So
+you must save your work to <strong>Google Drive</strong>.</p>
+<p>In the first cell:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> drive</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>drive.mount(<span class="st">&#39;/content/drive&#39;</span>)</span></code></pre></div>
+<p>A pop-up asks for permission. Click “Allow”. After this, Drive is
+available at <code>/content/drive/MyDrive/</code>.</p>
+<h2 id="step-3-create-a-project-folder">Step 3 — Create a project
+folder</h2>
+<p>In a new cell:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&#39;/content/drive/MyDrive/airbnb_lab&#39;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>cd <span class="op">/</span>content<span class="op">/</span>drive<span class="op">/</span>MyDrive<span class="op">/</span>airbnb_lab</span></code></pre></div>
+<p>Your team will save ALL files in this folder.</p>
+<h2 id="step-4-get-the-data">Step 4 — Get the data</h2>
+<p>The data comes from <strong>Inside Airbnb</strong>. It is an
+independent project. The license is CC0 (public domain). You do NOT need
+an account.</p>
+<p><strong>Option A — Direct download in Colab
+(recommended):</strong></p>
+<ol type="1">
+<li>Go to http://insideairbnb.com/get-the-data/ on your laptop.</li>
+<li>Find the <strong>New York City, New York, United States</strong>
+section. Pick the latest scrape date.</li>
+<li>Copy the URLs for two files:
+<ul>
+<li><code>listings.csv.gz</code> (the detailed one, around 40,000
+listings, 75 columns)</li>
+<li><code>reviews.csv.gz</code> (the detailed one, around 500,000
+reviews)</li>
+</ul></li>
+<li>In Colab:</li>
+</ol>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> urllib.request</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>LISTINGS_URL <span class="op">=</span> <span class="st">&#39;PASTE_URL_HERE&#39;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>REVIEWS_URL  <span class="op">=</span> <span class="st">&#39;PASTE_URL_HERE&#39;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>urllib.request.urlretrieve(LISTINGS_URL, <span class="st">&#39;data/listings.csv.gz&#39;</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>urllib.request.urlretrieve(REVIEWS_URL,  <span class="st">&#39;data/reviews.csv.gz&#39;</span>)</span></code></pre></div>
+<p>(Make a <code>data/</code> folder first with
+<code>os.makedirs('data', exist_ok=True)</code>.)</p>
+<p><strong>Option B — Upload by hand:</strong></p>
+<ol type="1">
+<li>Download the two files on your laptop.</li>
+<li>In Colab’s file panel (left sidebar), upload them into a
+<code>data/</code> folder.</li>
+</ol>
+<h2 id="step-5-test-it">Step 5 — Test it</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>listings <span class="op">=</span> pd.read_csv(<span class="st">&#39;data/listings.csv.gz&#39;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(listings.shape)</span></code></pre></div>
+<p>You should see something like <code>(40123, 75)</code>. The exact
+number changes by month, but it is around 40,000 rows and around 75
+columns. You are ready.</p>
+<h2 id="colab-tips">Colab tips</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Save your notebook to Drive often</td>
+<td>Colab disconnects after 12 hours.</td>
+</tr>
+<tr>
+<td>Save intermediate <code>.parquet</code> files to Drive</td>
+<td>Files in <code>/content/</code> disappear when Colab
+disconnects.</td>
+</tr>
+<tr>
+<td>Share the notebook with teammates (Share button, top right)</td>
+<td>Editor access. Like Google Docs for code.</td>
+</tr>
+<tr>
+<td>Restart runtime if memory full</td>
+<td>Runtime &gt; Restart runtime.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="class-1-data-cleaning">Class 1 — Data Cleaning</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Marcus drops the raw Inside
+Airbnb files on your desk. The price column has <code>$</code> and
+<code>,</code> characters. The bathrooms column has weird strings like
+“1.5 baths” and “Half-bath”. Your job today: clean the most important
+columns.</p>
+</blockquote>
+<h2 id="your-goal">Your goal</h2>
+<p>Make the raw <code>listings.csv.gz</code> file USABLE. Fix the price
+column. Fix the bathrooms column. Find missing values. Decide what to
+keep.</p>
+<h2 id="inputs">Inputs</h2>
+<ul>
+<li><code>data/listings.csv.gz</code></li>
+<li><code>data/reviews.csv.gz</code></li>
+</ul>
+<h2 id="outputs">Outputs</h2>
+<ul>
+<li><code>listings_step1.parquet</code> saved in your Drive folder</li>
+<li>3+ exploratory charts in your notebook</li>
+<li>1 explanatory chart for Marcus</li>
+<li>Notes in markdown about every decision you made</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-15-minutes">Phase A — Explore the
+data first (15 minutes)</h2>
+<p>Before you clean anything, <strong>LOOK</strong> at the data.</p>
+<h3 id="exploratory-chart-1-how-many-listings-per-room_type">Exploratory
+chart 1 — How many listings per <code>room_type</code>?</h3>
+<ul>
+<li><strong>Question:</strong> “Of about 40,000 listings, how many are
+Entire home, Private room, Shared room, Hotel room?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>listings['room_type'].value_counts()</code>.</li>
+<li>Then <code>.plot.bar()</code> on the result.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Most listings are “Entire home” or
+“Private room”. The other types are rare.</li>
+</ul>
+<h3
+id="exploratory-chart-2-how-many-listings-per-neighbourhood_group_cleansed">Exploratory
+chart 2 — How many listings per
+<code>neighbourhood_group_cleansed</code>?</h3>
+<ul>
+<li><strong>Question:</strong> “How many listings in each borough
+(Manhattan, Brooklyn, Queens, Bronx, Staten Island)?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>value_counts()</code> then bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Manhattan and Brooklyn are the
+biggest. Staten Island is tiny.</li>
+</ul>
+<h3 id="exploratory-chart-3-missing-values-per-column">Exploratory chart
+3 — Missing values per column</h3>
+<ul>
+<li><strong>Question:</strong> “Which columns have the most missing
+data?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>listings.isna().sum().sort_values(ascending=False).head(20)</code>.</li>
+<li>Plot it as a bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> <code>bedrooms</code> is missing in
+about 30% of rows. Some date columns are also missing.</li>
+</ul>
+<h3 id="exploratory-chart-4-a-first-look-at-price">Exploratory chart 4 —
+A first look at <code>price</code></h3>
+<ul>
+<li><strong>Question:</strong> “What does the raw price column look
+like?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Print <code>listings['price'].head(20)</code>.</li>
+<li>You will see strings like <code>"$150.00"</code>,
+<code>"$1,200.00"</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Price is NOT a number yet. It is
+text with a dollar sign and commas. You must clean it before you can
+plot a histogram.</li>
+</ul>
+<hr />
+<h2 id="phase-b-clean-the-listings-table-45-minutes">Phase B — Clean the
+listings table (45 minutes)</h2>
+<h3 id="step-1-load-both-files">Step 1 — Load both files</h3>
+<ul>
+<li><strong>WHAT:</strong> Load the listings file and the reviews file
+into two DataFrames.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>listings = pd.read_csv('data/listings.csv.gz')</code>.</li>
+<li><code>reviews  = pd.read_csv('data/reviews.csv.gz')</code>.</li>
+<li>Pandas reads <code>.csv.gz</code> directly. No need to unzip.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Two DataFrames. Listings around 40,000
+rows. Reviews around 500,000 rows.</li>
+</ul>
+<h3 id="step-2-look-at-the-dataframe">Step 2 — Look at the
+DataFrame</h3>
+<ul>
+<li><strong>WHAT:</strong> Check <code>.shape</code>,
+<code>.info()</code>, and <code>.head()</code> on listings.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>75 columns is a lot. Use <code>listings.columns.tolist()</code> to
+see all names.</li>
+<li>Look at the <code>Dtype</code> column. Many “number” columns are
+actually <code>object</code> (text).</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> You see that <code>price</code>,
+<code>bathrooms_text</code>, <code>host_since</code>, and
+<code>first_review</code> are all text.</li>
+</ul>
+<h3 id="step-3-clean-the-price-column">Step 3 — Clean the
+<code>price</code> column</h3>
+<p>This is the most important column in the whole project. It must be a
+float.</p>
+<ul>
+<li><strong>WHAT:</strong> Remove the <code>$</code> and the
+<code>,</code>. Then convert to float.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>listings['price'].str.replace('$', '', regex=False)</code>.</li>
+<li>Chain another <code>.str.replace(',', '', regex=False)</code>.</li>
+<li>Then <code>.astype(float)</code>.</li>
+<li>One line:
+<code>listings['price'] = listings['price'].str.replace('$','',regex=False).str.replace(',','',regex=False).astype(float)</code>.</li>
+</ul></li>
+<li><strong>WARNING:</strong> If a cell is missing, the chain may crash.
+Wrap with <code>errors='coerce'</code> style. Or drop missing prices
+first.</li>
+<li><strong>EXPECTED:</strong> <code>listings['price'].dtype</code> is
+<code>float64</code>. The minimum is around $10. The maximum can be
+$10,000+ (outliers).</li>
+</ul>
+<h3 id="step-4-parse-the-bathrooms_text-column">Step 4 — Parse the
+<code>bathrooms_text</code> column</h3>
+<p>The column has weird strings. Examples: - <code>"1 bath"</code> -
+<code>"1.5 baths"</code> - <code>"Half-bath"</code> -
+<code>"Shared half-bath"</code> - <code>NaN</code> (missing)</p>
+<ul>
+<li><strong>WHAT:</strong> Extract the number. Save as
+<code>bathrooms</code> (float).</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>First, lowercase the column:
+<code>listings['bathrooms_text'].str.lower()</code>.</p></li>
+<li><p>For “half-bath” rows, the number is 0.5. Use
+<code>.str.contains('half')</code> and set those to 0.5.</p></li>
+<li><p>For the rest, extract the first number using regex:
+<code>.str.extract(r'(\d+\.?\d*)')</code>.</p></li>
+<li><p>Convert to float.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>txt <span class="op">=</span> listings[<span class="st">&#39;bathrooms_text&#39;</span>].<span class="bu">str</span>.lower()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>is_half <span class="op">=</span> txt.<span class="bu">str</span>.contains(<span class="st">&#39;half&#39;</span>, na<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>nums <span class="op">=</span> txt.<span class="bu">str</span>.extract(<span class="vs">r&#39;</span><span class="kw">(</span><span class="dv">\d</span><span class="op">+</span><span class="ch">\.</span><span class="op">?</span><span class="dv">\d</span><span class="op">*</span><span class="kw">)</span><span class="vs">&#39;</span>)[<span class="dv">0</span>].astype(<span class="bu">float</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>listings[<span class="st">&#39;bathrooms&#39;</span>] <span class="op">=</span> nums</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>listings.loc[is_half, <span class="st">&#39;bathrooms&#39;</span>] <span class="op">=</span> ___</span></code></pre></div></li>
+<li><p>Fill in the blank.</p></li>
+</ul></li>
+<li><strong>EXPECTED:</strong> A new float column
+<code>bathrooms</code>. Min around 0, max around 10. About 1% still
+missing.</li>
+</ul>
+<h3 id="step-5-fix-the-date-columns">Step 5 — Fix the date columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Convert <code>host_since</code>,
+<code>first_review</code>, <code>last_review</code>,
+<code>last_scraped</code> to real datetime.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>The function is <code>pd.to_datetime()</code>.</li>
+<li>Add the argument <code>errors='coerce'</code>. If a cell is bad, it
+becomes <code>NaT</code> (Not a Time = missing). The code does not
+crash.</li>
+<li>Use a <code>for</code> loop over the 4 column names. Do NOT write 4
+separate lines.</li>
+</ul></li>
+<li><strong>WHY:</strong> If dates are strings, you cannot subtract
+them. “How long has the host been on Airbnb?” is impossible.</li>
+<li><strong>EXPECTED:</strong> After your code,
+<code>listings.dtypes</code> shows <code>datetime64[ns]</code> for those
+4 columns.</li>
+</ul>
+<h3 id="step-6-find-missing-values">Step 6 — Find missing values</h3>
+<ul>
+<li><p><strong>WHAT:</strong> Count missing values per column. Look at
+the top 15.</p></li>
+<li><p><strong>HINTS:</strong>
+<code>.isna().sum().sort_values(ascending=False).head(15)</code>.</p></li>
+<li><p><strong>EXPECTED:</strong> Something like:</p>
+<pre><code>bedrooms                12000
+reviews_per_month        9000
+first_review             9000
+last_review              9000
+bathrooms                  400</code></pre></li>
+</ul>
+<h3 id="step-7-drop-rows-with-missing-or-zero-price">Step 7 — Drop rows
+with missing or zero price</h3>
+<ul>
+<li><strong>WHAT:</strong> A listing with no price (or price = 0) is
+useless for our model.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>First drop rows where <code>price</code> is NaN.</li>
+<li>Then drop rows where <code>price</code> &lt;= 0.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> About 39,000 rows left.</li>
+</ul>
+<h3 id="step-8-drop-extreme-price-outliers">Step 8 — Drop extreme price
+outliers</h3>
+<ul>
+<li><strong>WHAT:</strong> A few listings cost $10,000+ per night. They
+are not real.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Look at the 99th percentile:
+<code>listings['price'].quantile(0.99)</code>.</li>
+<li>Drop rows above some threshold (try $1,000 or $1,500).</li>
+<li>Also drop rows below $10 (probably typos).</li>
+</ul></li>
+<li><strong>WHY:</strong> Outliers will pull the average and ruin the
+model.</li>
+<li><strong>EXPECTED:</strong> About 38,000 rows left.</li>
+</ul>
+<h3 id="step-9-write-down-what-you-did">Step 9 — Write down what you
+did</h3>
+<p>In a markdown cell, write: - Starting rows: ~40,000 - After dropping
+missing price: ~39,000 - After dropping price outliers: ~38,000 - WHY
+you removed each group.</p>
+<h3 id="step-10-save-to-drive">Step 10 — Save to Drive</h3>
+<ul>
+<li><strong>WHAT:</strong> Save the cleaned <code>listings</code>
+DataFrame as parquet, inside your Drive folder.</li>
+<li><strong>HINTS:</strong>
+<code>listings.to_parquet('/content/drive/MyDrive/airbnb_lab/listings_step1.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-marcus-15-minutes">Phase C — Make ONE
+chart for Marcus (15 minutes)</h2>
+<p>He does not have time to read your code. He wants ONE picture.</p>
+<h3 id="marcuss-chart-how-does-price-look-across-the-city">Marcus’s
+chart — “How does price look across the city?”</h3>
+<p>Make a histogram of <code>price</code> AFTER cleaning. Use a sensible
+upper limit (e.g. cut at $500 for the chart).</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>plt.hist(listings['price'], bins=50, range=(0, 500))</code>.</li>
+<li>Add the title:
+<code>"NYC Airbnb price distribution — most listings between $60 and $250"</code>.</li>
+<li>X-label: Price per night (USD).</li>
+<li>Y-label: Number of listings.</li>
+<li>Add a vertical line at the median:
+<code>plt.axvline(listings['price'].median(), color='red')</code>.</li>
+</ul></li>
+<li><strong>Takeaway for Marcus:</strong> “Half of all listings charge
+less than $X per night. The market is very wide. A new host needs a hint
+based on their own neighborhood and room type, not the city
+average.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-1">Common mistakes in Class 1</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Forget to remove the <code>,</code> in <code>"$1,200.00"</code></td>
+<td><code>astype(float)</code> crashes.</td>
+</tr>
+<tr>
+<td>Forget <code>errors='coerce'</code> on <code>to_datetime</code></td>
+<td>Code crashes on one bad date.</td>
+</tr>
+<tr>
+<td>Drop ALL missing rows in one go</td>
+<td>You lose 80% of the data. Drop per column with care.</td>
+</tr>
+<tr>
+<td>Cap price at $100</td>
+<td>You delete real luxury listings. Use $1,000 or $1,500.</td>
+</tr>
+<tr>
+<td>Save to <code>/content/</code> instead of Drive</td>
+<td>File disappears when Colab disconnects.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-2">Self-check before Class 2</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Both files loaded.</label></li>
+<li><label><input type="checkbox" /><code>price</code> is float. Range
+looks sensible (10 to ~1500).</label></li>
+<li><label><input type="checkbox" /><code>bathrooms</code> is float.
+“Half-bath” handled.</label></li>
+<li><label><input type="checkbox" />The 4 date columns have dtype
+<code>datetime64</code>.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory charts in
+your notebook.</label></li>
+<li><label><input type="checkbox" />1 polished chart for
+Marcus.</label></li>
+<li><label><input type="checkbox" />You saved
+<code>listings_step1.parquet</code> to your Drive folder.</label></li>
+<li><label><input type="checkbox" />You wrote down (in markdown) what
+you did and WHY.</label></li>
+</ul>
+<hr />
+<h1 id="class-2-encoding-and-scaling">Class 2 — Encoding and
+Scaling</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Marcus looks at your cleaned
+data. He is happy that price is now a number. But he says: “The model is
+a math model. It does not understand the word ‘Entire home/apt’. Turn
+the words into numbers. Also, the price has a very long tail — fix
+that.”</p>
+</blockquote>
+<h2 id="your-goal-1">Your goal</h2>
+<p>Turn TEXT columns into numbers. Apply log-transform to price. Make
+all numeric columns about the same size.</p>
+<h2 id="inputs-1">Inputs</h2>
+<ul>
+<li><code>listings_step1.parquet</code> from Class 1</li>
+</ul>
+<h2 id="outputs-1">Outputs</h2>
+<ul>
+<li><code>listings_step2.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Marcus</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-distribution-of-price-raw">Exploratory chart
+1 — Distribution of <code>price</code> (raw)</h3>
+<ul>
+<li><strong>Question:</strong> “Most listings are $100-$300. But a few
+are $1,000+. Is the distribution skewed?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use a histogram (<code>plt.hist()</code>).</li>
+<li>Use <code>bins=50</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The price column has a long right
+tail. This is why we will use log-transform.</li>
+</ul>
+<h3
+id="exploratory-chart-2-distribution-of-log_price-after-np.log1p">Exploratory
+chart 2 — Distribution of <code>log_price</code> (after
+<code>np.log1p</code>)</h3>
+<ul>
+<li><strong>Question:</strong> “Does log-transform make the shape more
+normal?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Make a NEW column:
+<code>log_price = np.log1p(listings['price'])</code>.</li>
+<li>Histogram it.</li>
+<li>Compare to chart 1. The new shape should look like a bell.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Log makes the long tail manageable
+for the model.</li>
+</ul>
+<h3 id="exploratory-chart-3-room_type-counts">Exploratory chart 3 —
+<code>room_type</code> counts</h3>
+<ul>
+<li><strong>Question:</strong> “Which room types are popular in
+NYC?”</li>
+<li><strong>HINTS:</strong> <code>value_counts().plot.bar()</code>.</li>
+<li><strong>What you learn:</strong> Most are “Entire home/apt” or
+“Private room”. Shared rooms and hotel rooms are rare. (Maybe merge the
+rare ones?)</li>
+</ul>
+<h3 id="exploratory-chart-4-neighbourhood_cleansed-counts">Exploratory
+chart 4 — <code>neighbourhood_cleansed</code> counts</h3>
+<ul>
+<li><strong>Question:</strong> “How many distinct neighbourhoods exist?
+How spread out are they?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>listings['neighbourhood_cleansed'].nunique()</code>.</li>
+<li>Then <code>value_counts().head(20).plot.bar()</code> to see the top
+20.</li>
+</ul></li>
+<li><strong>What you learn:</strong> About 200 neighbourhoods. The top
+20 hold half the listings. The tail is very long. This affects encoding
+choice.</li>
+</ul>
+<hr />
+<h2 id="phase-b-encode-and-scale">Phase B — Encode and scale</h2>
+<h3 id="step-1-drop-columns-you-do-not-need">Step 1 — Drop columns you
+do not need</h3>
+<ul>
+<li><strong>WHAT:</strong> Of 75 columns, keep maybe 20-25. Drop the
+rest now to make life easier.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Keep: <code>id</code>, <code>host_id</code>,
+<code>host_since</code>, <code>neighbourhood_cleansed</code>,
+<code>neighbourhood_group_cleansed</code>, <code>latitude</code>,
+<code>longitude</code>, <code>room_type</code>,
+<code>accommodates</code>, <code>bedrooms</code>,
+<code>bathrooms</code>, <code>price</code>, <code>minimum_nights</code>,
+<code>number_of_reviews</code>, <code>reviews_per_month</code>,
+<code>last_review</code>, <code>first_review</code>,
+<code>review_scores_rating</code>, <code>description</code>,
+<code>availability_365</code>.</li>
+<li>Drop the rest. Use <code>listings = listings[keep_cols]</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Most of the 75 columns are URLs, host
+pictures, summary text duplicates, calendar fields. Useless for price
+prediction.</li>
+</ul>
+<h3 id="step-2-impute-missing-bedrooms">Step 2 — Impute missing
+<code>bedrooms</code></h3>
+<ul>
+<li><strong>WHAT:</strong> About 30% of <code>bedrooms</code> is
+missing. Decide how to fill.</li>
+<li><strong>TWO OPTIONS:</strong>
+<ul>
+<li><strong>A — Fill with median (1.0)</strong> for all missing.
+Simple.</li>
+<li><strong>B — Fill with median PER <code>room_type</code></strong>. A
+“Private room” usually has 1 bedroom, an “Entire home” usually has 1 or
+2. Smarter.</li>
+</ul></li>
+<li><strong>HINTS for option B:</strong>
+<ul>
+<li><code>listings.groupby('room_type')['bedrooms'].transform(lambda x: x.fillna(x.median()))</code>.</li>
+</ul></li>
+<li><strong>YOUR CHOICE:</strong> Pick one. Write in your notebook
+WHY.</li>
+</ul>
+<h3 id="step-3-impute-missing-bathrooms-and-review_scores_rating">Step 3
+— Impute missing <code>bathrooms</code> and
+<code>review_scores_rating</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Use median fill for the small leftover
+gaps.</li>
+<li><strong>HINTS:</strong>
+<code>listings['bathrooms'] = listings['bathrooms'].fillna(listings['bathrooms'].median())</code>.</li>
+<li><strong>WARNING:</strong> This is for inspection only. In Class 5,
+imputing goes INSIDE the Pipeline. Do NOT save the imputed version as
+your FINAL file before you check with the teacher.</li>
+</ul>
+<h3 id="step-4-one-hot-encode-room_type">Step 4 — One-hot encode
+<code>room_type</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Turn the 4 categories into 4 new 0/1
+columns.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>pd.get_dummies(listings, columns=['room_type'], prefix='room')</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> 4 new columns:
+<code>room_Entire home/apt</code>, <code>room_Private room</code>,
+<code>room_Shared room</code>, <code>room_Hotel room</code>.</li>
+</ul>
+<h3 id="step-5-one-hot-encode-neighbourhood_group_cleansed">Step 5 —
+One-hot encode <code>neighbourhood_group_cleansed</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Only 5 boroughs. Safe to one-hot.</li>
+<li><strong>HINTS:</strong>
+<code>pd.get_dummies(..., columns=['neighbourhood_group_cleansed'], prefix='borough')</code>.</li>
+<li><strong>EXPECTED:</strong> 5 new 0/1 columns.</li>
+</ul>
+<h3
+id="step-6-decide-what-to-do-with-neighbourhood_cleansed-200-values">Step
+6 — Decide what to do with <code>neighbourhood_cleansed</code> (~200
+values)</h3>
+<ul>
+<li><strong>WHAT:</strong> 200 categories is too many for one-hot.</li>
+<li><strong>TWO OPTIONS:</strong>
+<ul>
+<li><strong>A — Keep only the top 30, group the rest as
+<code>"Other"</code></strong>. Then one-hot.</li>
+<li><strong>B — Target encoding:</strong> Replace each neighbourhood
+with the AVG <code>log_price</code> for that neighbourhood (compute from
+train only).</li>
+</ul></li>
+<li><strong>YOUR CHOICE:</strong> Pick one. Write in your notebook
+WHY.</li>
+<li><strong>HINTS for option A:</strong>
+<ul>
+<li><code>top30 = listings['neighbourhood_cleansed'].value_counts().head(30).index</code>.</li>
+<li><code>listings['neighbourhood_cleansed'] = listings['neighbourhood_cleansed'].where(listings['neighbourhood_cleansed'].isin(top30), 'Other')</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-7-log-transform-price">Step 7 — Log-transform
+<code>price</code></h3>
+<ul>
+<li><strong>WHAT:</strong> The target column for the model. Apply
+<code>np.log1p()</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>listings['log_price'] = np.log1p(listings['price'])</code>.</li>
+</ul></li>
+<li><strong>WHY <code>log1p</code> and not <code>log</code>?</strong>
+<code>log(0)</code> is <code>-inf</code>.
+<code>log1p(x) = log(x + 1)</code> is safe for zeros. Even though we
+already dropped price = 0, this is good habit.</li>
+</ul>
+<h3 id="step-8-scale-numeric-columns-preview-only">Step 8 — Scale
+numeric columns (preview only)</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>StandardScaler</code> to make every
+numeric column have mean = 0, std = 1.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.preprocessing import StandardScaler</code>.</li>
+<li><code>scaler = StandardScaler()</code>.</li>
+<li><code>scaler.fit_transform(listings[numeric_cols])</code>.</li>
+</ul></li>
+<li><strong>WARNING:</strong> This is for inspection only. In Class 5,
+scaling goes INSIDE the Pipeline. Do NOT save the scaled version as your
+final file.</li>
+</ul>
+<h3 id="step-9-save">Step 9 — Save</h3>
+<ul>
+<li><strong>WHAT:</strong> Save to Drive.
+<code>listings.to_parquet('/content/drive/MyDrive/airbnb_lab/listings_step2.parquet')</code>.</li>
+<li><strong>Save the UNSCALED version.</strong> Scaling will happen
+inside the Pipeline later.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-marcus">Phase C — Make ONE chart for
+Marcus</h2>
+<h3
+id="marcuss-chart-price-differs-a-lot-by-room-type-and-borough">Marcus’s
+chart — “Price differs a lot by room type and borough”</h3>
+<p>A box plot of <code>price</code> (or <code>log_price</code>) split by
+<code>room_type</code>, with one panel per borough. Or just a grouped
+box plot.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>sns.boxplot(data=listings, x='room_type', y='price', hue='neighbourhood_group_cleansed')</code>.</li>
+<li>Or split into 5 small charts (one per borough).</li>
+<li>Limit y-axis to a sensible range:
+<code>plt.ylim(0, 500)</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Price by room type and borough — Manhattan
+entire homes are 3x pricier than Bronx private rooms.”</li>
+<li><strong>X-label:</strong> Room type.</li>
+<li><strong>Y-label:</strong> Price per night (USD).</li>
+<li><strong>Takeaway for Marcus:</strong> “A ‘fair price’ depends on
+BOTH borough AND room type. A single city-wide hint will be wrong for
+most hosts.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-2">Common mistakes in Class 2</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scale BEFORE train/test split</td>
+<td><strong>Leakage.</strong> Scaler sees test data.</td>
+</tr>
+<tr>
+<td>One-hot encode <code>neighbourhood_cleansed</code> directly (200
+cols)</td>
+<td>Table explodes. Some columns are 1-hot for 5 rows only.</td>
+</tr>
+<tr>
+<td>Forget <code>np.log1p</code> and use <code>np.log</code> on
+zeros</td>
+<td><code>np.log(0) = -inf</code>. Crash.</td>
+</tr>
+<tr>
+<td>Save the scaled version</td>
+<td>Class 5 will scale again inside the pipeline. Double scaling = wrong
+numbers.</td>
+</tr>
+<tr>
+<td>Fill bedrooms with mean instead of median</td>
+<td>The few 10-bedroom mansions pull the mean too high.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-3">Self-check before Class 3</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />One row per listing. About 38,000
+rows.</label></li>
+<li><label><input type="checkbox" /><code>bedrooms</code> and
+<code>bathrooms</code> no longer have missing values.</label></li>
+<li><label><input type="checkbox" /><code>room_type</code> and
+<code>neighbourhood_group_cleansed</code> one-hot encoded.</label></li>
+<li><label><input type="checkbox" />You decided what to do with
+<code>neighbourhood_cleansed</code>.</label></li>
+<li><label><input type="checkbox" /><code>log_price</code> column
+exists.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory
+charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Marcus.</label></li>
+<li><label><input type="checkbox" /><code>listings_step2.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-3-feature-engineering">Class 3 — Feature Engineering</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Marcus says: “The columns in the
+raw data are not enough. The TRULY useful columns are not there. We must
+MAKE them. For example, the distance to Times Square — I bet listings
+closer to Times Square cost more. And the host experience — older hosts
+may charge more.”</p>
+</blockquote>
+<h2 id="your-goal-2">Your goal</h2>
+<p>Make NEW columns from the existing ones. These will help the model
+predict price.</p>
+<h2 id="inputs-2">Inputs</h2>
+<ul>
+<li><code>listings_step2.parquet</code></li>
+<li><code>reviews.csv.gz</code> (for review-based features)</li>
+</ul>
+<h2 id="outputs-2">Outputs</h2>
+<ul>
+<li><code>listings_step3.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Marcus</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-1">Phase A — Explore the data
+first</h2>
+<h3
+id="exploratory-chart-1-map-scatter-latitude-vs-longitude-colored-by-price">Exploratory
+chart 1 — Map scatter (latitude vs longitude, colored by price)</h3>
+<ul>
+<li><strong>Question:</strong> “Where are the expensive listings on the
+NYC map?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>plt.scatter(listings['longitude'], listings['latitude'], c=listings['log_price'], s=2, cmap='viridis')</code>.</li>
+<li>Add <code>plt.colorbar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Manhattan is hotter. The shape of
+NYC appears like a real map.</li>
+</ul>
+<h3
+id="exploratory-chart-2-log_price-by-borough-after-engineering">Exploratory
+chart 2 — <code>log_price</code> by borough (after engineering)</h3>
+<ul>
+<li><strong>Question:</strong> “How does the average log_price compare
+across 5 boroughs?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>listings.groupby('neighbourhood_group_cleansed')['log_price'].mean().plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Manhattan is highest. Bronx is
+lowest.</li>
+</ul>
+<h3
+id="exploratory-chart-3-distance-to-times-square-histogram">Exploratory
+chart 3 — Distance to Times Square histogram</h3>
+<ul>
+<li>After you compute <code>distance_to_times_square_km</code> (Step 3
+below), look at its distribution.</li>
+<li><strong>HINTS:</strong> Histogram with <code>bins=50</code>.</li>
+<li><strong>What you learn:</strong> Most listings are within 10 km. A
+few in Staten Island are 20-30 km away.</li>
+</ul>
+<h3 id="exploratory-chart-4-distance-vs-price-scatter">Exploratory chart
+4 — Distance vs price (scatter)</h3>
+<ul>
+<li><strong>Question:</strong> “Are far listings cheaper?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Scatter <code>distance_to_times_square_km</code> on x-axis,
+<code>log_price</code> on y-axis.</li>
+<li>Use <code>alpha=0.2</code> to see density.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Yes, price drops with distance.
+This is the most important location feature.</li>
+</ul>
+<hr />
+<h2 id="phase-b-engineer-the-features">Phase B — Engineer the
+features</h2>
+<h3 id="step-1-create-the-target-column-log_price">Step 1 — Create the
+target column <code>log_price</code></h3>
+<ul>
+<li><strong>WHAT:</strong> You already made <code>log_price</code> in
+Class 2. Confirm it exists.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>assert 'log_price' in listings.columns</code>.</li>
+<li><code>print(listings['log_price'].describe())</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Mean around 4.8 (which is
+<code>log1p(120)</code> roughly). Min around 2.4, max around 7.3.</li>
+</ul>
+<h3 id="step-2-host-age-in-days">Step 2 — Host age in days</h3>
+<ul>
+<li><strong>WHAT:</strong> Make <code>host_age_days</code>. The number
+of days from <code>host_since</code> to the scrape date.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Get the scrape date from <code>last_scraped</code> (or use today’s
+date).</li>
+<li>Subtract:
+<code>listings['last_scraped'] - listings['host_since']</code>.</li>
+<li>Use <code>.dt.days</code> to convert from Timedelta to int.</li>
+</ul></li>
+<li><strong>WHY:</strong> Experienced hosts charge differently than new
+hosts.</li>
+</ul>
+<h3 id="step-3-compute-haversine-distance-to-times-square">Step 3 —
+Compute Haversine distance to Times Square</h3>
+<p>This is the <strong>biggest location feature.</strong></p>
+<p>Times Square is the heart of tourist NYC. Its coordinates:
+<strong>latitude 40.7580, longitude -73.9855</strong>.</p>
+<p>You need to write the Haversine formula. Skeleton:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> haversine(lat1, lon1, lat2, lon2):</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    R <span class="op">=</span> <span class="dv">6371</span>                  <span class="co"># Earth radius in km</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    phi1 <span class="op">=</span> np.radians(___)    <span class="co"># YOU fill in</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    phi2 <span class="op">=</span> np.radians(___)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    dphi <span class="op">=</span> np.radians(___ <span class="op">-</span> ___)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    dlam <span class="op">=</span> np.radians(___ <span class="op">-</span> ___)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> np.sin(dphi<span class="op">/</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> np.cos(phi1)<span class="op">*</span>np.cos(phi2) <span class="op">*</span> np.sin(dlam<span class="op">/</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">2</span> <span class="op">*</span> R <span class="op">*</span> np.arcsin(np.sqrt(a))</span></code></pre></div>
+<p>Then call it:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>TIMES_SQ_LAT, TIMES_SQ_LON <span class="op">=</span> <span class="fl">40.7580</span>, <span class="op">-</span><span class="fl">73.9855</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>listings[<span class="st">&#39;distance_to_times_square_km&#39;</span>] <span class="op">=</span> haversine(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    listings[<span class="st">&#39;latitude&#39;</span>], listings[<span class="st">&#39;longitude&#39;</span>],</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    ___, ___</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<ul>
+<li><strong>WHY Haversine?</strong> The Earth is a sphere. Straight-line
+distance on a flat map is wrong. Haversine gives the real distance.</li>
+<li><strong>EXPECTED:</strong> <code>distance_to_times_square_km</code>
+between 0 (very close) and ~30 km (Staten Island).</li>
+</ul>
+<h3 id="step-4-reviews-per-year">Step 4 — Reviews per year</h3>
+<ul>
+<li><strong>WHAT:</strong> Make <code>reviews_per_year</code>. A measure
+of how active the listing is.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>You have <code>number_of_reviews</code> and
+<code>first_review</code>.</li>
+<li>Years on platform =
+<code>(last_scraped - first_review).dt.days / 365</code>.</li>
+<li><code>listings['reviews_per_year'] = listings['number_of_reviews'] / years</code>.</li>
+<li>If <code>years</code> is 0 or NaN, set the result to 0.</li>
+</ul></li>
+<li><strong>WHY:</strong> A listing with 100 reviews in 1 year is busier
+than 100 reviews in 5 years. Busier listings might charge more.</li>
+</ul>
+<h3 id="step-5-review-text-features">Step 5 — Review text features</h3>
+<ul>
+<li><strong>WHAT:</strong> Join the <code>reviews</code> file. For each
+listing, compute two things:
+<ul>
+<li><code>mean_review_length</code> — average number of characters in
+the comments.</li>
+<li><code>num_reviews_text</code> — count of reviews we actually have
+text for.</li>
+</ul></li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Group reviews by <code>listing_id</code>:
+<code>reviews.groupby('listing_id')['comments'].agg(...)</code>.</li>
+<li>For length: <code>lambda x: x.str.len().mean()</code>.</li>
+<li>Then merge back into <code>listings</code> on
+<code>id == listing_id</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Listings with long, thoughtful reviews may be
+different from listings with short ones.</li>
+<li><strong>EXPECTED:</strong> Most listings have a mean review length
+between 100 and 400 characters.</li>
+</ul>
+<h3 id="step-6-description-length">Step 6 — Description length</h3>
+<ul>
+<li><strong>WHAT:</strong> Make <code>description_length</code> from the
+<code>description</code> column.</li>
+<li><strong>HINTS:</strong>
+<code>listings['description_length'] = listings['description'].fillna('').str.len()</code>.</li>
+<li><strong>WHY:</strong> A long, detailed pitch may attract
+higher-paying guests. We will read the text properly in Module 7.</li>
+</ul>
+<h3 id="step-7-domain-ratio-features-pick-at-least-2">Step 7 — Domain
+ratio features (pick at least 2)</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>price_per_person</code></td>
+<td><code>price / accommodates</code></td>
+</tr>
+<tr>
+<td><code>bedrooms_per_person</code></td>
+<td><code>bedrooms / accommodates</code></td>
+</tr>
+<tr>
+<td><code>bath_per_bedroom</code></td>
+<td><code>bathrooms / (bedrooms + 1)</code></td>
+</tr>
+<tr>
+<td><code>is_superhost_neighbour</code></td>
+<td>For each neighbourhood, the % of superhosts</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Simple arithmetic for the first 3.</li>
+<li>Add <code>+ 1</code> in the denominator to avoid
+divide-by-zero.</li>
+</ul></li>
+<li><strong>WHY:</strong> A model can learn “more bathrooms per bedroom
+= luxury” only if YOU give it that ratio.</li>
+</ul>
+<h3 id="step-8-save">Step 8 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>listings.to_parquet('/content/drive/MyDrive/airbnb_lab/listings_step3.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-marcus-1">Phase C — Make ONE chart
+for Marcus</h2>
+<h3 id="marcuss-chart-closer-to-times-square-higher-price">Marcus’s
+chart — “Closer to Times Square, higher price”</h3>
+<p>A bar chart showing: bin distance into 5 buckets, show the mean
+<code>price</code> (in dollars, not log) in each bucket.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>pd.cut(listings['distance_to_times_square_km'], bins=[0, 2, 5, 10, 15, 30])</code>.</li>
+<li>GroupBy that, take the mean of <code>price</code>.</li>
+<li>Bar chart.</li>
+</ul></li>
+<li><strong>Title:</strong> “Median price by distance to Times Square —
+listings within 2 km charge 60% more than listings beyond 10 km.”</li>
+<li><strong>X-label:</strong> Distance to Times Square (km).</li>
+<li><strong>Y-label:</strong> Median price per night (USD).</li>
+<li><strong>Takeaway for Marcus:</strong> “The single biggest pricing
+signal is location. Our hint engine must factor in distance to the
+nearest tourist hub, not just the borough.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-3">Common mistakes in Class 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Use Euclidean distance instead of Haversine</td>
+<td>Wrong distances. The Earth is round.</td>
+</tr>
+<tr>
+<td>Mix up latitude and longitude in the Haversine call</td>
+<td>Distances look crazy. NYC ends up “in the Pacific Ocean”.</td>
+</tr>
+<tr>
+<td>Divide by zero in ratios</td>
+<td>Code crashes or makes <code>inf</code>. Always add
+<code>+ 1</code>.</td>
+</tr>
+<tr>
+<td>Use <code>reviews_per_month</code> as-is from the file</td>
+<td>It is calculated per current activity, not historical. Make your
+own.</td>
+</tr>
+<tr>
+<td>Use the actual price to engineer a feature, then use that feature to
+predict price</td>
+<td>Leakage. The model gets near-100% but fails in real life.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-4">Self-check before Class 4</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>host_age_days</code> exists.
+Range looks reasonable (0 to about 6000 days).</label></li>
+<li><label><input
+type="checkbox" /><code>distance_to_times_square_km</code> looks
+reasonable (0 to 30 km).</label></li>
+<li><label><input type="checkbox" /><code>reviews_per_year</code>
+exists. No NaN.</label></li>
+<li><label><input type="checkbox" /><code>mean_review_length</code>
+joined from reviews file.</label></li>
+<li><label><input type="checkbox" />At least 2 domain
+features.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 explanatory chart.</label></li>
+<li><label><input type="checkbox" /><code>listings_step3.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-4-feature-selection">Class 4 — Feature Selection</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Now you have around 30 columns.
+Marcus says: “Too many. Some are duplicates. Some are useless. I want
+10-15 GOOD columns. Pick them.”</p>
+</blockquote>
+<h2 id="your-goal-3">Your goal</h2>
+<p>Pick the best 10-15 columns. Drop the rest. Justify every choice.</p>
+<h2 id="inputs-3">Inputs</h2>
+<ul>
+<li><code>listings_step3.parquet</code></li>
+</ul>
+<h2 id="outputs-3">Outputs</h2>
+<ul>
+<li><code>listings_step4.parquet</code> in Drive (only the selected
+columns + <code>log_price</code>)</li>
+<li>3+ exploratory charts (correlation heatmap, mutual info bars,
+importance bars)</li>
+<li>A short markdown report explaining your choices</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-2">Phase A — Explore the data
+first</h2>
+<h3
+id="exploratory-chart-1-correlation-heatmap-of-numeric-columns">Exploratory
+chart 1 — Correlation heatmap of numeric columns</h3>
+<ul>
+<li><strong>Question:</strong> “Which columns say the same thing as each
+other?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute <code>listings[numeric_cols].corr()</code>.</li>
+<li>Plot with <code>sns.heatmap()</code>.</li>
+<li>Use <code>annot=True</code> and <code>fmt='.2f'</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> <code>accommodates</code>,
+<code>bedrooms</code>, <code>beds</code> are highly correlated. Pick
+one. <code>price_per_person</code> and <code>price</code> are also
+correlated — careful.</li>
+</ul>
+<h3 id="exploratory-chart-2-mutual-information-bar-chart">Exploratory
+chart 2 — Mutual information bar chart</h3>
+<ul>
+<li>After you compute mutual info (Step 4 below), plot it.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Sort the values, then bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Which columns predict
+<code>log_price</code> strongest.</li>
+</ul>
+<h3
+id="exploratory-chart-3-random-forest-feature-importance">Exploratory
+chart 3 — Random Forest feature importance</h3>
+<ul>
+<li>After you train the RF (Step 5 below), plot the importances.</li>
+<li><strong>HINTS:</strong>
+<code>pd.Series(rf.feature_importances_, index=...).sort_values().plot.barh()</code>.</li>
+<li><strong>What you learn:</strong> A second opinion on feature
+importance.</li>
+</ul>
+<hr />
+<h2 id="phase-b-select-features">Phase B — Select features</h2>
+<h3 id="step-1-split-into-train-and-test-first">Step 1 — Split into
+train and test FIRST</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>train_test_split</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.model_selection import train_test_split</code>.</li>
+<li><code>X = listings.drop(['price', 'log_price'], axis=1); y = listings['log_price']</code>.</li>
+<li>Pass: <code>test_size=0.2</code>, <code>random_state=42</code>.</li>
+<li><strong>NOTE:</strong> No <code>stratify</code> for regression.</li>
+</ul></li>
+<li><strong>WHY:</strong> All next steps use TRAIN ONLY. Otherwise
+leakage.</li>
+</ul>
+<h3 id="step-2-drop-id-and-text-columns-not-features">Step 2 — Drop ID
+and text columns (not features)</h3>
+<ul>
+<li><strong>WHAT:</strong> Columns like <code>id</code>,
+<code>host_id</code>, <code>description</code>,
+<code>last_scraped</code> are not numeric features.</li>
+<li><strong>HINTS:</strong> Drop them from <code>X_train</code> and
+<code>X_test</code>. Keep <code>description</code> aside in another
+DataFrame — we will need it in Module 7.</li>
+</ul>
+<h3 id="step-3-remove-highly-correlated-columns">Step 3 — Remove highly
+correlated columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop one of each pair where |corr| &gt;
+0.9.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute correlation matrix on numeric columns of
+<code>X_train</code>.</li>
+<li>Get the upper triangle with <code>np.triu(...)</code>.</li>
+<li>For each column, if any of its upper-triangle correlations is &gt;
+0.9, mark it for dropping.</li>
+</ul></li>
+<li><strong>EXAMPLE:</strong> <code>accommodates</code> and
+<code>beds</code> are usually &gt; 0.9. Keep <code>accommodates</code>,
+drop <code>beds</code>.</li>
+</ul>
+<h3 id="step-4-rank-by-mutual-information">Step 4 — Rank by mutual
+information</h3>
+<ul>
+<li><strong>WHAT:</strong> Score each column by how much it tells you
+about <code>log_price</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>This is regression, so use <code>mutual_info_regression</code>.</li>
+<li><code>from sklearn.feature_selection import mutual_info_regression</code>.</li>
+<li><code>mi = mutual_info_regression(X_train_numeric, y_train)</code>.</li>
+<li>Put in a Series, sort.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> <code>distance_to_times_square_km</code>,
+<code>room_Entire home/apt</code>, <code>accommodates</code>,
+<code>bedrooms</code>, <code>bathrooms</code>,
+<code>borough_Manhattan</code> should be near the top.</li>
+</ul>
+<h3 id="step-5-random-forest-importance-second-opinion">Step 5 — Random
+Forest importance (second opinion)</h3>
+<ul>
+<li><strong>WHAT:</strong> Train a small RF regressor. Look at
+<code>feature_importances_</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.ensemble import RandomForestRegressor</code>.</li>
+<li><code>RandomForestRegressor(n_estimators=50, max_depth=8, n_jobs=-1, random_state=42)</code>.</li>
+<li><code>.fit(X_train, y_train)</code>.</li>
+<li>Look at <code>.feature_importances_</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-6-pick-the-final-10-15-columns">Step 6 — Pick the final
+10-15 columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Combine the rankings. Pick columns that:
+<ul>
+<li>Are high in mutual info, AND</li>
+<li>Are high in RF importance, AND</li>
+<li>Were not dropped by correlation pruning.</li>
+</ul></li>
+<li><strong>WRITE DOWN:</strong> In your notebook, list the columns.
+Explain in 1 sentence why each one is in.</li>
+</ul>
+<h3 id="step-7-save">Step 7 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong> Keep only the selected columns +
+<code>log_price</code> + <code>price</code> (raw, for analysis) +
+<code>description</code> (for Module 7). Save as
+<code>listings_step4.parquet</code> to Drive.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-marcus-2">Phase C — Make ONE chart
+for Marcus</h2>
+<h3
+id="marcuss-chart-these-are-the-10-most-important-columns-for-price">Marcus’s
+chart — “These are the 10 most important columns for price”</h3>
+<p>A horizontal bar chart of your top 10 features and their RF
+importance score.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use the RF importance.</li>
+<li><code>sort_values()</code> then <code>.head(10)</code> then
+<code>.plot.barh()</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Top 10 predictors of nightly price.”</li>
+<li><strong>Y-axis:</strong> column names.</li>
+<li><strong>X-axis:</strong> Random Forest importance.</li>
+<li><strong>Takeaway:</strong> “Room type, size (accommodates and
+bedrooms), and distance to Times Square explain most of the price. Host
+history and review count add fine-tuning.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-4">Common mistakes in Class 4</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compute mutual info on the FULL data</td>
+<td>Leakage.</td>
+</tr>
+<tr>
+<td>Use <code>mutual_info_classif</code> instead of
+<code>mutual_info_regression</code></td>
+<td>Wrong scores. Price is continuous.</td>
+</tr>
+<tr>
+<td>Drop columns without writing why</td>
+<td>Module 4 students will not understand.</td>
+</tr>
+<tr>
+<td>Keep <code>price</code> AND <code>log_price</code> as features</td>
+<td>Predicting <code>log_price</code> from <code>price</code>. 100%
+useless model.</td>
+</tr>
+<tr>
+<td>Drop a high-mutual-info column</td>
+<td>Big mistake. Check why it is high before dropping.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-5">Self-check before Class 5</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Train/test split done
+FIRST.</label></li>
+<li><label><input type="checkbox" />10-15 columns remain +
+<code>log_price</code>.</label></li>
+<li><label><input type="checkbox" />You wrote down WHY for each kept
+column.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Marcus.</label></li>
+<li><label><input type="checkbox" /><code>listings_step4.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-5-pipelines">Class 5 — Pipelines</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Marcus says: “Your cleaning code
+is in 4 different notebooks. When a new host posts a listing tomorrow
+morning, you cannot copy 4 notebooks to the server. We need ONE object
+that takes a raw listing and returns a price hint.”</p>
+</blockquote>
+<h2 id="your-goal-4">Your goal</h2>
+<p>Put EVERY cleaning step inside ONE Pipeline object. Production-ready
+code.</p>
+<h2 id="inputs-4">Inputs</h2>
+<ul>
+<li><code>listings_step4.parquet</code> (selected columns)</li>
+</ul>
+<h2 id="outputs-4">Outputs</h2>
+<ul>
+<li><code>airbnb_pipeline.joblib</code> saved in Drive</li>
+<li>1 chart of predicted vs actual price</li>
+<li>A pipeline that takes RAW input and produces a price prediction</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-3">Phase A — Explore the data
+first</h2>
+<h3
+id="exploratory-chart-1-predicted-vs-actual-log_price-after-training">Exploratory
+chart 1 — Predicted vs actual log_price (after training)</h3>
+<ul>
+<li>After Step 6, plot a scatter.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>plt.scatter(y_test, y_pred, alpha=0.2)</code>.</li>
+<li>Add a 45-degree line:
+<code>plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--')</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> A good model has points near the
+red line.</li>
+</ul>
+<h3 id="exploratory-chart-2-residual-histogram">Exploratory chart 2 —
+Residual histogram</h3>
+<ul>
+<li><strong>WHAT:</strong> A “residual” is
+<code>actual - predicted</code>. Plot the histogram.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>residuals = y_test - y_pred</code>.</li>
+<li><code>plt.hist(residuals, bins=50)</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The residuals should look like a
+bell curve around 0. If they are skewed, the model has systematic
+bias.</li>
+</ul>
+<hr />
+<h2 id="phase-b-build-the-pipeline">Phase B — Build the pipeline</h2>
+<h3
+id="step-1-decide-which-columns-are-numeric-and-which-are-categorical">Step
+1 — Decide which columns are numeric and which are categorical</h3>
+<ul>
+<li><strong>HINTS:</strong> Make two lists.</li>
+<li><strong>EXAMPLE:</strong>
+<ul>
+<li>numeric: <code>accommodates</code>, <code>bedrooms</code>,
+<code>bathrooms</code>, <code>distance_to_times_square_km</code>,
+<code>host_age_days</code>, <code>reviews_per_year</code>,
+<code>mean_review_length</code>, <code>review_scores_rating</code>,
+<code>availability_365</code>.</li>
+<li>categorical: <code>room_type</code>,
+<code>neighbourhood_group_cleansed</code>, possibly
+<code>neighbourhood_cleansed</code> (grouped).</li>
+</ul></li>
+</ul>
+<h3 id="step-2-build-the-numeric-mini-pipeline">Step 2 — Build the
+numeric mini-pipeline</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer (fill missing) +
+scaler.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.pipeline import Pipeline</code>.</p></li>
+<li><p><code>from sklearn.impute import SimpleImputer</code>.</p></li>
+<li><p><code>from sklearn.preprocessing import StandardScaler</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>numeric_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;scaler&#39;</span>,  StandardScaler()),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in the blank: best strategy for numeric?
+(<code>'median'</code>)</p></li>
+</ul></li>
+</ul>
+<h3 id="step-3-build-the-categorical-mini-pipeline">Step 3 — Build the
+categorical mini-pipeline</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer + one-hot encoder.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.preprocessing import OneHotEncoder</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>categorical_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;onehot&#39;</span>,  OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">&#39;___&#39;</span>, sparse_output<span class="op">=</span>___)),</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in blanks. (Strategy <code>'most_frequent'</code>,
+handle_unknown <code>'ignore'</code>, sparse_output
+<code>False</code>.)</p></li>
+</ul></li>
+<li><strong>WHY <code>handle_unknown='ignore'</code>?</strong> In
+production, a new neighbourhood name may appear. We do not want the code
+to crash.</li>
+</ul>
+<h3 id="step-4-combine-into-a-columntransformer">Step 4 — Combine into a
+ColumnTransformer</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.compose import ColumnTransformer</code>.</li>
+<li>It takes a list of tuples:
+<code>(name, transformer, list_of_columns)</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-5-add-the-model-on-top">Step 5 — Add the model on top</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>For a baseline regression model, use <code>Ridge</code>.</li>
+<li><code>from sklearn.linear_model import Ridge</code>.</li>
+<li><code>Ridge(alpha=1.0, random_state=42)</code>.</li>
+<li>Put it in a Pipeline with the preprocessor.</li>
+</ul></li>
+<li><strong>WHY Ridge and not plain LinearRegression?</strong> Ridge
+handles correlated columns better. It is a simple, fast, safe
+baseline.</li>
+</ul>
+<h3 id="step-6-train-and-evaluate">Step 6 — Train and evaluate</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>full_pipeline.fit(X_train, y_train)</code>.</li>
+<li><code>y_pred = full_pipeline.predict(X_test)</code>.</li>
+<li>For regression, use these metrics:
+<ul>
+<li><code>from sklearn.metrics import mean_absolute_error, r2_score</code>.</li>
+<li>MAE on <code>log_price</code> should be around 0.30 to 0.45.</li>
+<li>R^2 should be around 0.50 to 0.65.</li>
+</ul></li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Module 4 improves this with gradient
+boosting.</li>
+</ul>
+<h3 id="step-7-convert-log_price-back-to-dollars-for-marcus">Step 7 —
+Convert log_price back to dollars for Marcus</h3>
+<ul>
+<li><strong>WHAT:</strong> Marcus speaks dollars, not logs. Show him
+predictions in real currency.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>price_pred = np.expm1(y_pred)</code>.</li>
+<li><code>price_actual = np.expm1(y_test)</code>.</li>
+<li><code>mae_dollars = mean_absolute_error(price_actual, price_pred)</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> A MAE of about $40 to $60. Means our hint
+is on average $50 off.</li>
+</ul>
+<h3 id="step-8-save-the-trained-pipeline">Step 8 — Save the trained
+pipeline</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>import joblib</code>.</li>
+<li><code>joblib.dump(full_pipeline, '/content/drive/MyDrive/airbnb_lab/airbnb_pipeline.joblib')</code>.</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-marcus-3">Phase C — Make ONE chart
+for Marcus</h2>
+<h3 id="marcuss-chart-how-close-is-our-hint-to-the-real-price">Marcus’s
+chart — “How close is our hint to the real price?”</h3>
+<p>A scatter plot of predicted vs actual price (in dollars, after
+<code>np.expm1</code>).</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>X-axis: actual price. Y-axis: predicted price.</li>
+<li>Add the 45-degree line in red.</li>
+<li>Limit both axes to $0-$500 (the area where most listings are).</li>
+</ul></li>
+<li><strong>Title:</strong> “Price hint accuracy — average error of $XX
+per night.”</li>
+<li><strong>Takeaway for Marcus:</strong> “On average, our hint is
+within $XX of the actual market price. Good enough for a first version.
+Module 4 will improve accuracy.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-5">Common mistakes in Class 5</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Build the pipeline AFTER you scaled the data manually</td>
+<td>Pipeline scales it twice. Numbers wrong.</td>
+</tr>
+<tr>
+<td>Forget <code>sparse_output=False</code> in OneHotEncoder</td>
+<td>Some downstream code breaks.</td>
+</tr>
+<tr>
+<td>Train on <code>price</code>, evaluate on <code>log_price</code> (or
+vice versa)</td>
+<td>Metric numbers look impossible.</td>
+</tr>
+<tr>
+<td>Forget <code>random_state</code></td>
+<td>Results change every run. Hard to debug.</td>
+</tr>
+<tr>
+<td>Forget to invert the log with <code>np.expm1</code> before showing
+dollars</td>
+<td>Numbers look like 4.7 (a log value) instead of $109. Confusing for
+Marcus.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-6">Self-check before Class 6</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Pipeline has preprocessor + Ridge
+model.</label></li>
+<li><label><input type="checkbox" />Preprocessor has numeric +
+categorical transformers.</label></li>
+<li><label><input type="checkbox" /><code>handle_unknown='ignore'</code>
+set.</label></li>
+<li><label><input type="checkbox" />You converted predictions back to
+dollars with <code>np.expm1</code>.</label></li>
+<li><label><input type="checkbox" />Predicted-vs-actual scatter chart +
+residual histogram.</label></li>
+<li><label><input type="checkbox" /><code>airbnb_pipeline.joblib</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-6-end-to-end-lab-the-big-one">Class 6 — End-to-End Lab
+(THE BIG ONE)</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Marcus is in the meeting room. He
+wants the FINAL clean dataset on his desk in 90 minutes. This is the
+lab.</p>
+</blockquote>
+<h2 id="your-goal-5">Your goal</h2>
+<p>Take the raw Inside Airbnb files. Produce ONE final
+<code>.parquet</code> file with the exact 21-column schema. Plus a
+1-page findings report.</p>
+<h2 id="time">Time</h2>
+<p><strong>90 minutes</strong> of focused work.</p>
+<h2 id="inputs-5">Inputs</h2>
+<ul>
+<li>The raw <code>listings.csv.gz</code> and <code>reviews.csv.gz</code>
+in your Drive folder</li>
+</ul>
+<h2 id="outputs-5">Outputs</h2>
+<ul>
+<li><code>airbnb_clean.parquet</code> (~38,000 rows x 21 columns) in
+Drive</li>
+<li><code>findings.md</code> (~1 page)</li>
+<li>Your full Colab notebook</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-10-minutes">Phase A — Explore the
+data first (10 minutes)</h2>
+<p>You will reuse charts from Classes 1-5. Pick 3 of them. Put them all
+on ONE PAGE of your notebook with markdown headers: 1. NYC map scatter
+colored by <code>log_price</code> (the location story) 2. Distance to
+Times Square vs price (your most important chart) 3. Top 10 most
+important features</p>
+<p>These 3 charts tell Marcus the whole story.</p>
+<hr />
+<h2 id="phase-b-build-the-final-dataset-70-minutes">Phase B — Build the
+final dataset (70 minutes)</h2>
+<h3 id="required-output-schema">Required output schema</h3>
+<p>Your <code>airbnb_clean.parquet</code> MUST have these 21 columns,
+with these names and types:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Column</th>
+<th>Type</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>listing_id</code></td>
+<td>int</td>
+<td>listings (renamed from <code>id</code>)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>host_id</code></td>
+<td>int</td>
+<td>listings</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>neighbourhood</code></td>
+<td>string</td>
+<td>listings (cleansed, top-30 + Other)</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>borough</code></td>
+<td>string</td>
+<td>listings (neighbourhood_group_cleansed)</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>room_type</code></td>
+<td>string</td>
+<td>listings</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>latitude</code></td>
+<td>float</td>
+<td>listings</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>longitude</code></td>
+<td>float</td>
+<td>listings</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>accommodates</code></td>
+<td>int</td>
+<td>listings</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>bedrooms</code></td>
+<td>float</td>
+<td>listings (imputed)</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>bathrooms</code></td>
+<td>float</td>
+<td>parsed from <code>bathrooms_text</code></td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>minimum_nights</code></td>
+<td>int</td>
+<td>listings</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>availability_365</code></td>
+<td>int</td>
+<td>listings</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>number_of_reviews</code></td>
+<td>int</td>
+<td>listings</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>reviews_per_year</code></td>
+<td>float</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>review_scores_rating</code></td>
+<td>float</td>
+<td>listings (imputed)</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>host_age_days</code></td>
+<td>int</td>
+<td>engineered (from host_since)</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>distance_to_times_square_km</code></td>
+<td>float</td>
+<td>Haversine</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>mean_review_length</code></td>
+<td>float</td>
+<td>engineered from reviews file</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>description</code></td>
+<td>string</td>
+<td>listings (kept for Module 7)</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>price</code></td>
+<td>float</td>
+<td>cleaned (no <code>$</code> no <code>,</code>)</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>log_price</code></td>
+<td>float</td>
+<td>TARGET (engineered, <code>np.log1p(price)</code>)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lab-phases-timed">Lab phases (timed)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Time</th>
+<th>What you do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Load</td>
+<td>5 min</td>
+<td>Load listings and reviews. Confirm row counts.</td>
+</tr>
+<tr>
+<td>2. Clean price + bathrooms</td>
+<td>15 min</td>
+<td>Strip <code>$</code> and <code>,</code>. Parse bathrooms_text. Drop
+bad rows.</td>
+</tr>
+<tr>
+<td>3. Impute missing</td>
+<td>10 min</td>
+<td>Median fill for <code>bedrooms</code> (by room_type) and
+others.</td>
+</tr>
+<tr>
+<td>4. Group rare neighbourhoods</td>
+<td>5 min</td>
+<td>Top 30 + “Other”.</td>
+</tr>
+<tr>
+<td>5. Geo + Haversine</td>
+<td>15 min</td>
+<td>Compute distance_to_times_square_km.</td>
+</tr>
+<tr>
+<td>6. Date features</td>
+<td>10 min</td>
+<td>host_age_days, reviews_per_year.</td>
+</tr>
+<tr>
+<td>7. Review features</td>
+<td>10 min</td>
+<td>mean_review_length from reviews file.</td>
+</tr>
+<tr>
+<td>8. Save + findings</td>
+<td>10 min</td>
+<td>Validate schema. Save <code>.parquet</code>. Write findings.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total: 90 minutes.</strong></p>
+<hr />
+<h2 id="phase-c-findings-report-for-marcus-10-minutes">Phase C —
+Findings report for Marcus (10 minutes)</h2>
+<p>Write <code>findings.md</code> with these sections:</p>
+<h3 id="final-numbers">Final numbers</h3>
+<ul>
+<li>Final row count: ____</li>
+<li>Median price: $____</li>
+<li>Median distance to Times Square: ____ km</li>
+<li><code>log_price</code> mean: ____ (should be around 4.8)</li>
+</ul>
+<h3 id="top-3-insights">Top 3 insights</h3>
+<ol type="1">
+<li><hr /></li>
+<li><hr /></li>
+<li><hr /></li>
+</ol>
+<h3 id="one-question-to-investigate-in-module-4">One question to
+investigate in Module 4</h3>
+<ul>
+<li><hr /></li>
+</ul>
+<h3 id="one-chart-that-summarizes-everything">One chart that summarizes
+everything</h3>
+<p>Embed your most important chart (the distance to Times Square vs
+price one).</p>
+<hr />
+<h2 id="grading-rubric-100-points">Grading rubric (100 points)</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All 21 columns exist with the right names and dtypes</td>
+<td>25</td>
+</tr>
+<tr>
+<td>Cleaning decisions written in markdown</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Pipeline is reproducible (re-run from raw files in ONE command)</td>
+<td>15</td>
+</tr>
+<tr>
+<td>Haversine distance correct (within 0.5 km of the geopy library)</td>
+<td>10</td>
+</tr>
+<tr>
+<td><code>price</code> outliers handled with a clear cutoff and
+explanation</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>At least 3 exploratory + 1 explanatory chart per
+class</strong></td>
+<td><strong>15</strong></td>
+</tr>
+<tr>
+<td><code>findings.md</code> has insights, not just numbers</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Code is clean (comments, sensible variable names)</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<h2 id="submit">Submit</h2>
+<p>Upload to
+<code>module-3/class_6/submissions/&lt;YourTeamName&gt;/</code>: -
+<code>airbnb_clean.parquet</code> - Your Colab notebook
+(<code>File &gt; Download &gt; Download .ipynb</code>) -
+<code>findings.md</code></p>
+<hr />
+<h1 id="tips-for-the-whole-module">Tips for the whole module</h1>
+<ol type="1">
+<li><strong>Do NOT copy-paste code from this guide.</strong> This guide
+gives you HINTS only. Write the code yourself. You will learn much
+faster.</li>
+<li><strong>Save your notebook to Drive often.</strong> Colab
+disconnects after 12 hours.</li>
+<li><strong>Save intermediate <code>.parquet</code> files to
+Drive</strong> (listings_step1, listings_step2, etc.). If something
+breaks, you do not redo everything.</li>
+<li><strong>Pair-program.</strong> One student types, one reads. Switch
+every 20 minutes.</li>
+<li><strong>Make a chart BEFORE you write cleaning code.</strong> You
+must SEE the problem before you can fix it.</li>
+<li><strong>Make a chart AFTER each step.</strong> Confirm your code did
+what you expected.</li>
+<li><strong>Always convert <code>log_price</code> back to dollars with
+<code>np.expm1</code> before showing Marcus.</strong> He thinks in
+dollars, not logs.</li>
+<li><strong>Ask the mentor early.</strong> If you are stuck for 20
+minutes, ask. Do not waste an afternoon.</li>
+</ol>
+<p>Good luck.</p>
+</main>
+
+<footer class="scenario-footer">
+  <p><a href="../../#/module/3/class/6">&larr; Back to all 15 scenarios</a></p>
+</footer>
+
+</body>
+</html>

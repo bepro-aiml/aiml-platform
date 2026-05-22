@@ -1,0 +1,2157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>01_olist_m3_lab</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --text: #e6e8ec;
+    --text-dim: #9aa0aa;
+    --accent: #7aa2f7;
+    --accent-hover: #a5c0ff;
+    --border: #2a2f3a;
+    --code-bg: #11141a;
+    --table-header: #232732;
+    --quote-bar: #7aa2f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(26, 29, 36, 0.92);
+  }
+  .topbar-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .back-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .back-link:hover { color: var(--accent-hover); }
+  .pdf-link {
+    background: var(--accent);
+    color: #0f1115;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pdf-link:hover { background: var(--accent-hover); }
+  .pdf-link svg { width: 14px; height: 14px; }
+
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 56px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  p { margin-bottom: 16px; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+  strong { color: #fff; font-weight: 600; }
+  em { color: var(--text); font-style: italic; }
+
+  ul, ol { margin-bottom: 18px; padding-left: 28px; }
+  li { margin-bottom: 6px; }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 36px 0;
+  }
+
+  blockquote {
+    border-left: 4px solid var(--quote-bar);
+    background: var(--card);
+    padding: 14px 22px;
+    margin: 18px 0;
+    color: var(--text);
+    border-radius: 0 8px 8px 0;
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  blockquote strong { color: var(--accent); }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    font-size: 0.88em;
+    color: #f0a3b5;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 18px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text);
+    font-size: 1em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.94rem;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  thead { background: var(--table-header); }
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+
+  /* Checkboxes in self-check lists */
+  input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+
+  /* Anchored sections for nav */
+  h2[id], h3[id] { scroll-margin-top: 80px; }
+
+  footer.scenario-footer {
+    max-width: 920px;
+    margin: 60px auto 40px;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+  footer.scenario-footer a {
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    main { padding: 24px 16px 60px; }
+    h1 { font-size: 1.7rem; }
+    h2 { font-size: 1.35rem; }
+    h3 { font-size: 1.1rem; }
+    .topbar { padding: 10px 16px; }
+    pre { font-size: 0.8rem; padding: 12px 14px; }
+    table { font-size: 0.85rem; }
+    th, td { padding: 9px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="../../#/module/3/class/6">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <span style="display:inline-block;transform:translateY(-1px)">&larr;</span> Back to all scenarios
+    </a>
+    <a class="pdf-link" href="01_olist_m3_lab.pdf" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-4-4h3V4h2v8h3l-4 4zm-8 4v-2h16v2H4z"/></svg>
+      Download as PDF
+    </a>
+  </div>
+</div>
+
+<main>
+<h1 id="olist-module-3-lab-guide">Olist — Module 3 Lab Guide</h1>
+<p><strong>Scenario:</strong> Brazilian E-commerce. Predict late
+deliveries. <strong>Module:</strong> 3 (Data Preparation and Feature
+Engineering) <strong>Audience:</strong> Adult learners, A2 English. New
+to AI. <strong>Tools:</strong> Google Colab (no install needed).</p>
+<hr />
+<h1 id="the-scenario-your-mission">The Scenario — Your Mission</h1>
+<h2 id="where-you-work">Where you work</h2>
+<p>You and your team are new data analysts at <strong>Olist</strong>.
+Olist is the biggest online marketplace in Brazil. Like Amazon, but
+Brazilian.</p>
+<p>Every month: - <strong>100,000 customers</strong> buy something on
+Olist. - Sellers from all over Brazil ship the orders. - Each customer
+is promised a delivery date.</p>
+<h2 id="the-problem">The problem</h2>
+<p>About <strong>7% of orders arrive AFTER the promised date.</strong>
+That is <strong>7,000 angry customers every month.</strong></p>
+<p>Angry customers: - Write 1-star reviews. - Tell their friends to use
+a competitor. - Never buy from Olist again.</p>
+<p>The CEO is worried. She calls your team into a meeting on Monday
+morning.</p>
+<h2 id="your-managers-request">Your manager’s request</h2>
+<p>Your manager, <strong>Beatriz</strong> (Head of Logistics), tells
+you:</p>
+<blockquote>
+<p>“I do not need you to make the trucks faster. I cannot change
+geography.</p>
+<p>I need a different tool. When a new order is placed, I want a number:
+<strong>‘this order has a 70% chance of being late.’</strong></p>
+<p>Then we will do TWO things: 1. Send the customer a polite email:
+‘Sorry, your order may be late. Here is a $5 voucher.’ 2. Call the
+seller and ask them to ship faster.</p>
+<p>If we catch even half the late orders early, we save thousands of
+customers.”</p>
+</blockquote>
+<h2 id="your-teams-job-for-the-next-2-weeks-module-3">Your team’s job
+for the next 2 weeks (Module 3)</h2>
+<p>Beatriz cannot do this alone. Her data is <strong>9 messy CSV
+files</strong> sitting in different systems.</p>
+<p>Your job in Module 3: &gt; <strong>Turn 9 messy CSV files into ONE
+clean file. The clean file will be used to train the model in Module
+4.</strong></p>
+<p>The clean file is called <code>olist_clean.parquet</code>. It must
+have <strong>21 specific columns</strong> (we will see them in Class
+6).</p>
+<h2 id="after-module-3">After Module 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Module</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Module 4</strong></td>
+<td>Train the prediction model. Beatriz finally gets her “late-risk
+score”.</td>
+</tr>
+<tr>
+<td><strong>Module 5</strong></td>
+<td>Find groups of customers (VIPs vs at-risk vs new). For
+marketing.</td>
+</tr>
+<tr>
+<td><strong>Module 7</strong></td>
+<td>Read the review comments (in Portuguese). Find common
+complaints.</td>
+</tr>
+</tbody>
+</table>
+<p>You use the <strong>same Olist dataset</strong> until the end of
+Module 7.</p>
+<hr />
+<h1 id="how-this-guide-works-read-this-first">How This Guide Works (Read
+This First!)</h1>
+<h2 id="we-do-not-give-you-the-full-code">We do NOT give you the full
+code</h2>
+<p>In this guide you will see two kinds of content:</p>
+<h3 id="what-why-expected-explained-in-words">1. WHAT / WHY / EXPECTED —
+explained in words</h3>
+<p>For every step you read: - <strong>WHAT</strong> you have to do (in
+normal language) - <strong>WHY</strong> you do it (the reason) -
+<strong>HINTS</strong> — the function names, the arguments to remember -
+<strong>EXPECTED</strong> — the result you should see if you did it
+right</p>
+<h3 id="sometimes-a-tiny-code-skeleton-with-blanks">2. Sometimes a tiny
+code skeleton with blanks</h3>
+<p>For the harder steps we give you a code skeleton with
+<code>___</code> blanks. <strong>You fill in the blanks.</strong></p>
+<h3 id="why-no-full-code">Why no full code?</h3>
+<p>Because you will NOT learn if you copy-paste. - In Module 4, the
+model only works if YOU understand each step. - In your future job,
+nobody will give you the code. - Writing the code yourself takes 10
+minutes more today, but saves 10 hours later.</p>
+<p><strong>Rule:</strong> If you finish a step in 30 seconds by
+copy-pasting from a teammate’s notebook, do it AGAIN by yourself.
+Different variable names, same logic.</p>
+<hr />
+<h1 id="visualizations-two-modes">Visualizations — Two Modes</h1>
+<p>In every class you will make charts. There are <strong>two
+reasons</strong> to make a chart:</p>
+<h2 id="exploratory-charts-for-you">1. Exploratory charts (for YOU)</h2>
+<p>Made BEFORE you clean the data. To understand what the data looks
+like. - Fast, ugly, no labels needed. - Examples:
+<code>df.hist()</code>,
+<code>df['column'].value_counts().plot.bar()</code>.</p>
+<blockquote>
+<p>Goal: <strong>“What does this data look like?”</strong></p>
+</blockquote>
+<h2 id="explanatory-charts-for-beatriz">2. Explanatory charts (for
+BEATRIZ)</h2>
+<p>Made AFTER you understand. To EXPLAIN something to your manager. -
+Clean, labeled, one clear message. - Must have: title, x-label, y-label,
+source, and a 1-sentence takeaway.</p>
+<blockquote>
+<p>Goal: <strong>“Beatriz, look at this. This is the
+problem.”</strong></p>
+</blockquote>
+<p>In every class you make BOTH kinds.</p>
+<h2 id="your-plotting-toolkit-you-learned-this-in-module-2-class-5">Your
+plotting toolkit (you learned this in Module 2 Class 5)</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Plot</th>
+<th>When to use it</th>
+<th>Function name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Histogram</td>
+<td>See the SHAPE of a numeric column</td>
+<td><code>plt.hist()</code> or <code>sns.histplot()</code></td>
+</tr>
+<tr>
+<td>Bar chart</td>
+<td>Count of each category</td>
+<td><code>df['col'].value_counts().plot.bar()</code></td>
+</tr>
+<tr>
+<td>Box plot</td>
+<td>See outliers in a numeric column</td>
+<td><code>sns.boxplot()</code></td>
+</tr>
+<tr>
+<td>Scatter plot</td>
+<td>See the relationship between 2 numbers</td>
+<td><code>plt.scatter()</code> or <code>sns.scatterplot()</code></td>
+</tr>
+<tr>
+<td>Heatmap</td>
+<td>See correlation between many columns</td>
+<td><code>sns.heatmap(df.corr())</code></td>
+</tr>
+<tr>
+<td>Line plot</td>
+<td>See change over time</td>
+<td><code>plt.plot()</code></td>
+</tr>
+</tbody>
+</table>
+<p>Before you start: <code>import matplotlib.pyplot as plt</code> and
+<code>import seaborn as sns</code>.</p>
+<hr />
+<h1 id="before-you-start-google-colab-setup">Before You Start — Google
+Colab Setup</h1>
+<p>You will work in <strong>Google Colab</strong>. That means: - You do
+NOT install Python. - You do NOT install pandas, scikit-learn, or
+anything. - You just open a notebook in your web browser.</p>
+<h2 id="step-1-open-a-new-colab-notebook">Step 1 — Open a new Colab
+notebook</h2>
+<ol type="1">
+<li>Go to https://colab.research.google.com</li>
+<li>Sign in with your Google account.</li>
+<li>Click <strong>“New notebook”</strong> (top left).</li>
+<li>Name it <code>olist_module_3.ipynb</code>.</li>
+</ol>
+<h2 id="step-2-connect-to-google-drive">Step 2 — Connect to Google
+Drive</h2>
+<p>Colab files <strong>disappear</strong> when you close the browser. So
+you must save your work to <strong>Google Drive</strong>.</p>
+<p>In the first cell:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> drive</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>drive.mount(<span class="st">&#39;/content/drive&#39;</span>)</span></code></pre></div>
+<p>A pop-up asks for permission. Click “Allow”. After this, Drive is
+available at <code>/content/drive/MyDrive/</code>.</p>
+<h2 id="step-3-create-a-project-folder">Step 3 — Create a project
+folder</h2>
+<p>In a new cell:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&#39;/content/drive/MyDrive/olist_lab&#39;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>cd <span class="op">/</span>content<span class="op">/</span>drive<span class="op">/</span>MyDrive<span class="op">/</span>olist_lab</span></code></pre></div>
+<p>Your team will save ALL files in this folder.</p>
+<h2 id="step-4-get-the-data">Step 4 — Get the data</h2>
+<p><strong>Option A — Direct from Kaggle (recommended):</strong></p>
+<ol type="1">
+<li>Make a free Kaggle account.</li>
+<li>Go to kaggle.com/settings/account, scroll to “API”, click “Create
+New Token”. Save the <code>kaggle.json</code> file.</li>
+<li>In Colab:</li>
+</ol>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> files</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>files.upload()    <span class="co"># pick kaggle.json</span></span></code></pre></div>
+<ol start="4" type="1">
+<li>Then:</li>
+</ol>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>mkdir <span class="op">-</span>p <span class="op">~/</span>.kaggle <span class="op">&amp;&amp;</span> mv kaggle.json <span class="op">~/</span>.kaggle<span class="op">/</span> <span class="op">&amp;&amp;</span> chmod <span class="dv">600</span> <span class="op">~/</span>.kaggle<span class="op">/</span>kaggle.json</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install kaggle <span class="op">-</span>q</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kaggle datasets download <span class="op">-</span>d olistbr<span class="op">/</span>brazilian<span class="op">-</span>ecommerce</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>unzip <span class="op">-</span>q brazilian<span class="op">-</span>ecommerce.<span class="bu">zip</span> <span class="op">-</span>d data</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ls data<span class="op">/</span></span></code></pre></div>
+<p>You should see <strong>9 CSV files</strong> inside
+<code>data/</code>.</p>
+<p><strong>Option B — Upload by hand:</strong></p>
+<ol type="1">
+<li>Download the zip from
+kaggle.com/datasets/olistbr/brazilian-ecommerce on your laptop.</li>
+<li>Unzip it.</li>
+<li>In Colab’s file panel (left sidebar), upload all 9 CSV files.</li>
+</ol>
+<h2 id="step-5-test-it">Step 5 — Test it</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>orders <span class="op">=</span> pd.read_csv(<span class="st">&#39;data/olist_orders_dataset.csv&#39;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(orders.shape)</span></code></pre></div>
+<p>Should print <code>(99441, 8)</code>. You are ready.</p>
+<h2 id="colab-tips">Colab tips</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Save your notebook to Drive often</td>
+<td>Colab disconnects after 12 hours.</td>
+</tr>
+<tr>
+<td>Save intermediate <code>.parquet</code> files to Drive</td>
+<td>Files in <code>/content/</code> disappear when Colab
+disconnects.</td>
+</tr>
+<tr>
+<td>Share the notebook with teammates (Share button, top right)</td>
+<td>Editor access. Like Google Docs for code.</td>
+</tr>
+<tr>
+<td>Restart runtime if memory full</td>
+<td>Runtime &gt; Restart runtime.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="class-1-data-cleaning">Class 1 — Data Cleaning</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Beatriz drops 9 messy CSV files
+on your desk. Some date columns are stored as text. Some rows have
+missing values. Your job today: clean the most important file
+(<code>orders</code>).</p>
+</blockquote>
+<h2 id="your-goal">Your goal</h2>
+<p>Make the 9 CSV files USABLE. Fix date columns. Find missing values.
+Decide what to keep.</p>
+<h2 id="inputs">Inputs</h2>
+<ul>
+<li>The 9 CSV files in <code>data/</code></li>
+</ul>
+<h2 id="outputs">Outputs</h2>
+<ul>
+<li><code>orders_step1.parquet</code> saved in your Drive folder</li>
+<li>3+ exploratory charts in your notebook</li>
+<li>1 explanatory chart for Beatriz</li>
+<li>Notes in markdown about every decision you made</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-15-minutes">Phase A — Explore the
+data first (15 minutes)</h2>
+<p>Before you clean anything, <strong>LOOK</strong> at the data.</p>
+<h3 id="exploratory-chart-1-how-many-orders-per-status">Exploratory
+chart 1 — How many orders per status?</h3>
+<ul>
+<li><strong>Question:</strong> “Of 99,441 orders, how many are
+<code>delivered</code>, how many <code>canceled</code>, etc.?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>orders['order_status'].value_counts()</code>.</li>
+<li>Then <code>.plot.bar()</code> on the result.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Most orders are
+<code>delivered</code>. We will keep only those.</li>
+</ul>
+<h3
+id="exploratory-chart-2-when-were-orders-placed-by-month">Exploratory
+chart 2 — When were orders placed (by month)?</h3>
+<ul>
+<li><strong>Question:</strong> “When in the year do most orders happen?
+Is there a holiday spike?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>First convert <code>order_purchase_timestamp</code> to datetime (you
+do this in Phase B Step 3 anyway, do it here too).</li>
+<li>Use <code>.dt.to_period('M')</code> to group by month.</li>
+<li>Plot the counts.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Does Olist have a December rush? A
+weekly pattern?</li>
+</ul>
+<h3 id="exploratory-chart-3-missing-values-per-column">Exploratory chart
+3 — Missing values per column</h3>
+<ul>
+<li><strong>Question:</strong> “Which columns have the most missing
+data?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>orders.isna().sum().sort_values(ascending=False)</code>.</li>
+<li>Plot it as a bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Which columns will be hard to
+use.</li>
+</ul>
+<hr />
+<h2 id="phase-b-clean-the-orders-table-45-minutes">Phase B — Clean the
+orders table (45 minutes)</h2>
+<h3 id="step-1-load-all-9-files">Step 1 — Load all 9 files</h3>
+<ul>
+<li><strong>WHAT:</strong> Load each of the 9 CSV files into its own
+DataFrame.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>pd.read_csv('data/&lt;filename&gt;')</code>.</li>
+<li>Give each DataFrame a short name: <code>orders</code>,
+<code>customers</code>, <code>items</code>, <code>payments</code>,
+<code>reviews</code>, <code>products</code>, <code>sellers</code>,
+<code>geo</code>, <code>trans</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> 9 DataFrames in memory.</li>
+</ul>
+<h3 id="step-2-look-at-each-dataframe">Step 2 — Look at each
+DataFrame</h3>
+<ul>
+<li><strong>WHAT:</strong> For each, check <code>.shape</code>,
+<code>.info()</code>, and <code>.head()</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Loop over your 9 DataFrames? Or just call them one by one.</li>
+<li>Look at the <code>Dtype</code> column in <code>.info()</code>
+output. <strong>Are dates stored as <code>object</code>
+(text)?</strong></li>
+</ul></li>
+<li><strong>EXPECTED:</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>DataFrame</th>
+<th>Approx rows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>orders</td>
+<td>99,441</td>
+</tr>
+<tr>
+<td>customers</td>
+<td>99,441</td>
+</tr>
+<tr>
+<td>items</td>
+<td>112,650</td>
+</tr>
+<tr>
+<td>payments</td>
+<td>103,886</td>
+</tr>
+<tr>
+<td>reviews</td>
+<td>99,224</td>
+</tr>
+<tr>
+<td>geo</td>
+<td>1,000,163</td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-3-fix-the-date-columns">Step 3 — Fix the date columns</h3>
+<ul>
+<li><strong>WHAT:</strong> In <code>orders</code>, <strong>5 date
+columns</strong> are stored as text. Convert them to real datetime.</li>
+<li><strong>The 5 columns:</strong>
+<ul>
+<li><code>order_purchase_timestamp</code></li>
+<li><code>order_approved_at</code></li>
+<li><code>order_delivered_carrier_date</code></li>
+<li><code>order_delivered_customer_date</code></li>
+<li><code>order_estimated_delivery_date</code></li>
+</ul></li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>The function is <code>pd.to_datetime()</code>.</li>
+<li>Add the argument <code>errors='coerce'</code>. If a cell is bad, it
+becomes <code>NaT</code> (Not a Time = missing). The code does not
+crash.</li>
+<li>Use a <code>for</code> loop over the 5 column names. Do NOT write 5
+separate lines.</li>
+</ul></li>
+<li><strong>WHY:</strong> If dates are strings, you cannot subtract
+them. “How many days from purchase to delivery?” is impossible.</li>
+<li><strong>EXPECTED:</strong> After your code,
+<code>orders.dtypes</code> shows <code>datetime64[ns]</code> for those 5
+columns.</li>
+</ul>
+<h3 id="step-4-find-missing-values">Step 4 — Find missing values</h3>
+<ul>
+<li><p><strong>WHAT:</strong> Count missing values per column.</p></li>
+<li><p><strong>HINTS:</strong> <code>.isna()</code> returns True/False
+per cell. <code>.sum()</code> counts the Trues per column.</p></li>
+<li><p><strong>EXPECTED:</strong> Something like:</p>
+<pre><code>order_approved_at               160
+order_delivered_carrier_date   1783
+order_delivered_customer_date  2965</code></pre></li>
+</ul>
+<h3 id="step-5-filter-to-delivered-orders">Step 5 — Filter to delivered
+orders</h3>
+<ul>
+<li><strong>WHAT:</strong> Keep only rows where
+<code>order_status == 'delivered'</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Boolean mask:
+<code>orders[orders['order_status'] == 'delivered']</code>.</li>
+<li>Add <code>.copy()</code> at the end. This avoids a warning
+later.</li>
+</ul></li>
+<li><strong>WHY:</strong> Only delivered orders have a real delivery
+date. We cannot compute “late?” for the others.</li>
+<li><strong>EXPECTED:</strong> About <strong>96,478 rows</strong>
+left.</li>
+</ul>
+<h3 id="step-6-drop-rows-missing-the-delivery-date">Step 6 — Drop rows
+missing the delivery date</h3>
+<ul>
+<li><strong>WHAT:</strong> Even after Step 5, a few rows still have no
+<code>order_delivered_customer_date</code>. Drop them.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>.dropna(subset=['order_delivered_customer_date'])</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> We cannot compute <code>is_late</code> without
+the actual delivery date.</li>
+<li><strong>EXPECTED:</strong> About <strong>96,470 rows</strong>
+left.</li>
+</ul>
+<h3 id="step-7-write-down-what-you-did">Step 7 — Write down what you
+did</h3>
+<p>In a markdown cell, write: - Starting rows: ~99,441 - After status
+filter: ~96,478 - After dropping missing dates: ~96,470 - WHY you
+removed each group.</p>
+<h3 id="step-8-save-to-drive">Step 8 — Save to Drive</h3>
+<ul>
+<li><strong>WHAT:</strong> Save the cleaned <code>orders</code>
+DataFrame as parquet, inside your Drive folder.</li>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/olist_lab/orders_step1.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-beatriz-15-minutes">Phase C — Make
+ONE chart for Beatriz (15 minutes)</h2>
+<p>She does not have time to read your code. She wants ONE picture.</p>
+<h3 id="beatrizs-chart-how-clean-was-the-data">Beatriz’s chart — “How
+clean was the data?”</h3>
+<p>Make a bar chart showing the row count after each cleaning step:</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Rows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Raw orders</td>
+<td>99,441</td>
+</tr>
+<tr>
+<td>After “delivered” filter</td>
+<td>96,478</td>
+</tr>
+<tr>
+<td>After drop-missing-date</td>
+<td>96,470</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>plt.bar()</code> with 3 bars.</li>
+<li>Add the title:
+<code>"Data cleaning impact — 99.4% of orders survived"</code>.</li>
+<li>X-label: stages of cleaning.</li>
+<li>Y-label: row count.</li>
+<li>Put the number on top of each bar.</li>
+</ul></li>
+<li><strong>Takeaway for Beatriz:</strong> “We threw out less than 1% of
+the data. Almost everything is usable.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-1">Common mistakes in Class 1</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Forget <code>errors='coerce'</code> on <code>to_datetime</code></td>
+<td>Code crashes on one bad date.</td>
+</tr>
+<tr>
+<td>Forget <code>.copy()</code> after a filter</td>
+<td>Pandas warns “SettingWithCopyWarning”.</td>
+</tr>
+<tr>
+<td>Delete rows without writing WHY</td>
+<td>Module 4 students will not understand.</td>
+</tr>
+<tr>
+<td>Save to <code>/content/</code> instead of Drive</td>
+<td>File disappears when Colab disconnects.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-2">Self-check before Class 2</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />All 9 DataFrames
+loaded.</label></li>
+<li><label><input type="checkbox" />The 5 date columns in
+<code>orders</code> have dtype <code>datetime64</code>.</label></li>
+<li><label><input type="checkbox" />You filtered to delivered
+orders.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory charts in
+your notebook.</label></li>
+<li><label><input type="checkbox" />1 polished chart for
+Beatriz.</label></li>
+<li><label><input type="checkbox" />You saved
+<code>orders_step1.parquet</code> to your Drive folder.</label></li>
+<li><label><input type="checkbox" />You wrote down (in markdown) what
+you did and WHY.</label></li>
+</ul>
+<hr />
+<h1 id="class-2-encoding-and-scaling">Class 2 — Encoding and
+Scaling</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Beatriz looks at your cleaned
+data. She is happy. But she says: “the model is a math model. It does
+not understand the word ‘credit_card’. Turn the words into numbers.”</p>
+</blockquote>
+<h2 id="your-goal-1">Your goal</h2>
+<p>Turn TEXT columns into numbers. Make all numeric columns about the
+same size.</p>
+<h2 id="inputs-1">Inputs</h2>
+<ul>
+<li><code>orders_step1.parquet</code> from Class 1</li>
+<li>The other 8 raw CSVs (still needed for joins)</li>
+</ul>
+<h2 id="outputs-1">Outputs</h2>
+<ul>
+<li><code>orders_step2.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Beatriz</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-distribution-of-total_price">Exploratory
+chart 1 — Distribution of <code>total_price</code></h3>
+<ul>
+<li><strong>Question:</strong> “Most orders are small ($50). A few are
+huge ($5000+). Is the distribution skewed?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use a histogram (<code>plt.hist()</code>).</li>
+<li>Use <code>bins=50</code> to see the shape.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The price column has a “long tail”.
+This is why we will use log-transform.</li>
+</ul>
+<h3
+id="exploratory-chart-2-distribution-of-total_price-after-np.log1p">Exploratory
+chart 2 — Distribution of <code>total_price</code> AFTER
+<code>np.log1p</code></h3>
+<ul>
+<li><strong>Question:</strong> “Does log-transform make the shape more
+normal?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Make a NEW column:
+<code>log_price = np.log1p(df['total_price'])</code>.</li>
+<li>Histogram it.</li>
+<li>Compare to chart 1.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Log makes the long tail manageable
+for the model.</li>
+</ul>
+<h3 id="exploratory-chart-3-payment_type-counts">Exploratory chart 3 —
+<code>payment_type</code> counts</h3>
+<ul>
+<li><strong>Question:</strong> “Which payment methods are popular in
+Brazil?”</li>
+<li><strong>HINTS:</strong> <code>value_counts().plot.bar()</code>.</li>
+<li><strong>What you learn:</strong> Are some categories super rare?
+(Should you merge them?)</li>
+</ul>
+<h3 id="exploratory-chart-4-customer_state-counts">Exploratory chart 4 —
+<code>customer_state</code> counts</h3>
+<ul>
+<li><strong>Question:</strong> “How many states do customers come
+from?”</li>
+<li><strong>HINTS:</strong> <code>value_counts().plot.bar()</code>. Or
+<code>sns.countplot()</code>.</li>
+<li><strong>What you learn:</strong> 27 states. Sao Paulo dominates.
+This affects encoding choice.</li>
+</ul>
+<hr />
+<h2 id="phase-b-encode-and-scale">Phase B — Encode and scale</h2>
+<h3 id="step-1-join-the-most-important-tables">Step 1 — Join the most
+important tables</h3>
+<ul>
+<li><strong>WHAT:</strong> Merge <code>orders</code> +
+<code>customers</code> + <code>items</code> + <code>payments</code> into
+one DataFrame <code>df</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>df = orders.merge(customers, on='customer_id', how='left')</code>.</li>
+<li>Repeat for items (<code>on='order_id'</code>) and payments
+(<code>on='order_id'</code>).</li>
+</ul></li>
+<li><strong>WHY <code>how='left'</code>?</strong> Keep all orders even
+if some have missing items.</li>
+<li><strong>EXPECTED:</strong> ~112,650 rows (one per ORDER ITEM, not
+per order — <code>items</code> expands the table).</li>
+</ul>
+<h3 id="step-2-aggregate-to-one-row-per-order">Step 2 — Aggregate to one
+row per order</h3>
+<ul>
+<li><strong>WHAT:</strong> Group by <code>order_id</code>. Sum the
+numeric columns. Take the first value for text columns.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>df.groupby('order_id').agg(...)</code>.</li>
+<li>Sum: <code>total_price</code>, <code>total_freight</code>,
+<code>num_items</code> (count of items).</li>
+<li>First: <code>payment_type</code>, <code>customer_state</code>, the
+date columns.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> ~96,470 rows × ~12 columns.</li>
+</ul>
+<h3 id="step-3-one-hot-encode-payment_type">Step 3 — One-hot encode
+<code>payment_type</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Turn the 5 categories into 5 new 0/1
+columns.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>pd.get_dummies(df, columns=['payment_type'], prefix='payment')</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> 5 new columns:
+<code>payment_credit_card</code>, <code>payment_boleto</code>, etc.</li>
+</ul>
+<h3 id="step-4-decide-what-to-do-with-customer_state">Step 4 — Decide
+what to do with <code>customer_state</code></h3>
+<ul>
+<li><strong>WHAT:</strong> 27 states. Too many for one-hot? Maybe.</li>
+<li><strong>TWO OPTIONS:</strong>
+<ul>
+<li><strong>A — One-hot:</strong> Add 27 new 0/1 columns.</li>
+<li><strong>B — Target encoding:</strong> Replace each state with the
+AVG <code>is_late</code> rate for that state (compute from train
+only).</li>
+</ul></li>
+<li><strong>YOUR CHOICE:</strong> Pick one. Write in your notebook
+WHY.</li>
+</ul>
+<h3 id="step-5-log-transform-total_price-and-total_freight">Step 5 —
+Log-transform <code>total_price</code> and
+<code>total_freight</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Both columns have very long tails. Apply
+<code>np.log1p()</code>.</li>
+<li><strong>HINTS:</strong>
+<code>df['log_price'] = np.log1p(df['total_price'])</code>.</li>
+<li><strong>WHY <code>log1p</code> and not <code>log</code>?</strong>
+<code>log(0)</code> is <code>-inf</code>.
+<code>log1p(x) = log(x + 1)</code> is safe for zeros.</li>
+</ul>
+<h3 id="step-6-scale-numeric-columns-preview-only">Step 6 — Scale
+numeric columns (preview only)</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>StandardScaler</code> to make every
+numeric column have mean = 0, std = 1.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.preprocessing import StandardScaler</code>.</li>
+<li><code>scaler = StandardScaler()</code>.</li>
+<li><code>scaler.fit_transform(df[numeric_cols])</code>.</li>
+</ul></li>
+<li><strong>WARNING:</strong> This is for inspection only. In Class 5,
+scaling goes INSIDE the Pipeline. Do NOT save the scaled version as your
+final file.</li>
+</ul>
+<h3 id="step-7-save">Step 7 — Save</h3>
+<ul>
+<li><strong>WHAT:</strong> Save to Drive.
+<code>df.to_parquet('/content/drive/MyDrive/olist_lab/orders_step2.parquet')</code>.</li>
+<li><strong>Save the UNSCALED version.</strong> Scaling will happen
+inside the Pipeline later.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-beatriz">Phase C — Make ONE chart for
+Beatriz</h2>
+<h3 id="beatrizs-chart-where-do-our-customers-live">Beatriz’s chart —
+“Where do our customers live?”</h3>
+<p>A bar chart of the top 10 states by order count.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['customer_state'].value_counts().head(10).plot.bar()</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Top 10 states by order volume — Sao Paulo
+dominates (40%)”.</li>
+<li><strong>X-label:</strong> State.</li>
+<li><strong>Y-label:</strong> Number of orders.</li>
+<li><strong>Takeaway:</strong> “Most customers are in 5 states. Your
+trucks should focus there.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-2">Common mistakes in Class 2</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scale BEFORE train/test split</td>
+<td><strong>Leakage.</strong> Scaler sees test data.</td>
+</tr>
+<tr>
+<td>One-hot encode every text column</td>
+<td>Some columns have 1000+ values. Table explodes.</td>
+</tr>
+<tr>
+<td>Forget <code>np.log1p</code> and use <code>np.log</code> on
+zeros</td>
+<td><code>np.log(0) = -inf</code>. Crash.</td>
+</tr>
+<tr>
+<td>Save the scaled version</td>
+<td>Class 5 will scale again inside the pipeline. Double scaling = wrong
+numbers.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-3">Self-check before Class 3</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />One row per order.</label></li>
+<li><label><input type="checkbox" /><code>payment_type</code>
+encoded.</label></li>
+<li><label><input type="checkbox" />You decided what to do with
+<code>customer_state</code>.</label></li>
+<li><label><input type="checkbox" /><code>log_price</code> and
+<code>log_freight</code> exist.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory
+charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Beatriz.</label></li>
+<li><label><input type="checkbox" /><code>orders_step2.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-3-feature-engineering">Class 3 — Feature Engineering</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Beatriz says: “The columns in the
+raw data are not enough. The TRULY useful columns are not there. We must
+MAKE them. For example, the distance between buyer and seller — biggest
+predictor of lateness.”</p>
+</blockquote>
+<h2 id="your-goal-2">Your goal</h2>
+<p>Make NEW columns from the existing ones. These will help the model
+predict lateness.</p>
+<h2 id="inputs-2">Inputs</h2>
+<ul>
+<li><code>orders_step2.parquet</code></li>
+<li><code>geolocation</code> (zip code -&gt; lat/lon)</li>
+<li><code>sellers</code></li>
+</ul>
+<h2 id="outputs-2">Outputs</h2>
+<ul>
+<li><code>orders_step3.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Beatriz</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-1">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-is_late-distribution">Exploratory chart 1 —
+<code>is_late</code> distribution</h3>
+<ul>
+<li>First make the <code>is_late</code> column (see Step 1 below).</li>
+<li><strong>Question:</strong> “What % of orders are late?”</li>
+<li><strong>HINTS:</strong>
+<code>df['is_late'].value_counts(normalize=True).plot.bar()</code>.</li>
+<li><strong>What you learn:</strong> Confirm it is around 5-10%.</li>
+</ul>
+<h3 id="exploratory-chart-2-is_late-by-purchase-day-of-week">Exploratory
+chart 2 — <code>is_late</code> by purchase day of week</h3>
+<ul>
+<li><strong>Question:</strong> “Are weekend orders more likely to be
+late?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Make <code>purchase_dayofweek</code> (see Step 2 below).</li>
+<li>Use
+<code>df.groupby('purchase_dayofweek')['is_late'].mean()</code>.</li>
+<li>Plot as a bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Patterns by day of week.</li>
+</ul>
+<h3 id="exploratory-chart-3-distance-histogram">Exploratory chart 3 —
+Distance histogram</h3>
+<ul>
+<li>After you compute <code>distance_km</code> (Step 4), look at its
+distribution.</li>
+<li><strong>HINTS:</strong> Histogram with <code>bins=50</code>.</li>
+<li><strong>What you learn:</strong> Most orders are &lt; 500 km. A few
+are 3000+ km (Brazil is huge).</li>
+</ul>
+<h3 id="exploratory-chart-4-distance-vs-late-rate">Exploratory chart 4 —
+Distance vs late rate</h3>
+<ul>
+<li><strong>Question:</strong> “Are far orders more likely to be
+late?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Group <code>distance_km</code> into 10 bins
+(<code>pd.cut()</code>).</li>
+<li>Compute <code>is_late</code> mean per bin.</li>
+<li>Bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> This is the most important
+feature.</li>
+</ul>
+<hr />
+<h2 id="phase-b-engineer-the-features">Phase B — Engineer the
+features</h2>
+<h3 id="step-1-create-the-target-column-is_late">Step 1 — Create the
+target column <code>is_late</code></h3>
+<ul>
+<li><strong>WHAT:</strong> <code>is_late = 1</code> if delivered AFTER
+the estimated date, else 0.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compare two columns:
+<code>delivered_customer_date &gt; estimated_delivery_date</code>.</li>
+<li>The result is True/False. Convert to int with
+<code>.astype(int)</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> About 7% of rows have
+<code>is_late = 1</code>. Confirm with
+<code>df['is_late'].mean()</code>.</li>
+</ul>
+<h3 id="step-2-date-derived-features">Step 2 — Date-derived
+features</h3>
+<p>Make these new columns from
+<code>order_purchase_timestamp</code>:</p>
+<table>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>purchase_year</code></td>
+<td>The year</td>
+</tr>
+<tr>
+<td><code>purchase_month</code></td>
+<td>The month (1–12)</td>
+</tr>
+<tr>
+<td><code>purchase_dayofweek</code></td>
+<td>0=Monday, 6=Sunday</td>
+</tr>
+<tr>
+<td><code>purchase_hour</code></td>
+<td>0–23</td>
+</tr>
+<tr>
+<td><code>is_weekend</code></td>
+<td>1 if dayofweek &gt;= 5, else 0</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use the <code>.dt</code> accessor on a datetime column.</li>
+<li><code>df['col'].dt.year</code>, <code>.dt.month</code>,
+<code>.dt.dayofweek</code>, <code>.dt.hour</code>.</li>
+<li>For <code>is_weekend</code>, write a comparison and convert to
+int.</li>
+</ul></li>
+<li><strong>WHY:</strong> A model can learn “Friday-night orders are
+riskier” only if YOU give it the <code>purchase_dayofweek</code>
+column.</li>
+</ul>
+<h3 id="step-3-date-difference-features">Step 3 — Date-difference
+features</h3>
+<table>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>delivery_days</code></td>
+<td>Actual delivery time, in days</td>
+</tr>
+<tr>
+<td><code>estimate_days</code></td>
+<td>Promised delivery time, in days</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Subtract two datetime columns. Result is a Timedelta.</li>
+<li>Use <code>.dt.days</code> on the Timedelta to get a number.</li>
+</ul></li>
+<li><strong>WARNING:</strong>
+<ul>
+<li><code>estimate_days</code> is OK to use as a feature. (We know the
+estimate at order time.)</li>
+<li><code>delivery_days</code> is NOT OK. Knowing the actual delivery
+time = knowing the answer. This is <strong>leakage.</strong> Use for
+analysis only.</li>
+</ul></li>
+</ul>
+<h3 id="step-4-compute-distance-with-the-haversine-formula">Step 4 —
+Compute distance with the Haversine formula</h3>
+<p>This is the <strong>biggest</strong> feature.</p>
+<p><strong>Sub-step 4a — Build <code>zip -&gt; (lat, lon)</code> map
+from <code>geo</code>:</strong> - <strong>HINTS:</strong> -
+<code>geo.groupby('geolocation_zip_code_prefix').agg(lat=..., lon=...)</code>.
+- Use <code>'mean'</code> for both lat and lon (sometimes one zip has
+many points).</p>
+<p><strong>Sub-step 4b — Join the map to customers and sellers.</strong>
+- <strong>HINTS:</strong> - Merge <code>zip_to_latlon</code> with
+<code>customers</code> on
+<code>customer_zip_code_prefix == geolocation_zip_code_prefix</code>. -
+Repeat for sellers. - Then join customer_lat/lon and seller_lat/lon to
+your main <code>df</code>.</p>
+<p><strong>Sub-step 4c — Compute Haversine distance.</strong></p>
+<p>You need to write the formula. Skeleton:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> haversine(lat1, lon1, lat2, lon2):</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    R <span class="op">=</span> <span class="dv">6371</span>                  <span class="co"># Earth radius in km</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    phi1 <span class="op">=</span> np.radians(___)    <span class="co"># YOU fill in</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    phi2 <span class="op">=</span> np.radians(___)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    dphi <span class="op">=</span> np.radians(___ <span class="op">-</span> ___)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    dlam <span class="op">=</span> np.radians(___ <span class="op">-</span> ___)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> np.sin(dphi<span class="op">/</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> np.cos(phi1)<span class="op">*</span>np.cos(phi2) <span class="op">*</span> np.sin(dlam<span class="op">/</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">2</span> <span class="op">*</span> R <span class="op">*</span> np.arcsin(np.sqrt(a))</span></code></pre></div>
+<p>Then call it: <code>df['distance_km'] = haversine(...)</code> with
+the 4 columns.</p>
+<ul>
+<li><strong>WHY Haversine?</strong> The Earth is a sphere. Straight-line
+distance on a flat map is wrong. Haversine gives the real distance.</li>
+<li><strong>EXPECTED:</strong> <code>distance_km</code> between 0 and
+~5000.</li>
+</ul>
+<h3 id="step-5-domain-features-pick-at-least-2">Step 5 — Domain features
+(pick at least 2)</h3>
+<table>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>freight_per_item</code></td>
+<td><code>total_freight / num_items</code></td>
+</tr>
+<tr>
+<td><code>price_per_item</code></td>
+<td><code>total_price / num_items</code></td>
+</tr>
+<tr>
+<td><code>freight_ratio</code></td>
+<td><code>total_freight / (total_price + 1)</code></td>
+</tr>
+<tr>
+<td><code>seller_avg_late_rate</code></td>
+<td>For each seller, the % of past orders late</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Simple arithmetic for the first 3.</li>
+<li>For <code>seller_avg_late_rate</code>: groupby
+<code>seller_id</code>, compute mean of <code>is_late</code>. WARNING:
+use train data only.</li>
+</ul></li>
+</ul>
+<h3 id="step-6-save">Step 6 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/olist_lab/orders_step3.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-beatriz-1">Phase C — Make ONE chart
+for Beatriz</h2>
+<h3 id="beatrizs-chart-distance-kills-delivery-times">Beatriz’s chart —
+“Distance kills delivery times”</h3>
+<p>A bar chart showing: bin distance into 5 buckets, show the % late in
+each bucket.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>pd.cut(df['distance_km'], bins=[0, 100, 500, 1000, 2000, 5000])</code>.</li>
+<li>GroupBy that, take the mean of <code>is_late</code>.</li>
+<li>Multiply by 100 to get %.</li>
+<li>Bar chart.</li>
+</ul></li>
+<li><strong>Title:</strong> “Late delivery rate by distance — orders
+over 1000 km are 4x more likely to be late.”</li>
+<li><strong>Takeaway for Beatriz:</strong> “If we promise faster
+delivery on long routes, we lose money. Maybe extend the estimate for
+distant orders.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-3">Common mistakes in Class 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Use <code>delivery_days</code> as a feature</td>
+<td>Leakage. The model will look 100% accurate but fail in
+production.</td>
+</tr>
+<tr>
+<td>Forget <code>.dt.days</code> and get a Timedelta</td>
+<td>Model crashes on Timedelta dtype.</td>
+</tr>
+<tr>
+<td>Use Euclidean distance instead of Haversine</td>
+<td>Wrong distances. Brazil is huge and curved.</td>
+</tr>
+<tr>
+<td>Compute seller late rate from ALL data</td>
+<td>Leakage. Only from train data.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-4">Self-check before Class 4</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>is_late</code> exists. Mean
+~7%.</label></li>
+<li><label><input type="checkbox" />5 date-derived features
+exist.</label></li>
+<li><label><input type="checkbox" /><code>distance_km</code> looks
+reasonable (0–5000).</label></li>
+<li><label><input type="checkbox" />At least 2 domain
+features.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 explanatory chart.</label></li>
+<li><label><input type="checkbox" /><code>orders_step3.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-4-feature-selection">Class 4 — Feature Selection</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Now you have ~25 columns. Beatriz
+says: “Too many. Some are duplicates. Some are useless. I want 10–15
+GOOD columns. Pick them.”</p>
+</blockquote>
+<h2 id="your-goal-3">Your goal</h2>
+<p>Pick the best 10–15 columns. Drop the rest. Justify every choice.</p>
+<h2 id="inputs-3">Inputs</h2>
+<ul>
+<li><code>orders_step3.parquet</code></li>
+</ul>
+<h2 id="outputs-3">Outputs</h2>
+<ul>
+<li><code>orders_step4.parquet</code> in Drive (only the selected
+columns + <code>is_late</code>)</li>
+<li>3+ exploratory charts (correlation heatmap, mutual info bars,
+importance bars)</li>
+<li>A short markdown report explaining your choices</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-2">Phase A — Explore the data
+first</h2>
+<h3
+id="exploratory-chart-1-correlation-heatmap-of-numeric-columns">Exploratory
+chart 1 — Correlation heatmap of numeric columns</h3>
+<ul>
+<li><strong>Question:</strong> “Which columns say the same thing as each
+other?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute <code>df[numeric_cols].corr()</code>.</li>
+<li>Plot with <code>sns.heatmap()</code>.</li>
+<li>Use <code>annot=True</code> and <code>fmt='.2f'</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Pairs of columns with |corr| &gt;
+0.9 are redundant.</li>
+</ul>
+<h3 id="exploratory-chart-2-mutual-information-bar-chart">Exploratory
+chart 2 — Mutual information bar chart</h3>
+<ul>
+<li>After you compute mutual info (Step 4 below), plot it.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Sort the values, then bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Which columns predict
+<code>is_late</code> strongest.</li>
+</ul>
+<h3
+id="exploratory-chart-3-random-forest-feature-importance">Exploratory
+chart 3 — Random Forest feature importance</h3>
+<ul>
+<li>After you train the RF (Step 5 below), plot the importances.</li>
+<li><strong>HINTS:</strong>
+<code>pd.Series(rf.feature_importances_, index=...).sort_values().plot.barh()</code>.</li>
+<li><strong>What you learn:</strong> A second opinion on feature
+importance.</li>
+</ul>
+<hr />
+<h2 id="phase-b-select-features">Phase B — Select features</h2>
+<h3 id="step-1-split-into-train-and-test-first">Step 1 — Split into
+train and test FIRST</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>train_test_split</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.model_selection import train_test_split</code>.</li>
+<li><code>X = df.drop('is_late', axis=1); y = df['is_late']</code>.</li>
+<li>Pass: <code>test_size=0.2</code>, <code>random_state=42</code>,
+<code>stratify=y</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> All next steps use TRAIN ONLY. Otherwise
+leakage.</li>
+</ul>
+<h3 id="step-2-remove-low-variance-columns">Step 2 — Remove low-variance
+columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop columns where almost all values are the
+same.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import VarianceThreshold</code>.</li>
+<li><code>VarianceThreshold(threshold=0.01)</code> then
+<code>.fit_transform(X_train[numeric_cols])</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-3-remove-highly-correlated-columns">Step 3 — Remove highly
+correlated columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop one of each pair where |corr| &gt;
+0.9.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute correlation matrix.</li>
+<li>Get the upper triangle with <code>np.triu(...)</code>.</li>
+<li>For each column, if any of its upper-triangle correlations is &gt;
+0.9, mark it for dropping.</li>
+</ul></li>
+</ul>
+<h3 id="step-4-rank-by-mutual-information">Step 4 — Rank by mutual
+information</h3>
+<ul>
+<li><strong>WHAT:</strong> Score each column by how much it tells you
+about <code>is_late</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import mutual_info_classif</code>.</li>
+<li><code>mi = mutual_info_classif(X_train_numeric, y_train)</code>.</li>
+<li>Put in a Series, sort.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> <code>distance_km</code>,
+<code>estimate_days</code>, <code>seller_avg_late_rate</code> should be
+at the top.</li>
+</ul>
+<h3 id="step-5-random-forest-importance-second-opinion">Step 5 — Random
+Forest importance (second opinion)</h3>
+<ul>
+<li><strong>WHAT:</strong> Train a small RF, look at
+<code>feature_importances_</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.ensemble import RandomForestClassifier</code>.</li>
+<li><code>RandomForestClassifier(n_estimators=50, max_depth=8, n_jobs=-1)</code>.</li>
+<li><code>.fit(X_train, y_train)</code>.</li>
+<li>Look at <code>.feature_importances_</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-6-pick-the-final-1015-columns">Step 6 — Pick the final
+10–15 columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Combine the rankings. Pick columns that:
+<ul>
+<li>Are high in mutual info, AND</li>
+<li>Are high in RF importance, AND</li>
+<li>Were not dropped by variance/correlation pruning.</li>
+</ul></li>
+<li><strong>WRITE DOWN:</strong> In your notebook, list the columns.
+Explain in 1 sentence why each one is in.</li>
+</ul>
+<h3 id="step-7-save-1">Step 7 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong> Keep only the selected columns +
+<code>is_late</code>. Save as <code>orders_step4.parquet</code> to
+Drive.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-beatriz-2">Phase C — Make ONE chart
+for Beatriz</h2>
+<h3
+id="beatrizs-chart-these-are-the-10-most-important-columns">Beatriz’s
+chart — “These are the 10 most important columns”</h3>
+<p>A horizontal bar chart of your top 10 features and their importance
+score.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use the RF importance.</li>
+<li><code>sort_values()</code> then <code>.head(10)</code> then
+<code>.plot.barh()</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Top 10 predictors of late delivery.”</li>
+<li><strong>Y-axis:</strong> column names.</li>
+<li><strong>X-axis:</strong> Random Forest importance.</li>
+<li><strong>Takeaway:</strong> “Distance and the estimated delivery time
+predict 70% of lateness. Everything else is small.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-4">Common mistakes in Class 4</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compute mutual info on the FULL data</td>
+<td>Leakage.</td>
+</tr>
+<tr>
+<td>Drop columns without writing why</td>
+<td>Module 4 students will not understand.</td>
+</tr>
+<tr>
+<td>Keep too many columns (40+)</td>
+<td>Slow training. Overfitting risk.</td>
+</tr>
+<tr>
+<td>Drop a high-mutual-info column</td>
+<td>Big mistake. Check why it is high before dropping.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-5">Self-check before Class 5</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Train/test split done
+FIRST.</label></li>
+<li><label><input type="checkbox" />10–15 columns remain +
+<code>is_late</code>.</label></li>
+<li><label><input type="checkbox" />You wrote down WHY for each kept
+column.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Beatriz.</label></li>
+<li><label><input type="checkbox" /><code>orders_step4.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-5-pipelines">Class 5 — Pipelines</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Beatriz says: “Your cleaning code
+is in 4 different notebooks. When a new order arrives tomorrow, you
+cannot copy 4 notebooks to the server. We need ONE object that does
+everything.”</p>
+</blockquote>
+<h2 id="your-goal-4">Your goal</h2>
+<p>Put EVERY cleaning step inside ONE Pipeline object. Production-ready
+code.</p>
+<h2 id="inputs-4">Inputs</h2>
+<ul>
+<li><code>orders_step4.parquet</code> (selected columns)</li>
+</ul>
+<h2 id="outputs-4">Outputs</h2>
+<ul>
+<li><code>olist_pipeline.joblib</code> saved in Drive</li>
+<li>1 confusion-matrix chart + 1 ROC curve chart</li>
+<li>A pipeline that takes RAW input and produces predictions</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-3">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-confusion-matrix-after-training">Exploratory
+chart 1 — Confusion matrix (after training)</h3>
+<ul>
+<li>After Step 6, build a confusion matrix.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay</code>.</li>
+<li><code>cm = confusion_matrix(y_test, y_pred)</code>.</li>
+<li><code>ConfusionMatrixDisplay(cm, display_labels=['On time', 'Late']).plot()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> How many late orders did we CATCH?
+How many did we MISS?</li>
+</ul>
+<h3 id="exploratory-chart-2-roc-curve">Exploratory chart 2 — ROC
+curve</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.metrics import RocCurveDisplay</code>.</li>
+<li><code>RocCurveDisplay.from_estimator(pipeline, X_test, y_test)</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The trade-off between recall and
+false alarms. The AUC number.</li>
+</ul>
+<hr />
+<h2 id="phase-b-build-the-pipeline">Phase B — Build the pipeline</h2>
+<h3
+id="step-1-decide-which-columns-are-numeric-and-which-are-categorical">Step
+1 — Decide which columns are numeric and which are categorical</h3>
+<ul>
+<li><strong>HINTS:</strong> Make two lists.</li>
+<li><strong>EXAMPLE:</strong>
+<ul>
+<li>numeric: <code>distance_km</code>, <code>estimate_days</code>,
+<code>total_price</code>, <code>total_freight</code>,
+<code>num_items</code>, <code>purchase_hour</code>,
+<code>log_freight</code>.</li>
+<li>categorical: <code>payment_type</code>,
+<code>customer_state</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-2-build-the-numeric-mini-pipeline">Step 2 — Build the
+numeric mini-pipeline</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer (fill missing) +
+scaler.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.pipeline import Pipeline</code>.</p></li>
+<li><p><code>from sklearn.impute import SimpleImputer</code>.</p></li>
+<li><p><code>from sklearn.preprocessing import StandardScaler</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>numeric_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;scaler&#39;</span>,  StandardScaler()),</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in the blank: best strategy for numeric?
+(<code>'median'</code>)</p></li>
+</ul></li>
+</ul>
+<h3 id="step-3-build-the-categorical-mini-pipeline">Step 3 — Build the
+categorical mini-pipeline</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer + one-hot encoder.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.preprocessing import OneHotEncoder</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>categorical_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;onehot&#39;</span>,  OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">&#39;___&#39;</span>, sparse_output<span class="op">=</span>___)),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in blanks. (Strategy <code>'most_frequent'</code>,
+handle_unknown <code>'ignore'</code>, sparse_output
+<code>False</code>.)</p></li>
+</ul></li>
+<li><strong>WHY <code>handle_unknown='ignore'</code>?</strong> In
+production, a new customer state may appear. We do not want the code to
+crash.</li>
+</ul>
+<h3 id="step-4-combine-into-a-columntransformer">Step 4 — Combine into a
+ColumnTransformer</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.compose import ColumnTransformer</code>.</li>
+<li>It takes a list of tuples:
+<code>(name, transformer, list_of_columns)</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-5-add-the-model-on-top">Step 5 — Add the model on top</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.linear_model import LogisticRegression</code>.</li>
+<li><code>LogisticRegression(class_weight='balanced', max_iter=1000, random_state=42)</code>.</li>
+<li>Put it in a Pipeline with the preprocessor.</li>
+</ul></li>
+<li><strong>WHY <code>class_weight='balanced'</code>?</strong> Only 7%
+of orders are late. Without this, the model just predicts “not late” for
+everyone and gets 93% accuracy (but useless).</li>
+</ul>
+<h3 id="step-6-train-and-evaluate">Step 6 — Train and evaluate</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>full_pipeline.fit(X_train, y_train)</code>.</li>
+<li><code>y_pred = full_pipeline.predict(X_test)</code>.</li>
+<li><code>from sklearn.metrics import classification_report</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> F1 on the late class around 0.30–0.45.
+(Module 4 improves this.)</li>
+</ul>
+<h3 id="step-7-save-the-trained-pipeline">Step 7 — Save the trained
+pipeline</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>import joblib</code>.</li>
+<li><code>joblib.dump(full_pipeline, '/content/drive/MyDrive/olist_lab/olist_pipeline.joblib')</code>.</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-beatriz-3">Phase C — Make ONE chart
+for Beatriz</h2>
+<h3 id="beatrizs-chart-how-many-late-orders-did-we-catch">Beatriz’s
+chart — “How many late orders did we catch?”</h3>
+<p>A simple table or annotated bar:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Predicted on time</th>
+<th>Predicted late</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Actually on time</strong></td>
+<td>true negatives</td>
+<td>false alarms</td>
+</tr>
+<tr>
+<td><strong>Actually late</strong></td>
+<td>missed late</td>
+<td>caught late</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong> Just print the confusion matrix with labels.
+Or use <code>seaborn.heatmap()</code> on it.</li>
+<li><strong>Title:</strong> “Of 1,000 late orders, our baseline model
+catches ~400.”</li>
+<li><strong>Takeaway for Beatriz:</strong> “Not great, but better than
+zero (which is what we have now). Module 4 will improve this with a
+better model.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-5">Common mistakes in Class 5</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Build the pipeline AFTER you scaled the data manually</td>
+<td>Pipeline scales it twice. Numbers wrong.</td>
+</tr>
+<tr>
+<td>Forget <code>sparse_output=False</code> in OneHotEncoder</td>
+<td>Some downstream code breaks.</td>
+</tr>
+<tr>
+<td>Use <code>class_weight='balanced'</code> AND SMOTE</td>
+<td>Over-correction. Pick one.</td>
+</tr>
+<tr>
+<td>Forget <code>random_state</code></td>
+<td>Results change every run. Hard to debug.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-6">Self-check before Class 6</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Pipeline has preprocessor +
+model.</label></li>
+<li><label><input type="checkbox" />Preprocessor has numeric +
+categorical transformers.</label></li>
+<li><label><input type="checkbox" /><code>handle_unknown='ignore'</code>
+set.</label></li>
+<li><label><input type="checkbox" /><code>class_weight='balanced'</code>
+set.</label></li>
+<li><label><input type="checkbox" />Confusion matrix + ROC curve
+charts.</label></li>
+<li><label><input type="checkbox" /><code>olist_pipeline.joblib</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-6-end-to-end-lab-the-big-one">Class 6 — End-to-End Lab
+(THE BIG ONE)</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Beatriz is in the meeting room.
+She wants the FINAL clean dataset on her desk in 90 minutes. This is the
+lab.</p>
+</blockquote>
+<h2 id="your-goal-5">Your goal</h2>
+<p>Take 9 raw CSV files. Produce ONE final <code>.parquet</code> file
+with the exact 21-column schema. Plus a 1-page findings report.</p>
+<h2 id="time">Time</h2>
+<p><strong>90 minutes</strong> of focused work.</p>
+<h2 id="inputs-5">Inputs</h2>
+<ul>
+<li>The 9 raw CSV files in your Drive folder</li>
+</ul>
+<h2 id="outputs-5">Outputs</h2>
+<ul>
+<li><code>olist_clean.parquet</code> (~95,000 rows × 21 columns) in
+Drive</li>
+<li><code>findings.md</code> (~1 page)</li>
+<li>Your full Colab notebook</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-10-minutes">Phase A — Explore the
+data first (10 minutes)</h2>
+<p>You will reuse charts from Classes 1–5. Pick 3 of them. Put them all
+on ONE PAGE of your notebook with markdown headers: 1.
+<code>is_late</code> distribution (the 7% problem) 2. Distance vs late
+rate (your most important chart) 3. Top 10 most important features</p>
+<p>These 3 charts tell Beatriz the whole story.</p>
+<hr />
+<h2 id="phase-b-build-the-final-dataset-70-minutes">Phase B — Build the
+final dataset (70 minutes)</h2>
+<h3 id="required-output-schema">Required output schema</h3>
+<p>Your <code>olist_clean.parquet</code> MUST have these 21 columns,
+with these names and types:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>Column</th>
+<th>Type</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>order_id</code></td>
+<td>string</td>
+<td>orders</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>customer_unique_id</code></td>
+<td>string</td>
+<td>customers (joined)</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>customer_state</code></td>
+<td>string</td>
+<td>customers</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>seller_state</code></td>
+<td>string</td>
+<td>sellers (joined)</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>purchase_year</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>purchase_month</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>purchase_dayofweek</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>purchase_hour</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>is_weekend</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>num_items</code></td>
+<td>int</td>
+<td>aggregated from items</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>total_price</code></td>
+<td>float</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>total_freight</code></td>
+<td>float</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>log_freight</code></td>
+<td>float</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>payment_type</code></td>
+<td>string</td>
+<td>payments</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>payment_installments</code></td>
+<td>int</td>
+<td>payments</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>distance_km</code></td>
+<td>float</td>
+<td>Haversine</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>delivery_days</code></td>
+<td>float</td>
+<td>engineered (for analysis only — not a feature)</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>estimate_days</code></td>
+<td>float</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>is_late</code></td>
+<td>int (0/1)</td>
+<td>TARGET (engineered)</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>review_score</code></td>
+<td>int 1–5</td>
+<td>reviews</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>review_comment_message</code></td>
+<td>string</td>
+<td>reviews (kept for Module 7!)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lab-phases-timed">Lab phases (timed)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Time</th>
+<th>What you do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Load</td>
+<td>10 min</td>
+<td>Load all 9 CSVs. Confirm row counts.</td>
+</tr>
+<tr>
+<td>2. Clean</td>
+<td>15 min</td>
+<td>Convert dates, filter to delivered, drop missing delivery
+dates.</td>
+</tr>
+<tr>
+<td>3. Aggregate</td>
+<td>15 min</td>
+<td>Sum items per order. Pick primary payment.</td>
+</tr>
+<tr>
+<td>4. Geo + Haversine</td>
+<td>20 min</td>
+<td>Build zip-&gt;latlon map. Join. Compute distance.</td>
+</tr>
+<tr>
+<td>5. Date features + target</td>
+<td>10 min</td>
+<td>Engineer purchase_year/month/dow/hour/is_weekend, delivery_days,
+estimate_days, <strong>is_late</strong>.</td>
+</tr>
+<tr>
+<td>6. Join reviews + save</td>
+<td>10 min</td>
+<td>Join reviews. Validate schema. Save <code>.parquet</code>.</td>
+</tr>
+<tr>
+<td>7. Findings</td>
+<td>10 min</td>
+<td>Write <code>findings.md</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total: 90 minutes.</strong></p>
+<hr />
+<h2 id="phase-c-findings-report-for-beatriz-10-minutes">Phase C —
+Findings report for Beatriz (10 minutes)</h2>
+<p>Write <code>findings.md</code> with these sections:</p>
+<h3 id="final-numbers">Final numbers</h3>
+<ul>
+<li>Final row count: ____</li>
+<li><code>is_late</code> rate: ____% (should be 5–10%)</li>
+</ul>
+<h3 id="top-3-insights">Top 3 insights</h3>
+<ol type="1">
+<li><hr /></li>
+<li><hr /></li>
+<li><hr /></li>
+</ol>
+<h3 id="one-question-to-investigate-in-module-4">One question to
+investigate in Module 4</h3>
+<ul>
+<li><hr /></li>
+</ul>
+<h3 id="one-chart-that-summarizes-everything">One chart that summarizes
+everything</h3>
+<p>Embed your most important chart (the distance vs late rate one).</p>
+<hr />
+<h2 id="grading-rubric-100-points">Grading rubric (100 points)</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All 21 columns exist with the right names and dtypes</td>
+<td>25</td>
+</tr>
+<tr>
+<td>Cleaning decisions written in markdown</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Pipeline is reproducible (re-run from 9 CSVs in ONE command)</td>
+<td>15</td>
+</tr>
+<tr>
+<td>Haversine distance correct (within 1 km of the geopy library)</td>
+<td>10</td>
+</tr>
+<tr>
+<td><code>is_late</code> rate is between 5–10%</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>At least 3 exploratory + 1 explanatory chart per
+class</strong></td>
+<td><strong>15</strong></td>
+</tr>
+<tr>
+<td><code>findings.md</code> has insights, not just numbers</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Code is clean (comments, sensible variable names)</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<h2 id="submit">Submit</h2>
+<p>Upload to
+<code>module-3/class_6/submissions/&lt;YourTeamName&gt;/</code>: -
+<code>olist_clean.parquet</code> - Your Colab notebook
+(<code>File &gt; Download &gt; Download .ipynb</code>) -
+<code>findings.md</code></p>
+<hr />
+<h1 id="tips-for-the-whole-module">Tips for the whole module</h1>
+<ol type="1">
+<li><strong>Do NOT copy-paste code from this guide.</strong> This guide
+gives you HINTS only. Write the code yourself. You will learn much
+faster.</li>
+<li><strong>Save your notebook to Drive often.</strong> Colab
+disconnects after 12 hours.</li>
+<li><strong>Save intermediate <code>.parquet</code> files to
+Drive</strong> (orders_step1, orders_step2, etc.). If something breaks,
+you do not redo everything.</li>
+<li><strong>Pair-program.</strong> One student types, one reads. Switch
+every 20 minutes.</li>
+<li><strong>Make a chart BEFORE you write cleaning code.</strong> You
+must SEE the problem before you can fix it.</li>
+<li><strong>Make a chart AFTER each step.</strong> Confirm your code did
+what you expected.</li>
+<li><strong>Ask the mentor early.</strong> If you are stuck for 20
+minutes, ask. Do not waste an afternoon.</li>
+</ol>
+<p>Good luck.</p>
+</main>
+
+<footer class="scenario-footer">
+  <p><a href="../../#/module/3/class/6">&larr; Back to all 15 scenarios</a></p>
+</footer>
+
+</body>
+</html>

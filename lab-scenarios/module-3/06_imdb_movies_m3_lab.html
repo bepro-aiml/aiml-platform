@@ -1,0 +1,2310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>06_imdb_movies_m3_lab</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --text: #e6e8ec;
+    --text-dim: #9aa0aa;
+    --accent: #7aa2f7;
+    --accent-hover: #a5c0ff;
+    --border: #2a2f3a;
+    --code-bg: #11141a;
+    --table-header: #232732;
+    --quote-bar: #7aa2f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(26, 29, 36, 0.92);
+  }
+  .topbar-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .back-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .back-link:hover { color: var(--accent-hover); }
+  .pdf-link {
+    background: var(--accent);
+    color: #0f1115;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pdf-link:hover { background: var(--accent-hover); }
+  .pdf-link svg { width: 14px; height: 14px; }
+
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 56px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  p { margin-bottom: 16px; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+  strong { color: #fff; font-weight: 600; }
+  em { color: var(--text); font-style: italic; }
+
+  ul, ol { margin-bottom: 18px; padding-left: 28px; }
+  li { margin-bottom: 6px; }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 36px 0;
+  }
+
+  blockquote {
+    border-left: 4px solid var(--quote-bar);
+    background: var(--card);
+    padding: 14px 22px;
+    margin: 18px 0;
+    color: var(--text);
+    border-radius: 0 8px 8px 0;
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  blockquote strong { color: var(--accent); }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    font-size: 0.88em;
+    color: #f0a3b5;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 18px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text);
+    font-size: 1em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.94rem;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  thead { background: var(--table-header); }
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+
+  /* Checkboxes in self-check lists */
+  input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+
+  /* Anchored sections for nav */
+  h2[id], h3[id] { scroll-margin-top: 80px; }
+
+  footer.scenario-footer {
+    max-width: 920px;
+    margin: 60px auto 40px;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+  footer.scenario-footer a {
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    main { padding: 24px 16px 60px; }
+    h1 { font-size: 1.7rem; }
+    h2 { font-size: 1.35rem; }
+    h3 { font-size: 1.1rem; }
+    .topbar { padding: 10px 16px; }
+    pre { font-size: 0.8rem; padding: 12px 14px; }
+    table { font-size: 0.85rem; }
+    th, td { padding: 9px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="../../#/module/3/class/6">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <span style="display:inline-block;transform:translateY(-1px)">&larr;</span> Back to all scenarios
+    </a>
+    <a class="pdf-link" href="06_imdb_movies_m3_lab.pdf" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-4-4h3V4h2v8h3l-4 4zm-8 4v-2h16v2H4z"/></svg>
+      Download as PDF
+    </a>
+  </div>
+</div>
+
+<main>
+<h1 id="imdb-movies-module-3-lab-guide">IMDB Movies — Module 3 Lab
+Guide</h1>
+<p><strong>Scenario:</strong> IMDB Movies. Predict the IMDb rating of a
+movie. <strong>Module:</strong> 3 (Data Preparation and Feature
+Engineering) <strong>Audience:</strong> Adult learners, A2 English. New
+to AI. <strong>Tools:</strong> Google Colab (no install needed).</p>
+<hr />
+<h1 id="the-scenario-your-mission">The Scenario — Your Mission</h1>
+<h2 id="where-you-work">Where you work</h2>
+<p>You and your team are new data analysts at
+<strong>StreamRegion</strong>. StreamRegion is a regional streaming
+service. Like Netflix, but for Central Asia and nearby countries.</p>
+<p>Every quarter: - StreamRegion buys the rights to show movies on its
+app. - <strong>About 10,000 movies</strong> are offered by studios and
+agents. - Each movie has a price (the “license fee”). - StreamRegion can
+only afford about <strong>200 movies per quarter.</strong></p>
+<h2 id="the-problem">The problem</h2>
+<p>The team has <strong>$5 million</strong> to spend this quarter. They
+must pick <strong>200 movies out of 10,000.</strong></p>
+<p>Right now, the team picks by hand: - They read the plot. - They check
+the director. - They guess.</p>
+<p>The result is bad: - Many bought movies get less than 6/10 on IMDb. -
+Subscribers complain: “Why are the movies so boring?” - Some subscribers
+cancel.</p>
+<h2 id="your-managers-request">Your manager’s request</h2>
+<p>Your manager, <strong>Sofia</strong> (Content Acquisitions Director),
+tells you:</p>
+<blockquote>
+<p>“We have <strong>$5 million</strong> to license movies this quarter.
+Out of <strong>10,000 candidates</strong>, we can pick
+<strong>200</strong>.</p>
+<p>Build me a tool that predicts the <strong>IMDb rating</strong> from
+the things we know BEFORE we buy: director, cast, genre, plot, year,
+country.</p>
+<p>Then we will buy the movies your model says will rate <strong>above
+7</strong>.</p>
+<p>If half of those movies really rate above 7, we save subscribers. If
+only 10% do, we lose money. So the model must be good.”</p>
+</blockquote>
+<h2 id="your-teams-job-for-the-next-2-weeks-module-3">Your team’s job
+for the next 2 weeks (Module 3)</h2>
+<p>Sofia cannot do this alone. Her data is <strong>one big messy CSV
+file</strong>. About <strong>85,000 movies</strong>. Some columns are
+full of problems: prices stored as text, genres stored as
+comma-separated strings, missing budgets, and so on.</p>
+<p>Your job in Module 3: &gt; <strong>Turn one messy CSV file into ONE
+clean file. The clean file will be used to train the model in Module
+4.</strong></p>
+<p>The clean file is called <code>imdb_movies_clean.parquet</code>. It
+must have <strong>21 specific columns</strong> (we will see them in
+Class 6).</p>
+<h2 id="after-module-3">After Module 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Module</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Module 4</strong></td>
+<td>Train the regression model. Sofia gets her “predicted rating” per
+movie.</td>
+</tr>
+<tr>
+<td><strong>Module 5</strong></td>
+<td>Find groups of movies (family / action / arthouse). For better
+recommendations.</td>
+</tr>
+<tr>
+<td><strong>Module 7</strong></td>
+<td>Read the plot descriptions in English. Find topic patterns.</td>
+</tr>
+</tbody>
+</table>
+<p>You use the <strong>same IMDB dataset</strong> until the end of
+Module 7.</p>
+<hr />
+<h1 id="how-this-guide-works-read-this-first">How This Guide Works (Read
+This First!)</h1>
+<h2 id="we-do-not-give-you-the-full-code">We do NOT give you the full
+code</h2>
+<p>In this guide you will see two kinds of content:</p>
+<h3 id="what-why-expected-explained-in-words">1. WHAT / WHY / EXPECTED —
+explained in words</h3>
+<p>For every step you read: - <strong>WHAT</strong> you have to do (in
+normal language) - <strong>WHY</strong> you do it (the reason) -
+<strong>HINTS</strong> — the function names, the arguments to remember -
+<strong>EXPECTED</strong> — the result you should see if you did it
+right</p>
+<h3 id="sometimes-a-tiny-code-skeleton-with-blanks">2. Sometimes a tiny
+code skeleton with blanks</h3>
+<p>For the harder steps we give you a code skeleton with
+<code>___</code> blanks. <strong>You fill in the blanks.</strong></p>
+<h3 id="why-no-full-code">Why no full code?</h3>
+<p>Because you will NOT learn if you copy-paste. - In Module 4, the
+model only works if YOU understand each step. - In your future job,
+nobody will give you the code. - Writing the code yourself takes 10
+minutes more today, but saves 10 hours later.</p>
+<p><strong>Rule:</strong> If you finish a step in 30 seconds by
+copy-pasting from a teammate’s notebook, do it AGAIN by yourself.
+Different variable names, same logic.</p>
+<hr />
+<h1 id="visualizations-two-modes">Visualizations — Two Modes</h1>
+<p>In every class you will make charts. There are <strong>two
+reasons</strong> to make a chart:</p>
+<h2 id="exploratory-charts-for-you">1. Exploratory charts (for YOU)</h2>
+<p>Made BEFORE you clean the data. To understand what the data looks
+like. - Fast, ugly, no labels needed. - Examples:
+<code>df.hist()</code>,
+<code>df['column'].value_counts().plot.bar()</code>.</p>
+<blockquote>
+<p>Goal: <strong>“What does this data look like?”</strong></p>
+</blockquote>
+<h2 id="explanatory-charts-for-sofia">2. Explanatory charts (for
+SOFIA)</h2>
+<p>Made AFTER you understand. To EXPLAIN something to your manager. -
+Clean, labeled, one clear message. - Must have: title, x-label, y-label,
+source, and a 1-sentence takeaway.</p>
+<blockquote>
+<p>Goal: <strong>“Sofia, look at this. This is the
+pattern.”</strong></p>
+</blockquote>
+<p>In every class you make BOTH kinds.</p>
+<h2 id="your-plotting-toolkit-you-learned-this-in-module-2-class-5">Your
+plotting toolkit (you learned this in Module 2 Class 5)</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Plot</th>
+<th>When to use it</th>
+<th>Function name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Histogram</td>
+<td>See the SHAPE of a numeric column</td>
+<td><code>plt.hist()</code> or <code>sns.histplot()</code></td>
+</tr>
+<tr>
+<td>Bar chart</td>
+<td>Count of each category</td>
+<td><code>df['col'].value_counts().plot.bar()</code></td>
+</tr>
+<tr>
+<td>Box plot</td>
+<td>See outliers in a numeric column</td>
+<td><code>sns.boxplot()</code></td>
+</tr>
+<tr>
+<td>Scatter plot</td>
+<td>See the relationship between 2 numbers</td>
+<td><code>plt.scatter()</code> or <code>sns.scatterplot()</code></td>
+</tr>
+<tr>
+<td>Heatmap</td>
+<td>See correlation between many columns</td>
+<td><code>sns.heatmap(df.corr())</code></td>
+</tr>
+<tr>
+<td>Line plot</td>
+<td>See change over time</td>
+<td><code>plt.plot()</code></td>
+</tr>
+</tbody>
+</table>
+<p>Before you start: <code>import matplotlib.pyplot as plt</code> and
+<code>import seaborn as sns</code>.</p>
+<hr />
+<h1 id="before-you-start-google-colab-setup">Before You Start — Google
+Colab Setup</h1>
+<p>You will work in <strong>Google Colab</strong>. That means: - You do
+NOT install Python. - You do NOT install pandas, scikit-learn, or
+anything. - You just open a notebook in your web browser.</p>
+<h2 id="step-1-open-a-new-colab-notebook">Step 1 — Open a new Colab
+notebook</h2>
+<ol type="1">
+<li>Go to https://colab.research.google.com</li>
+<li>Sign in with your Google account.</li>
+<li>Click <strong>“New notebook”</strong> (top left).</li>
+<li>Name it <code>imdb_module_3.ipynb</code>.</li>
+</ol>
+<h2 id="step-2-connect-to-google-drive">Step 2 — Connect to Google
+Drive</h2>
+<p>Colab files <strong>disappear</strong> when you close the browser. So
+you must save your work to <strong>Google Drive</strong>.</p>
+<p>In the first cell:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> drive</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>drive.mount(<span class="st">&#39;/content/drive&#39;</span>)</span></code></pre></div>
+<p>A pop-up asks for permission. Click “Allow”. After this, Drive is
+available at <code>/content/drive/MyDrive/</code>.</p>
+<h2 id="step-3-create-a-project-folder">Step 3 — Create a project
+folder</h2>
+<p>In a new cell:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&#39;/content/drive/MyDrive/imdb_lab&#39;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>cd <span class="op">/</span>content<span class="op">/</span>drive<span class="op">/</span>MyDrive<span class="op">/</span>imdb_lab</span></code></pre></div>
+<p>Your team will save ALL files in this folder.</p>
+<h2 id="step-4-get-the-data">Step 4 — Get the data</h2>
+<p><strong>Option A — Direct from Kaggle (recommended):</strong></p>
+<ol type="1">
+<li>Make a free Kaggle account.</li>
+<li>Go to kaggle.com/settings/account, scroll to “API”, click “Create
+New Token”. Save the <code>kaggle.json</code> file.</li>
+<li>In Colab:</li>
+</ol>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> files</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>files.upload()    <span class="co"># pick kaggle.json</span></span></code></pre></div>
+<ol start="4" type="1">
+<li>Then:</li>
+</ol>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>mkdir <span class="op">-</span>p <span class="op">~/</span>.kaggle <span class="op">&amp;&amp;</span> mv kaggle.json <span class="op">~/</span>.kaggle<span class="op">/</span> <span class="op">&amp;&amp;</span> chmod <span class="dv">600</span> <span class="op">~/</span>.kaggle<span class="op">/</span>kaggle.json</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install kaggle <span class="op">-</span>q</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kaggle datasets download <span class="op">-</span>d stefanoleone992<span class="op">/</span>imdb<span class="op">-</span>extensive<span class="op">-</span>dataset</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>unzip <span class="op">-</span>q imdb<span class="op">-</span>extensive<span class="op">-</span>dataset.<span class="bu">zip</span> <span class="op">-</span>d data</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ls data<span class="op">/</span></span></code></pre></div>
+<p>You should see at least <strong>one big CSV file</strong> inside
+<code>data/</code> (the movies file). There may also be a names file and
+a ratings file. The main one is the movies file (~85,000 rows, 22
+columns).</p>
+<p><strong>Option B — Upload by hand:</strong></p>
+<ol type="1">
+<li>Download the zip from
+kaggle.com/datasets/stefanoleone992/imdb-extensive-dataset on your
+laptop.</li>
+<li>Unzip it.</li>
+<li>In Colab’s file panel (left sidebar), upload the CSV file.</li>
+</ol>
+<h2 id="step-5-test-it">Step 5 — Test it</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>movies <span class="op">=</span> pd.read_csv(<span class="st">&#39;data/IMDb movies.csv&#39;</span>, low_memory<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(movies.shape)</span></code></pre></div>
+<p>Should print something like <code>(85855, 22)</code>. You are
+ready.</p>
+<blockquote>
+<p><strong>Note:</strong> The file name in the zip may be
+<code>IMDb movies.csv</code> or <code>IMDb_movies.csv</code>. Use
+<code>!ls data/</code> to check.</p>
+</blockquote>
+<h2 id="colab-tips">Colab tips</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Save your notebook to Drive often</td>
+<td>Colab disconnects after 12 hours.</td>
+</tr>
+<tr>
+<td>Save intermediate <code>.parquet</code> files to Drive</td>
+<td>Files in <code>/content/</code> disappear when Colab
+disconnects.</td>
+</tr>
+<tr>
+<td>Share the notebook with teammates (Share button, top right)</td>
+<td>Editor access. Like Google Docs for code.</td>
+</tr>
+<tr>
+<td>Restart runtime if memory full</td>
+<td>Runtime &gt; Restart runtime.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="class-1-data-cleaning">Class 1 — Data Cleaning</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Sofia drops one big CSV file on
+your desk. ~85,000 movies. 22 columns. Some prices are stored as text
+like “$ 1,000,000”. Some movies have no rating. Your job today: clean
+the most basic problems.</p>
+</blockquote>
+<h2 id="your-goal">Your goal</h2>
+<p>Make the raw CSV USABLE. Fix dirty text in number columns. Find
+missing values. Drop bad rows.</p>
+<h2 id="inputs">Inputs</h2>
+<ul>
+<li>The IMDB movies CSV in <code>data/</code></li>
+</ul>
+<h2 id="outputs">Outputs</h2>
+<ul>
+<li><code>movies_step1.parquet</code> saved in your Drive folder</li>
+<li>3+ exploratory charts in your notebook</li>
+<li>1 explanatory chart for Sofia</li>
+<li>Notes in markdown about every decision you made</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-15-minutes">Phase A — Explore the
+data first (15 minutes)</h2>
+<p>Before you clean anything, <strong>LOOK</strong> at the data.</p>
+<h3
+id="exploratory-chart-1-distribution-of-avg_vote-the-imdb-rating">Exploratory
+chart 1 — Distribution of <code>avg_vote</code> (the IMDb rating)</h3>
+<ul>
+<li><strong>Question:</strong> “Are most movies rated around 6? Are
+there many 1s or 10s?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use a histogram (<code>plt.hist()</code> or
+<code>sns.histplot()</code>).</li>
+<li>Use <code>bins=40</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The shape of the target column.
+Most movies are between 5 and 8.</li>
+</ul>
+<h3 id="exploratory-chart-2-movies-per-year">Exploratory chart 2 —
+Movies per year</h3>
+<ul>
+<li><strong>Question:</strong> “Are most movies recent? How many old
+movies are in the data?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>movies['year'].value_counts().sort_index().plot()</code>.</li>
+<li>WARNING: <code>year</code> may have a few text entries like
+<code>"TV Movie 2019"</code>. You may need to handle that.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The dataset has movies from ~1894
+to today. Most are from the last 30 years.</li>
+</ul>
+<h3 id="exploratory-chart-3-missing-values-per-column">Exploratory chart
+3 — Missing values per column</h3>
+<ul>
+<li><strong>Question:</strong> “Which columns have the most missing
+data?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>movies.isna().sum().sort_values(ascending=False)</code>.</li>
+<li>Plot it as a bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> <code>budget</code>,
+<code>usa_gross_income</code>, <code>worlwide_gross_income</code> are
+very often missing. Some are missing 50%+.</li>
+</ul>
+<hr />
+<h2 id="phase-b-clean-the-movies-table-45-minutes">Phase B — Clean the
+movies table (45 minutes)</h2>
+<h3 id="step-1-load-the-csv">Step 1 — Load the CSV</h3>
+<ul>
+<li><strong>WHAT:</strong> Load the IMDb movies CSV into a DataFrame
+called <code>movies</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>pd.read_csv('data/IMDb movies.csv', low_memory=False)</code>.</li>
+<li><code>low_memory=False</code> stops a warning about mixed
+types.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> A DataFrame with ~85,855 rows and 22
+columns.</li>
+</ul>
+<h3 id="step-2-look-at-the-dataframe">Step 2 — Look at the
+DataFrame</h3>
+<ul>
+<li><strong>WHAT:</strong> Check <code>.shape</code>,
+<code>.info()</code>, <code>.head()</code>, and
+<code>.dtypes</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Look at the <code>Dtype</code> column in <code>.info()</code>
+output.</li>
+<li>Notice: <code>budget</code> and <code>usa_gross_income</code> show
+as <code>object</code> (text). They look like “$ 1,000,000”. This is a
+problem.</li>
+<li>Notice: <code>year</code> may be <code>object</code> too because of
+strings like “TV Movie 2019”.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> You can list at least 5 dirty columns
+that need fixing.</li>
+</ul>
+<h3 id="step-3-fix-the-year-column">Step 3 — Fix the <code>year</code>
+column</h3>
+<ul>
+<li><strong>WHAT:</strong> <code>year</code> should be a number. But
+some rows have text like <code>"TV Movie 2019"</code> or just bad
+values.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>pd.to_numeric(movies['year'], errors='coerce')</code>.</li>
+<li><code>errors='coerce'</code> turns bad values into <code>NaN</code>
+instead of crashing.</li>
+</ul></li>
+<li><strong>WHY:</strong> If <code>year</code> is text, you cannot
+compute <code>movie_age_years = 2026 - year</code> later.</li>
+<li><strong>EXPECTED:</strong> <code>movies['year'].dtype</code> is
+<code>float64</code> (or <code>Int64</code> if you cast). A few rows
+become NaN.</li>
+</ul>
+<h3 id="step-4-parse-the-money-columns">Step 4 — Parse the money
+columns</h3>
+<p>The columns <code>budget</code>, <code>usa_gross_income</code>, and
+<code>worlwide_gross_income</code> look like:</p>
+<pre><code>$ 1,000,000
+$ 25,000,000
+GBP 500,000
+EUR 2,000,000</code></pre>
+<ul>
+<li><strong>WHAT:</strong> Keep only the number part. Convert to
+float.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>.str.extract(r'(\d[\d,]*)')</code> to get the digits and
+commas.</li>
+<li>Then <code>.str.replace(',', '')</code> to remove commas.</li>
+<li>Then <code>pd.to_numeric(..., errors='coerce')</code>.</li>
+<li>WARNING: some are in USD, some in GBP or EUR. For now, just keep the
+number. We will pretend all are USD. (Sofia knows this is rough but OK
+for a first model.)</li>
+</ul></li>
+<li><strong>WHY:</strong> A model cannot multiply or compare text like
+“$ 1,000,000”. It needs a number.</li>
+<li><strong>EXPECTED:</strong> <code>movies['budget'].dtype</code> is
+<code>float64</code>. Values look like <code>1000000.0</code>,
+<code>25000000.0</code>.</li>
+</ul>
+<h3 id="step-5-parse-the-duration-column">Step 5 — Parse the
+<code>duration</code> column</h3>
+<ul>
+<li><strong>WHAT:</strong> <code>duration</code> is already a number in
+most rows, but sometimes it is missing or text.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>pd.to_numeric(movies['duration'], errors='coerce')</code>.</li>
+<li>Rename to <code>duration_minutes</code> to be clear.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Numeric column, mostly 60–180.</li>
+</ul>
+<h3 id="step-6-drop-movies-with-no-votes-or-no-rating">Step 6 — Drop
+movies with no votes or no rating</h3>
+<ul>
+<li><strong>WHAT:</strong> Movies with no <code>avg_vote</code> or
+<code>votes &lt; 100</code> are not useful. The rating is too
+noisy.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Boolean mask:
+<code>movies[movies['avg_vote'].notna() &amp; (movies['votes'] &gt;= 100)]</code>.</li>
+<li>Add <code>.copy()</code> at the end.</li>
+</ul></li>
+<li><strong>WHY:</strong> A movie with 3 votes can be 10/10 by accident.
+We need real ratings. And the target column cannot be missing.</li>
+<li><strong>EXPECTED:</strong> About <strong>80,000 rows</strong>
+left.</li>
+</ul>
+<h3 id="step-7-drop-movies-with-no-key-fields">Step 7 — Drop movies with
+no key fields</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop rows where <code>director</code>,
+<code>genre</code>, or <code>year</code> are missing.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>.dropna(subset=['director', 'genre', 'year'])</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> These columns are the heart of every feature
+we will build. Without them, the row is useless.</li>
+<li><strong>EXPECTED:</strong> Still close to <strong>80,000
+rows</strong>.</li>
+</ul>
+<h3 id="step-8-write-down-what-you-did">Step 8 — Write down what you
+did</h3>
+<p>In a markdown cell, write: - Starting rows: ~85,855 - After drop
+low-votes / missing rating: ~80,000 - After drop missing key fields:
+~80,000 - WHY you removed each group.</p>
+<h3 id="step-9-save-to-drive">Step 9 — Save to Drive</h3>
+<ul>
+<li><strong>WHAT:</strong> Save the cleaned <code>movies</code>
+DataFrame as parquet, inside your Drive folder.</li>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/imdb_lab/movies_step1.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-sofia-15-minutes">Phase C — Make ONE
+chart for Sofia (15 minutes)</h2>
+<p>She does not have time to read your code. She wants ONE picture.</p>
+<h3
+id="sofias-chart-what-does-the-rating-distribution-look-like">Sofia’s
+chart — “What does the rating distribution look like?”</h3>
+<p>Make a clean histogram of <code>avg_vote</code> AFTER cleaning.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>plt.hist(movies['avg_vote'], bins=40)</code>.</li>
+<li>Add a vertical line at 7.0 with
+<code>plt.axvline(7.0, color='red')</code>.</li>
+<li>Title:
+<code>"IMDb rating distribution — only ~20% of movies rate above 7"</code>.</li>
+<li>X-label: IMDb rating (1 to 10).</li>
+<li>Y-label: Number of movies.</li>
+</ul></li>
+<li><strong>Takeaway for Sofia:</strong> “Most movies score 5 to 7. Only
+1 in 5 scores above 7. Your goal is to find those 1-in-5 movies BEFORE
+you buy.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-1">Common mistakes in Class 1</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Forget <code>errors='coerce'</code> on
+<code>pd.to_numeric</code></td>
+<td>Code crashes on one bad value.</td>
+</tr>
+<tr>
+<td>Keep movies with 3 votes</td>
+<td>Their rating is random. Adds noise to the model.</td>
+</tr>
+<tr>
+<td>Forget <code>.copy()</code> after a filter</td>
+<td>Pandas warns “SettingWithCopyWarning”.</td>
+</tr>
+<tr>
+<td>Save to <code>/content/</code> instead of Drive</td>
+<td>File disappears when Colab disconnects.</td>
+</tr>
+<tr>
+<td>Delete the money columns because they are messy</td>
+<td>You will need them in Class 3. Just parse them.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-2">Self-check before Class 2</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />CSV loaded with
+<code>low_memory=False</code>.</label></li>
+<li><label><input type="checkbox" /><code>year</code> is
+numeric.</label></li>
+<li><label><input type="checkbox" /><code>budget</code>,
+<code>usa_gross_income</code>, <code>worlwide_gross_income</code> are
+numeric.</label></li>
+<li><label><input type="checkbox" /><code>duration_minutes</code> is
+numeric.</label></li>
+<li><label><input type="checkbox" />You filtered movies with
+<code>votes &gt;= 100</code> and no missing rating.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory charts in
+your notebook.</label></li>
+<li><label><input type="checkbox" />1 polished chart for
+Sofia.</label></li>
+<li><label><input type="checkbox" />You saved
+<code>movies_step1.parquet</code> to your Drive folder.</label></li>
+<li><label><input type="checkbox" />You wrote down (in markdown) what
+you did and WHY.</label></li>
+</ul>
+<hr />
+<h1 id="class-2-encoding-and-scaling">Class 2 — Encoding and
+Scaling</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Sofia looks at your cleaned data.
+She is happy. But she says: “the model is a math model. It does not
+understand the word ‘Drama’ or ‘United States’. Turn the words into
+numbers.”</p>
+</blockquote>
+<h2 id="your-goal-1">Your goal</h2>
+<p>Turn TEXT columns into numbers. Make all numeric columns about the
+same size.</p>
+<h2 id="inputs-1">Inputs</h2>
+<ul>
+<li><code>movies_step1.parquet</code> from Class 1</li>
+</ul>
+<h2 id="outputs-1">Outputs</h2>
+<ul>
+<li><code>movies_step2.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Sofia</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-distribution-of-votes">Exploratory chart 1 —
+Distribution of <code>votes</code></h3>
+<ul>
+<li><strong>Question:</strong> “How many votes does an average movie
+have? Are there huge outliers?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use a histogram (<code>plt.hist()</code>).</li>
+<li>Use <code>bins=50</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The <code>votes</code> column has a
+huge “long tail”. One famous movie has 2 million votes; most have 200.
+This is why we will use a log transform.</li>
+</ul>
+<h3
+id="exploratory-chart-2-distribution-of-votes-after-np.log1p">Exploratory
+chart 2 — Distribution of <code>votes</code> AFTER
+<code>np.log1p</code></h3>
+<ul>
+<li><strong>Question:</strong> “Does log-transform make the shape more
+normal?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Make a NEW column:
+<code>log_votes = np.log1p(df['votes'])</code>.</li>
+<li>Histogram it.</li>
+<li>Compare to chart 1.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Log makes the long tail manageable
+for the model.</li>
+</ul>
+<h3
+id="exploratory-chart-3-top-15-genres-first-genre-per-movie">Exploratory
+chart 3 — Top 15 genres (FIRST genre per movie)</h3>
+<ul>
+<li><strong>Question:</strong> “What are the most common genres?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>genre</code> is a comma-separated string like
+<code>"Drama, Comedy, Romance"</code>.</li>
+<li>To get the first genre:
+<code>df['genre'].str.split(',').str[0].str.strip()</code>.</li>
+<li>Then <code>.value_counts().head(15).plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Drama is the most common. Some
+genres (Western, Musical) are rare.</li>
+</ul>
+<h3
+id="exploratory-chart-4-top-15-countries-first-country-per-movie">Exploratory
+chart 4 — Top 15 countries (FIRST country per movie)</h3>
+<ul>
+<li><strong>Question:</strong> “Which countries produce the most
+movies?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>country</code> is also comma-separated.</li>
+<li>Same trick: <code>.str.split(',').str[0].str.strip()</code>.</li>
+<li>Then <code>value_counts().head(15).plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> USA and India dominate. Many
+small-volume countries.</li>
+</ul>
+<hr />
+<h2 id="phase-b-encode-and-scale">Phase B — Encode and scale</h2>
+<h3 id="step-1-parse-genre-into-the-first-genre-and-a-list">Step 1 —
+Parse <code>genre</code> into the first genre and a list</h3>
+<ul>
+<li><strong>WHAT:</strong> Make two new columns.
+<ul>
+<li><code>genre_main</code> — the first genre (a single string)</li>
+<li><code>genre_list</code> — all genres as a Python list</li>
+</ul></li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>For <code>genre_main</code>:
+<code>df['genre'].str.split(',').str[0].str.strip()</code>.</li>
+<li>For <code>genre_list</code>:
+<code>df['genre'].str.split(',').apply(lambda lst: [g.strip() for g in lst])</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> We will use <code>genre_main</code> for charts
+and <code>genre_list</code> for multi-label encoding in Class 3.</li>
+</ul>
+<h3 id="step-2-parse-country-and-language">Step 2 — Parse
+<code>country</code> and <code>language</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Make <code>country_main</code> and
+<code>language_main</code>. Just the FIRST one.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Same pattern as genre: split on comma, take <code>.str[0]</code>,
+then <code>.str.strip()</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> A movie may say “USA, UK, France”. For now, we
+keep the first country only. Simple is better than wrong.</li>
+</ul>
+<h3 id="step-3-one-hot-encode-the-top-10-genres">Step 3 — One-hot encode
+the TOP 10 genres</h3>
+<ul>
+<li><strong>WHAT:</strong> There are about 25 genres. Keep the 10 most
+common. Make 10 new 0/1 columns.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Find the 10 most common in <code>genre_main</code>.</li>
+<li>For each top genre, make a new column like
+<code>genre_Drama = (df['genre_main'] == 'Drama').astype(int)</code>.</li>
+<li>Better: use a <code>for</code> loop over the 10 top genres.</li>
+</ul></li>
+<li><strong>WHY one-hot?</strong> Genre is a category. A model cannot
+use the string “Drama” directly. One-hot makes it usable.</li>
+<li><strong>WHY only top 10?</strong> 25 genres = 25 columns. Many will
+be all zeros for 99% of rows. Top 10 keeps the data slim.</li>
+</ul>
+<h3 id="step-4-decide-what-to-do-with-country_main">Step 4 — Decide what
+to do with <code>country_main</code></h3>
+<ul>
+<li><strong>WHAT:</strong> There are 100+ countries. Too many for
+one-hot.</li>
+<li><strong>TWO OPTIONS:</strong>
+<ul>
+<li><strong>A — Top-N + Other:</strong> Keep top 10 countries.
+Everything else becomes <code>"Other"</code>. Then one-hot.</li>
+<li><strong>B — Target encoding:</strong> Replace each country with the
+AVG <code>avg_vote</code> for that country (compute from train
+only).</li>
+</ul></li>
+<li><strong>YOUR CHOICE:</strong> Pick one. Write in your notebook
+WHY.</li>
+</ul>
+<h3 id="step-5-log-transform-votes-budget-and-gross">Step 5 —
+Log-transform <code>votes</code>, <code>budget</code>, and gross</h3>
+<ul>
+<li><strong>WHAT:</strong> All three have very long tails. Apply
+<code>np.log1p()</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['log_votes'] = np.log1p(df['votes'])</code>.</li>
+<li><code>df['log_budget'] = np.log1p(df['budget'])</code>.</li>
+<li><code>df['log_gross'] = np.log1p(df['worlwide_gross_income'])</code>.</li>
+</ul></li>
+<li><strong>WHY <code>log1p</code> and not <code>log</code>?</strong>
+<code>log(0)</code> is <code>-inf</code>.
+<code>log1p(x) = log(x + 1)</code> is safe for zeros.</li>
+<li><strong>WARNING:</strong> <code>budget</code> and gross are often
+missing. <code>log1p</code> of a NaN is still NaN. You will impute in
+Class 3 or in the Pipeline (Class 5).</li>
+</ul>
+<h3 id="step-6-scale-numeric-columns-preview-only">Step 6 — Scale
+numeric columns (preview only)</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>StandardScaler</code> to make every
+numeric column have mean = 0, std = 1.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.preprocessing import StandardScaler</code>.</li>
+<li><code>scaler = StandardScaler()</code>.</li>
+<li><code>scaler.fit_transform(df[numeric_cols])</code>.</li>
+</ul></li>
+<li><strong>WARNING:</strong> This is for inspection only. In Class 5,
+scaling goes INSIDE the Pipeline. Do NOT save the scaled version as your
+final file.</li>
+</ul>
+<h3 id="step-7-save">Step 7 — Save</h3>
+<ul>
+<li><strong>WHAT:</strong> Save to Drive.
+<code>df.to_parquet('/content/drive/MyDrive/imdb_lab/movies_step2.parquet')</code>.</li>
+<li><strong>Save the UNSCALED version.</strong> Scaling will happen
+inside the Pipeline later.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-sofia">Phase C — Make ONE chart for
+Sofia</h2>
+<h3 id="sofias-chart-which-genres-get-the-best-ratings">Sofia’s chart —
+“Which genres get the best ratings?”</h3>
+<p>A horizontal bar chart of average rating by genre (top 15 genres
+only).</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Group:
+<code>df.groupby('genre_main')['avg_vote'].mean().sort_values()</code>.</li>
+<li>Keep top 15 genres by COUNT first, then sort by rating.</li>
+<li><code>.plot.barh()</code>.</li>
+<li>Add a vertical line at 7.0.</li>
+</ul></li>
+<li><strong>Title:</strong> “Average IMDb rating by genre — Documentary
+and Biography rate highest, Horror lowest”.</li>
+<li><strong>X-label:</strong> Average IMDb rating.</li>
+<li><strong>Y-label:</strong> Genre.</li>
+<li><strong>Takeaway:</strong> “Sofia, if you must guess by genre alone,
+Documentaries and Biographies are safer bets. Horror is risky.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-2">Common mistakes in Class 2</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scale BEFORE train/test split</td>
+<td><strong>Leakage.</strong> Scaler sees test data.</td>
+</tr>
+<tr>
+<td>One-hot encode every text column (<code>director</code>,
+<code>country</code>, etc.)</td>
+<td>30,000 directors = 30,000 new columns. Table explodes.</td>
+</tr>
+<tr>
+<td>Forget <code>np.log1p</code> and use <code>np.log</code> on
+zeros</td>
+<td><code>np.log(0) = -inf</code>. Crash.</td>
+</tr>
+<tr>
+<td>Save the scaled version</td>
+<td>Class 5 will scale again inside the pipeline. Double scaling = wrong
+numbers.</td>
+</tr>
+<tr>
+<td>Use <code>.split(',')[0]</code> instead of
+<code>.str.split(',').str[0]</code></td>
+<td>The first version crashes on the WHOLE column. The second is the
+pandas way.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-3">Self-check before Class 3</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />One row per movie still
+(~80,000).</label></li>
+<li><label><input type="checkbox" /><code>genre_main</code>,
+<code>country_main</code>, <code>language_main</code>
+exist.</label></li>
+<li><label><input type="checkbox" />Top 10 genre dummies
+exist.</label></li>
+<li><label><input type="checkbox" /><code>log_votes</code>,
+<code>log_budget</code>, <code>log_gross</code> exist.</label></li>
+<li><label><input type="checkbox" />You decided what to do with
+<code>country_main</code>.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory
+charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Sofia.</label></li>
+<li><label><input type="checkbox" /><code>movies_step2.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-3-feature-engineering">Class 3 — Feature Engineering</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Sofia says: “The columns in the
+raw data are not enough. The TRULY useful columns are not there. For
+example, <strong>the director’s track record</strong> — best predictor
+of rating! We must MAKE that column.”</p>
+</blockquote>
+<h2 id="your-goal-2">Your goal</h2>
+<p>Make NEW columns from the existing ones. These will help the model
+predict the rating.</p>
+<h2 id="inputs-2">Inputs</h2>
+<ul>
+<li><code>movies_step2.parquet</code></li>
+</ul>
+<h2 id="outputs-2">Outputs</h2>
+<ul>
+<li><code>movies_step3.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Sofia</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-1">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-rating-by-decade">Exploratory chart 1 —
+Rating by decade</h3>
+<ul>
+<li>First make <code>decade = (year // 10) * 10</code>.</li>
+<li><strong>Question:</strong> “Are old movies rated higher than new
+movies?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['decade'] = (df['year'] // 10 * 10).astype(int)</code>.</li>
+<li><code>df.groupby('decade')['avg_vote'].mean().plot()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Old movies (1940s, 1950s) often
+rate higher. Survivor bias: only the good old movies are
+remembered.</li>
+</ul>
+<h3 id="exploratory-chart-2-rating-vs-duration">Exploratory chart 2 —
+Rating vs duration</h3>
+<ul>
+<li><strong>Question:</strong> “Are long movies rated higher?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Scatter plot:
+<code>plt.scatter(df['duration_minutes'], df['avg_vote'], alpha=0.1)</code>.</li>
+<li><code>alpha=0.1</code> makes the points see-through so you can see
+density.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Very short (&lt; 70 min) and very
+long (&gt; 200 min) are unusual. Long does not always mean good.</li>
+</ul>
+<h3
+id="exploratory-chart-3-top-20-directors-by-average-rating">Exploratory
+chart 3 — Top 20 directors by average rating</h3>
+<ul>
+<li><strong>Question:</strong> “Which directors have the highest average
+ratings?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>First filter: directors with at least 5 movies
+(<code>groupby('director').filter(lambda g: len(g) &gt;= 5)</code>).</li>
+<li>Then
+<code>groupby('director')['avg_vote'].mean().sort_values(ascending=False).head(20).plot.barh()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> A few directors (Kubrick, Nolan)
+average above 8. Most are around 6.</li>
+</ul>
+<h3 id="exploratory-chart-4-rating-by-number-of-genres">Exploratory
+chart 4 — Rating by number of genres</h3>
+<ul>
+<li>After you make <code>n_genres</code> (Step 3 below):</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df.groupby('n_genres')['avg_vote'].mean().plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Movies tagged with 1 genre vs 3
+genres — is there a pattern?</li>
+</ul>
+<hr />
+<h2 id="phase-b-engineer-the-features">Phase B — Engineer the
+features</h2>
+<h3 id="step-1-movie-age">Step 1 — Movie age</h3>
+<ul>
+<li><strong>WHAT:</strong>
+<code>movie_age_years = current_year - year</code>. Use 2026 (or
+<code>pd.Timestamp.now().year</code>).</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['movie_age_years'] = 2026 - df['year']</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> A model sometimes learns “older = more
+remembered = higher rated” through this column.</li>
+</ul>
+<h3 id="step-2-is_franchise-sequel-detector">Step 2 —
+<code>is_franchise</code> (sequel detector)</h3>
+<ul>
+<li><strong>WHAT:</strong> A 0/1 column. 1 if the title looks like a
+sequel or part of a series.</li>
+<li><strong>HINTS:</strong> Use simple string checks on
+<code>original_title</code> or <code>title</code>:
+<ul>
+<li>Contains a Roman numeral at the end (<code>II</code>,
+<code>III</code>, <code>IV</code>, <code>V</code>)</li>
+<li>OR contains <code>"Part"</code> (e.g. “Part 2”)</li>
+<li>OR contains a <code>":"</code> (often a subtitle, like “Star Wars:
+…”)</li>
+<li>OR ends with a digit (<code>2</code>, <code>3</code>).</li>
+</ul></li>
+<li><strong>Skeleton:</strong></li>
+</ul>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> is_franchise(title):</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> <span class="bu">isinstance</span>(title, <span class="bu">str</span>):</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> re.search(<span class="vs">r&#39; </span><span class="kw">(</span><span class="vs">II</span><span class="cf">|</span><span class="vs">III</span><span class="cf">|</span><span class="vs">IV</span><span class="cf">|</span><span class="vs">V</span><span class="cf">|</span><span class="vs">VI</span><span class="cf">|</span><span class="vs">VII</span><span class="cf">|</span><span class="vs">VIII</span><span class="cf">|</span><span class="vs">IX</span><span class="cf">|</span><span class="vs">X</span><span class="kw">)</span><span class="dv">$</span><span class="vs">&#39;</span>, ___):</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="st">&#39;Part &#39;</span> <span class="kw">in</span> ___:</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="st">&#39;:&#39;</span> <span class="kw">in</span> ___:</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> re.search(<span class="vs">r&#39; </span><span class="dv">\d</span><span class="op">+</span><span class="dv">$</span><span class="vs">&#39;</span>, ___):</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;is_franchise&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;original_title&#39;</span>].<span class="bu">apply</span>(___)</span></code></pre></div>
+<ul>
+<li><strong>WHY:</strong> Sequels often have a known audience. They may
+rate differently from one-off films.</li>
+<li><strong>EXPECTED:</strong> About 10–20% of rows are franchises.</li>
+</ul>
+<h3 id="step-3-n_genres">Step 3 — <code>n_genres</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Number of genres per movie.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>You already made <code>genre_list</code> in Class 2.</li>
+<li><code>df['n_genres'] = df['genre_list'].apply(len)</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Mostly 1, 2, or 3.</li>
+</ul>
+<h3 id="step-4-director_avg_rating-target-encoding-important">Step 4 —
+<code>director_avg_rating</code> (TARGET ENCODING — IMPORTANT)</h3>
+<p>This is the <strong>biggest</strong> feature.</p>
+<ul>
+<li><strong>WHAT:</strong> For each movie, get the AVERAGE rating of all
+OTHER movies by the same director.</li>
+<li><strong>WHY target encoding and not one-hot?</strong> There are
+~30,000 unique directors. One-hot = 30,000 new columns. Useless. Target
+encoding gives ONE number per movie: the director’s track record.</li>
+<li><strong>WARNING — LEAKAGE:</strong> You must compute this from TRAIN
+ONLY. Not from the whole dataset. We will do this properly inside the
+Pipeline in Class 5. For now (in this class), compute it on the full
+data as a preview. <strong>Mark it clearly as “preview only — recompute
+on train in Class 5”.</strong></li>
+</ul>
+<p><strong>Sub-step 4a — Group by director, get mean
+rating:</strong></p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>director_means = df.groupby('director')['avg_vote'].mean()</code>.</li>
+<li>This is a Series. The index is the director’s name.</li>
+</ul></li>
+</ul>
+<p><strong>Sub-step 4b — Map back to each row:</strong></p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['director_avg_rating'] = df['director'].map(director_means)</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> A number per row, e.g. for Christopher
+Nolan ~8.2, for an unknown director ~6.</li>
+</ul>
+<p><strong>Sub-step 4c — Handle directors with only 1
+movie:</strong></p>
+<ul>
+<li><strong>WHAT:</strong> If a director has only 1 movie, then
+<code>director_avg_rating</code> is just <code>avg_vote</code> itself.
+That is leakage.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Count movies per director:
+<code>counts = df['director'].value_counts()</code>.</li>
+<li>For directors with count == 1, replace the value with the global
+mean (<code>df['avg_vote'].mean()</code>, around 6).</li>
+</ul></li>
+<li><strong>WHY:</strong> Otherwise the model will see “this director
+has avg 8.5” only because THIS movie is 8.5. Cheating.</li>
+</ul>
+<h3 id="step-5-lead_actor_avg_rating">Step 5 —
+<code>lead_actor_avg_rating</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Same idea as Step 4 but for the LEAD
+actor.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>actors</code> is a comma-separated string. The lead is the
+first one.</li>
+<li><code>df['lead_actor'] = df['actors'].str.split(',').str[0].str.strip()</code>.</li>
+<li>Group by <code>lead_actor</code>, mean of <code>avg_vote</code>, map
+back.</li>
+<li>Same warning: handle actors with only 1 movie (replace with global
+mean).</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Another rough proxy for “is the cast
+good?”.</li>
+</ul>
+<h3 id="step-6-text-length">Step 6 — Text length</h3>
+<ul>
+<li><strong>WHAT:</strong>
+<code>description_length = number of characters in the plot description</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['description_length'] = df['description'].fillna('').str.len()</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Sometimes a longer description = a more
+complex movie = different rating. Easy to compute, may or may not
+help.</li>
+</ul>
+<h3 id="step-7-named-entity-count-rough-proxy">Step 7 — Named entity
+count (rough proxy)</h3>
+<ul>
+<li><strong>WHAT:</strong>
+<code>n_named_entities = number of capitalized words in the description (a rough count of names/places).</code></li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Split the description into words.</li>
+<li>Count words where the first letter is uppercase AND the word is not
+the first word of a sentence.</li>
+<li>This is a rough approximation. A real NER tool (spaCy) is better but
+slower.</li>
+</ul></li>
+<li><strong>Skeleton:</strong></li>
+</ul>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> count_caps(text):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> <span class="bu">isinstance</span>(text, <span class="bu">str</span>):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    words <span class="op">=</span> text.split()</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    count <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> w <span class="kw">in</span> words:</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(w) <span class="op">&gt;</span> <span class="dv">0</span> <span class="kw">and</span> w[<span class="dv">0</span>].___ <span class="kw">and</span> w[<span class="dv">0</span>].isalpha():</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>            count <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> count</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;n_named_entities&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;description&#39;</span>].<span class="bu">apply</span>(___)</span></code></pre></div>
+<ul>
+<li><strong>WHY:</strong> Plots with many proper nouns may be
+biographies, historical, or based on real events.</li>
+</ul>
+<h3 id="step-8-save">Step 8 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/imdb_lab/movies_step3.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-sofia-1">Phase C — Make ONE chart for
+Sofia</h2>
+<h3
+id="sofias-chart-director-track-record-predicts-the-next-movie">Sofia’s
+chart — “Director track record predicts the next movie”</h3>
+<p>A scatter plot: - X-axis: <code>director_avg_rating</code> (the
+director’s average over OTHER movies) - Y-axis: <code>avg_vote</code>
+(this movie’s rating)</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>plt.scatter(df['director_avg_rating'], df['avg_vote'], alpha=0.1)</code>.</li>
+<li>Plot a diagonal reference line <code>y = x</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Good directors keep making good movies —
+director track record vs new movie rating.”</li>
+<li><strong>X-label:</strong> Director’s average rating (track
+record).</li>
+<li><strong>Y-label:</strong> This movie’s rating.</li>
+<li><strong>Takeaway for Sofia:</strong> “If a director’s past movies
+average 7.5, the next one is very likely to be above 7. This single
+column will be one of the most important features in the model.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-3">Common mistakes in Class 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Use <code>director_avg_rating</code> from the FULL dataset including
+the test row</td>
+<td>Massive leakage. The model looks great in training, fails on Sofia’s
+new movies.</td>
+</tr>
+<tr>
+<td>Forget to handle directors with only 1 movie</td>
+<td>The “avg” is just the row itself. 100% leakage.</td>
+</tr>
+<tr>
+<td>One-hot encode <code>director</code></td>
+<td>30,000 columns. Memory crash.</td>
+</tr>
+<tr>
+<td>Use <code>actors</code> as one big string feature</td>
+<td>The model cannot read text directly. Extract the first actor
+only.</td>
+</tr>
+<tr>
+<td>Use <code>avg_vote</code> to compute <code>is_franchise</code></td>
+<td><code>is_franchise</code> must come from the title only, not the
+rating.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-4">Self-check before Class 4</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>movie_age_years</code>
+exists.</label></li>
+<li><label><input type="checkbox" /><code>is_franchise</code> exists.
+~10–20% are 1.</label></li>
+<li><label><input type="checkbox" /><code>n_genres</code>
+exists.</label></li>
+<li><label><input type="checkbox" /><code>director_avg_rating</code>
+exists. Mean is around 6.</label></li>
+<li><label><input type="checkbox" /><code>lead_actor_avg_rating</code>
+exists.</label></li>
+<li><label><input type="checkbox" /><code>description_length</code>,
+<code>n_named_entities</code> exist.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 explanatory chart.</label></li>
+<li><label><input type="checkbox" /><code>movies_step3.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-4-feature-selection">Class 4 — Feature Selection</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Now you have ~25–30 columns.
+Sofia says: “Too many. Some are duplicates. Some are useless. I want
+15–20 GOOD columns. Pick them.”</p>
+</blockquote>
+<h2 id="your-goal-3">Your goal</h2>
+<p>Pick the best 15–20 columns. Drop the rest. Justify every choice.</p>
+<h2 id="inputs-3">Inputs</h2>
+<ul>
+<li><code>movies_step3.parquet</code></li>
+</ul>
+<h2 id="outputs-3">Outputs</h2>
+<ul>
+<li><code>movies_step4.parquet</code> in Drive (only the selected
+columns + <code>avg_vote</code>)</li>
+<li>3+ exploratory charts (correlation heatmap, mutual info bars,
+importance bars)</li>
+<li>A short markdown report explaining your choices</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-2">Phase A — Explore the data
+first</h2>
+<h3
+id="exploratory-chart-1-correlation-heatmap-of-numeric-columns">Exploratory
+chart 1 — Correlation heatmap of numeric columns</h3>
+<ul>
+<li><strong>Question:</strong> “Which columns say the same thing as each
+other?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute <code>df[numeric_cols].corr()</code>.</li>
+<li>Plot with <code>sns.heatmap()</code>.</li>
+<li>Use <code>annot=True</code> and <code>fmt='.2f'</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> <code>log_votes</code> and
+<code>log_gross</code> may be correlated. <code>year</code> and
+<code>movie_age_years</code> are perfectly anti-correlated (one is
+<code>2026 - the other</code>). Keep only one.</li>
+</ul>
+<h3 id="exploratory-chart-2-mutual-information-bar-chart">Exploratory
+chart 2 — Mutual information bar chart</h3>
+<ul>
+<li>After you compute mutual info (Step 4 below), plot it.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Sort the values, then bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Which columns predict
+<code>avg_vote</code> strongest.</li>
+<li><strong>EXPECTED top features:</strong>
+<code>director_avg_rating</code>, <code>lead_actor_avg_rating</code>,
+<code>log_votes</code>.</li>
+</ul>
+<h3
+id="exploratory-chart-3-random-forest-feature-importance">Exploratory
+chart 3 — Random Forest feature importance</h3>
+<ul>
+<li>After you train the RF (Step 5 below), plot the importances.</li>
+<li><strong>HINTS:</strong>
+<code>pd.Series(rf.feature_importances_, index=...).sort_values().plot.barh()</code>.</li>
+<li><strong>What you learn:</strong> A second opinion on feature
+importance.</li>
+</ul>
+<hr />
+<h2 id="phase-b-select-features">Phase B — Select features</h2>
+<h3 id="step-1-split-into-train-and-test-first">Step 1 — Split into
+train and test FIRST</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>train_test_split</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.model_selection import train_test_split</code>.</li>
+<li><code>X = df.drop('avg_vote', axis=1); y = df['avg_vote']</code>.</li>
+<li>Pass: <code>test_size=0.2</code>, <code>random_state=42</code>.</li>
+<li>For a REGRESSION target you do NOT use <code>stratify=y</code>.
+(<code>stratify</code> is for classification.)</li>
+</ul></li>
+<li><strong>WHY:</strong> All next steps use TRAIN ONLY. Otherwise
+leakage.</li>
+</ul>
+<h3 id="step-2-remove-low-variance-columns">Step 2 — Remove low-variance
+columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop columns where almost all values are the
+same.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import VarianceThreshold</code>.</li>
+<li><code>VarianceThreshold(threshold=0.01)</code> then
+<code>.fit_transform(X_train[numeric_cols])</code>.</li>
+</ul></li>
+<li><strong>EXAMPLE:</strong> If <code>genre_FilmNoir = 0</code> for
+99.9% of rows, it has no variance. Drop.</li>
+</ul>
+<h3 id="step-3-remove-highly-correlated-columns">Step 3 — Remove highly
+correlated columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop one of each pair where |corr| &gt;
+0.9.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute correlation matrix.</li>
+<li>Get the upper triangle with <code>np.triu(...)</code>.</li>
+<li>For each column, if any of its upper-triangle correlations is &gt;
+0.9, mark it for dropping.</li>
+</ul></li>
+<li><strong>EXAMPLE:</strong> <code>year</code> and
+<code>movie_age_years</code> are 100% correlated. Keep
+<code>movie_age_years</code> only.</li>
+</ul>
+<h3 id="step-4-rank-by-mutual-information-regression-version">Step 4 —
+Rank by mutual information (regression version)</h3>
+<ul>
+<li><strong>WHAT:</strong> Score each column by how much it tells you
+about <code>avg_vote</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import mutual_info_regression</code>.</li>
+<li>Note: <code>regression</code>, not <code>classif</code>. The target
+is a float.</li>
+<li><code>mi = mutual_info_regression(X_train_numeric, y_train)</code>.</li>
+<li>Put in a Series, sort.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> <code>director_avg_rating</code>,
+<code>lead_actor_avg_rating</code>, <code>log_votes</code> should be at
+the top.</li>
+</ul>
+<h3 id="step-5-random-forest-importance-second-opinion">Step 5 — Random
+Forest importance (second opinion)</h3>
+<ul>
+<li><strong>WHAT:</strong> Train a small RF Regressor, look at
+<code>feature_importances_</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.ensemble import RandomForestRegressor</code>.</li>
+<li>Note: <code>Regressor</code>, not <code>Classifier</code>. Target is
+float.</li>
+<li><code>RandomForestRegressor(n_estimators=50, max_depth=8, n_jobs=-1, random_state=42)</code>.</li>
+<li><code>.fit(X_train, y_train)</code>.</li>
+<li>Look at <code>.feature_importances_</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-6-pick-the-final-1520-columns">Step 6 — Pick the final
+15–20 columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Combine the rankings. Pick columns that:
+<ul>
+<li>Are high in mutual info, AND</li>
+<li>Are high in RF importance, AND</li>
+<li>Were not dropped by variance/correlation pruning.</li>
+</ul></li>
+<li><strong>WRITE DOWN:</strong> In your notebook, list the columns.
+Explain in 1 sentence why each one is in.</li>
+</ul>
+<h3 id="step-7-save-1">Step 7 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong> Keep only the selected columns +
+<code>avg_vote</code>. Save as <code>movies_step4.parquet</code> to
+Drive.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-sofia-2">Phase C — Make ONE chart for
+Sofia</h2>
+<h3 id="sofias-chart-these-are-the-top-10-predictors-of-rating">Sofia’s
+chart — “These are the top 10 predictors of rating”</h3>
+<p>A horizontal bar chart of your top 10 features and their importance
+score.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use the RF importance.</li>
+<li><code>sort_values()</code> then <code>.head(10)</code> then
+<code>.plot.barh()</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Top 10 predictors of IMDb rating.”</li>
+<li><strong>Y-axis:</strong> column names.</li>
+<li><strong>X-axis:</strong> Random Forest importance.</li>
+<li><strong>Takeaway:</strong> “Director track record alone explains a
+big part of the rating. Add lead actor and log_votes, and we already
+have a strong model.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-4">Common mistakes in Class 4</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compute mutual info on the FULL data</td>
+<td>Leakage.</td>
+</tr>
+<tr>
+<td>Use <code>mutual_info_classif</code> for a float target</td>
+<td>Wrong tool. Use <code>mutual_info_regression</code>.</td>
+</tr>
+<tr>
+<td>Use <code>RandomForestClassifier</code> for
+<code>avg_vote</code></td>
+<td>Wrong tool. <code>avg_vote</code> is a float. Use
+<code>RandomForestRegressor</code>.</td>
+</tr>
+<tr>
+<td>Drop columns without writing why</td>
+<td>Module 4 students will not understand.</td>
+</tr>
+<tr>
+<td>Drop <code>description_length</code> because it is small</td>
+<td>It may still help. Check RF importance before dropping.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-5">Self-check before Class 5</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Train/test split done
+FIRST.</label></li>
+<li><label><input type="checkbox" />15–20 columns remain +
+<code>avg_vote</code>.</label></li>
+<li><label><input type="checkbox" />You used
+<code>mutual_info_regression</code>, not
+<code>_classif</code>.</label></li>
+<li><label><input type="checkbox" />You used
+<code>RandomForestRegressor</code>, not Classifier.</label></li>
+<li><label><input type="checkbox" />You wrote down WHY for each kept
+column.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Sofia.</label></li>
+<li><label><input type="checkbox" /><code>movies_step4.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-5-pipelines">Class 5 — Pipelines</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Sofia says: “Your cleaning code
+is in 4 different notebooks. When 1,000 new movies arrive next quarter,
+you cannot copy 4 notebooks to the server. We need ONE object that does
+everything.”</p>
+</blockquote>
+<h2 id="your-goal-4">Your goal</h2>
+<p>Put EVERY preprocessing step inside ONE Pipeline object.
+Production-ready code.</p>
+<h2 id="inputs-4">Inputs</h2>
+<ul>
+<li><code>movies_step4.parquet</code> (selected columns)</li>
+</ul>
+<h2 id="outputs-4">Outputs</h2>
+<ul>
+<li><code>imdb_pipeline.joblib</code> saved in Drive</li>
+<li>1 residuals chart + 1 predicted-vs-actual chart</li>
+<li>A pipeline that takes RAW input and produces predicted ratings</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-3">Phase A — Explore the data
+first</h2>
+<h3
+id="exploratory-chart-1-predicted-vs-actual-after-training">Exploratory
+chart 1 — Predicted vs actual (after training)</h3>
+<ul>
+<li>After Step 6, plot a scatter of predictions vs actual ratings.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>plt.scatter(y_test, y_pred, alpha=0.2)</code>.</li>
+<li>Add a diagonal <code>y = x</code> line.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Are we close to the line? Or way
+off?</li>
+</ul>
+<h3 id="exploratory-chart-2-residuals-histogram">Exploratory chart 2 —
+Residuals histogram</h3>
+<ul>
+<li><strong>WHAT:</strong> Residual = <code>y_test - y_pred</code>. The
+error per row.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>residuals = y_test - y_pred</code>.</li>
+<li><code>plt.hist(residuals, bins=50)</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Are errors centered around 0? Are
+they small (good) or huge (bad)? A good model has errors mostly between
+-1 and +1.</li>
+</ul>
+<hr />
+<h2 id="phase-b-build-the-pipeline">Phase B — Build the pipeline</h2>
+<h3
+id="step-1-decide-which-columns-are-numeric-and-which-are-categorical">Step
+1 — Decide which columns are numeric and which are categorical</h3>
+<ul>
+<li><strong>HINTS:</strong> Make two lists.</li>
+<li><strong>EXAMPLE:</strong>
+<ul>
+<li>numeric: <code>movie_age_years</code>,
+<code>duration_minutes</code>, <code>log_votes</code>,
+<code>log_budget</code>, <code>log_gross</code>, <code>n_genres</code>,
+<code>director_avg_rating</code>, <code>lead_actor_avg_rating</code>,
+<code>description_length</code>, <code>n_named_entities</code>, all the
+genre dummies.</li>
+<li>categorical: <code>country_main</code>,
+<code>language_main</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-2-build-the-numeric-mini-pipeline">Step 2 — Build the
+numeric mini-pipeline</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer (fill missing) +
+scaler.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.pipeline import Pipeline</code>.</p></li>
+<li><p><code>from sklearn.impute import SimpleImputer</code>.</p></li>
+<li><p><code>from sklearn.preprocessing import StandardScaler</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>numeric_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;scaler&#39;</span>,  StandardScaler()),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in the blank: best strategy for numeric?
+(<code>'median'</code>)</p></li>
+</ul></li>
+<li><strong>WHY median?</strong> <code>budget</code> is missing 30% of
+the time. The mean is pulled up by Hollywood blockbusters with $200M
+budgets. Median is safer.</li>
+</ul>
+<h3 id="step-3-build-the-categorical-mini-pipeline">Step 3 — Build the
+categorical mini-pipeline</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer + one-hot encoder.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.preprocessing import OneHotEncoder</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>categorical_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;onehot&#39;</span>,  OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">&#39;___&#39;</span>, sparse_output<span class="op">=</span>___)),</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in blanks. (Strategy <code>'most_frequent'</code>,
+handle_unknown <code>'ignore'</code>, sparse_output
+<code>False</code>.)</p></li>
+</ul></li>
+<li><strong>WHY <code>handle_unknown='ignore'</code>?</strong> In
+production, a new country may appear (a movie from a country never seen
+before). We do not want the code to crash.</li>
+</ul>
+<h3 id="step-4-combine-into-a-columntransformer">Step 4 — Combine into a
+ColumnTransformer</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.compose import ColumnTransformer</code>.</li>
+<li>It takes a list of tuples:
+<code>(name, transformer, list_of_columns)</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-5-add-the-model-on-top">Step 5 — Add the model on top</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.linear_model import Ridge</code>.</li>
+<li><code>Ridge(alpha=1.0, random_state=42)</code>.</li>
+<li>Put it in a Pipeline with the preprocessor.</li>
+</ul></li>
+<li><strong>WHY Ridge and not Logistic?</strong> This is a REGRESSION
+problem. <code>avg_vote</code> is a float between 1 and 10. We do NOT
+predict a 0/1. We predict a number. <code>LogisticRegression</code> is
+for 0/1. <code>Ridge</code> is <code>LinearRegression</code> with a
+small “do-not-overfit” penalty.</li>
+</ul>
+<h3 id="step-6-train-and-evaluate">Step 6 — Train and evaluate</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>full_pipeline.fit(X_train, y_train)</code>.</li>
+<li><code>y_pred = full_pipeline.predict(X_test)</code>.</li>
+<li><code>from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score</code>.</li>
+<li>Print MAE, RMSE, and R^2.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong>
+<ul>
+<li>MAE around 0.6–0.8 (average error of about 0.7 rating points).</li>
+<li>R^2 around 0.40–0.55. (Module 4 improves this with better
+models.)</li>
+</ul></li>
+</ul>
+<h3 id="step-7-save-the-trained-pipeline">Step 7 — Save the trained
+pipeline</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>import joblib</code>.</li>
+<li><code>joblib.dump(full_pipeline, '/content/drive/MyDrive/imdb_lab/imdb_pipeline.joblib')</code>.</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-sofia-3">Phase C — Make ONE chart for
+Sofia</h2>
+<h3 id="sofias-chart-how-well-does-the-model-predict-ratings">Sofia’s
+chart — “How well does the model predict ratings?”</h3>
+<p>A scatter plot of predicted vs actual rating, with a diagonal
+reference line.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>X = actual <code>avg_vote</code>.</li>
+<li>Y = predicted rating from the pipeline.</li>
+<li>Add <code>plt.plot([1,10],[1,10], 'r--')</code> for the
+perfect-prediction line.</li>
+<li>Add a vertical and horizontal line at 7.0 to show the “buy / no-buy”
+decision.</li>
+</ul></li>
+<li><strong>Title:</strong> “Predicted vs actual IMDb rating — baseline
+model. MAE = ____.”</li>
+<li><strong>Takeaway for Sofia:</strong> “Our baseline model misses by
+about 0.7 stars on average. Good enough to filter the bottom half of
+candidates. Module 4 will reduce the error more.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-5">Common mistakes in Class 5</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Build the pipeline AFTER you scaled the data manually</td>
+<td>Pipeline scales it twice. Numbers wrong.</td>
+</tr>
+<tr>
+<td>Use a Classifier on a float target</td>
+<td>sklearn crashes or treats <code>7.2</code> as a 7.2-class
+problem.</td>
+</tr>
+<tr>
+<td>Forget <code>sparse_output=False</code> in OneHotEncoder</td>
+<td>Some downstream code breaks.</td>
+</tr>
+<tr>
+<td>Use <code>mean</code> imputation for <code>budget</code></td>
+<td>Mean is pulled up by blockbusters. Use <code>median</code>.</td>
+</tr>
+<tr>
+<td>Forget <code>random_state</code></td>
+<td>Results change every run. Hard to debug.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-6">Self-check before Class 6</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Pipeline has preprocessor + Ridge
+regressor.</label></li>
+<li><label><input type="checkbox" />Preprocessor has numeric +
+categorical transformers.</label></li>
+<li><label><input type="checkbox" /><code>strategy='median'</code> for
+numeric, <code>'most_frequent'</code> for categorical.</label></li>
+<li><label><input type="checkbox" /><code>handle_unknown='ignore'</code>
+set.</label></li>
+<li><label><input type="checkbox" />You report MAE, RMSE,
+R^2.</label></li>
+<li><label><input type="checkbox" />2 evaluation charts (predicted vs
+actual, residuals).</label></li>
+<li><label><input type="checkbox" /><code>imdb_pipeline.joblib</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-6-end-to-end-lab-the-big-one">Class 6 — End-to-End Lab
+(THE BIG ONE)</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Sofia is in the meeting room. She
+wants the FINAL clean dataset on her desk in 90 minutes. This is the
+lab.</p>
+</blockquote>
+<h2 id="your-goal-5">Your goal</h2>
+<p>Take the raw IMDB CSV. Produce ONE final <code>.parquet</code> file
+with the exact 21-column schema. Plus a 1-page findings report.</p>
+<h2 id="time">Time</h2>
+<p><strong>90 minutes</strong> of focused work.</p>
+<h2 id="inputs-5">Inputs</h2>
+<ul>
+<li>The raw IMDB movies CSV in your Drive folder</li>
+</ul>
+<h2 id="outputs-5">Outputs</h2>
+<ul>
+<li><code>imdb_movies_clean.parquet</code> (~80,000 rows × 21 columns)
+in Drive</li>
+<li><code>findings.md</code> (~1 page)</li>
+<li>Your full Colab notebook</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-10-minutes">Phase A — Explore the
+data first (10 minutes)</h2>
+<p>You will reuse charts from Classes 1–5. Pick 3 of them. Put them all
+on ONE PAGE of your notebook with markdown headers: 1.
+<code>avg_vote</code> distribution (with the 7.0 line — the “buy/no-buy”
+threshold) 2. Average rating by genre (your most useful chart for Sofia)
+3. Director track record vs new movie rating (your most important
+predictor)</p>
+<p>These 3 charts tell Sofia the whole story.</p>
+<hr />
+<h2 id="phase-b-build-the-final-dataset-70-minutes">Phase B — Build the
+final dataset (70 minutes)</h2>
+<h3 id="required-output-schema">Required output schema</h3>
+<p>Your <code>imdb_movies_clean.parquet</code> MUST have these 21
+columns, with these names and types:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>Column</th>
+<th>Type</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>imdb_title_id</code></td>
+<td>string</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>year</code></td>
+<td>int</td>
+<td>parsed</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>movie_age_years</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>duration_minutes</code></td>
+<td>float</td>
+<td>parsed</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>log_votes</code></td>
+<td>float</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>log_budget</code></td>
+<td>float</td>
+<td>engineered (after parsing)</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>log_gross</code></td>
+<td>float</td>
+<td>engineered (after parsing)</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>n_genres</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>is_franchise</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>country_main</code></td>
+<td>string</td>
+<td>parsed</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>language_main</code></td>
+<td>string</td>
+<td>parsed</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>director_avg_rating</code></td>
+<td>float</td>
+<td>engineered (target encoding, train-only in M4)</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>lead_actor_avg_rating</code></td>
+<td>float</td>
+<td>engineered (target encoding, train-only in M4)</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>genre_Drama</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>genre_Comedy</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>genre_Action</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>genre_Romance</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>genre_Thriller</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>description_length</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>n_named_entities</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>avg_vote</code></td>
+<td>float (1.0–10.0)</td>
+<td><strong>TARGET</strong> (raw)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Note:</strong> The 5 genre dummies in rows 14–18 are the TOP
+5 genres. You may have built 10 in Class 2. For the final file, keep
+only the 5 most common to keep the schema clean. List the others in your
+<code>findings.md</code>.</p>
+</blockquote>
+<blockquote>
+<p><strong>Note 2:</strong> <code>description</code> is NOT in the final
+21-column schema. We keep it in a SEPARATE file
+<code>imdb_descriptions.parquet</code> (just <code>imdb_title_id</code>
++ <code>description</code>) for use in Module 7.</p>
+</blockquote>
+<h3 id="lab-phases-timed">Lab phases (timed)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Time</th>
+<th>What you do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Load</td>
+<td>5 min</td>
+<td>Load the CSV. Confirm row count ~85,855.</td>
+</tr>
+<tr>
+<td>2. Clean</td>
+<td>15 min</td>
+<td>Parse <code>year</code>, <code>budget</code>, gross,
+<code>duration</code>. Filter rows.</td>
+</tr>
+<tr>
+<td>3. Parse multi-value</td>
+<td>10 min</td>
+<td>Make <code>genre_main</code>, <code>genre_list</code>,
+<code>country_main</code>, <code>language_main</code>,
+<code>lead_actor</code>.</td>
+</tr>
+<tr>
+<td>4. Engineered features</td>
+<td>20 min</td>
+<td><code>movie_age_years</code>, <code>is_franchise</code>,
+<code>n_genres</code>, log columns, <code>description_length</code>,
+<code>n_named_entities</code>.</td>
+</tr>
+<tr>
+<td>5. Target-encoded features</td>
+<td>10 min</td>
+<td><code>director_avg_rating</code>, <code>lead_actor_avg_rating</code>
+(preview, train-only in M4).</td>
+</tr>
+<tr>
+<td>6. Top-5 genre dummies</td>
+<td>5 min</td>
+<td>One-hot of top 5 genres.</td>
+</tr>
+<tr>
+<td>7. Schema check + save</td>
+<td>5 min</td>
+<td>Keep only the 21 columns. Validate types. Save
+<code>.parquet</code>.</td>
+</tr>
+<tr>
+<td>8. Findings</td>
+<td>10 min</td>
+<td>Write <code>findings.md</code> + save
+<code>imdb_descriptions.parquet</code> for M7.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total: 80 minutes.</strong> (10 minutes buffer.)</p>
+<hr />
+<h2 id="phase-c-findings-report-for-sofia-10-minutes">Phase C — Findings
+report for Sofia (10 minutes)</h2>
+<p>Write <code>findings.md</code> with these sections:</p>
+<h3 id="final-numbers">Final numbers</h3>
+<ul>
+<li>Final row count: ____</li>
+<li>Share of movies with <code>avg_vote &gt;= 7</code>: ____%</li>
+<li>Median budget (USD): ____</li>
+<li>Most common country: ____</li>
+<li>Most common language: ____</li>
+</ul>
+<h3 id="top-3-insights">Top 3 insights</h3>
+<ol type="1">
+<li><hr /></li>
+<li><hr /></li>
+<li><hr /></li>
+</ol>
+<h3 id="one-question-to-investigate-in-module-4">One question to
+investigate in Module 4</h3>
+<ul>
+<li><hr /></li>
+</ul>
+<h3 id="decisions-sofia-should-know-about">Decisions Sofia should know
+about</h3>
+<ul>
+<li>We treated all money columns as USD even when the raw value was in
+EUR or GBP. About __% of rows are affected.
+<strong>Recommendation:</strong> in Module 4, add a currency-conversion
+step.</li>
+<li>About 30% of budget values are missing. We imputed with median.
+<strong>Risk:</strong> the imputed movies look “average-budget” to the
+model.</li>
+<li>Director track record (<code>director_avg_rating</code>) was
+computed from the full dataset in this class. In Module 4 we will
+recompute from train only to avoid leakage.</li>
+</ul>
+<h3 id="one-chart-that-summarizes-everything">One chart that summarizes
+everything</h3>
+<p>Embed your most important chart (the director track record one).</p>
+<hr />
+<h2 id="grading-rubric-100-points">Grading rubric (100 points)</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Item</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All 21 columns exist with the right names and dtypes</td>
+<td>25</td>
+</tr>
+<tr>
+<td>Cleaning decisions written in markdown</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Pipeline is reproducible (re-run from the raw CSV in ONE
+command)</td>
+<td>15</td>
+</tr>
+<tr>
+<td>Money columns correctly parsed (no strings left, no <code>$</code>
+or commas)</td>
+<td>10</td>
+</tr>
+<tr>
+<td><code>avg_vote</code> between 1.0 and 10.0 for every row</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Director / lead-actor target encoding handles single-movie
+cases</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>At least 3 exploratory + 1 explanatory chart per
+class</strong></td>
+<td><strong>15</strong></td>
+</tr>
+<tr>
+<td><code>findings.md</code> has insights, not just numbers</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Code is clean (comments, sensible variable names)</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<h2 id="submit">Submit</h2>
+<p>Upload to
+<code>module-3/class_6/submissions/&lt;YourTeamName&gt;/</code>: -
+<code>imdb_movies_clean.parquet</code> -
+<code>imdb_descriptions.parquet</code> (for Module 7) - Your Colab
+notebook (<code>File &gt; Download &gt; Download .ipynb</code>) -
+<code>findings.md</code></p>
+<hr />
+<h1 id="tips-for-the-whole-module">Tips for the whole module</h1>
+<ol type="1">
+<li><strong>Do NOT copy-paste code from this guide.</strong> This guide
+gives you HINTS only. Write the code yourself. You will learn much
+faster.</li>
+<li><strong>Save your notebook to Drive often.</strong> Colab
+disconnects after 12 hours.</li>
+<li><strong>Save intermediate <code>.parquet</code> files to
+Drive</strong> (movies_step1, movies_step2, etc.). If something breaks,
+you do not redo everything.</li>
+<li><strong>Pair-program.</strong> One student types, one reads. Switch
+every 20 minutes.</li>
+<li><strong>Make a chart BEFORE you write cleaning code.</strong> You
+must SEE the problem before you can fix it.</li>
+<li><strong>Make a chart AFTER each step.</strong> Confirm your code did
+what you expected.</li>
+<li><strong>Watch out for leakage.</strong> This dataset has many
+target-encoding traps. Every “average rating by director” or “average
+rating by actor” must come from train data only, computed without the
+current row.</li>
+<li><strong>Ask the mentor early.</strong> If you are stuck for 20
+minutes, ask. Do not waste an afternoon.</li>
+</ol>
+<p>Good luck.</p>
+</main>
+
+<footer class="scenario-footer">
+  <p><a href="../../#/module/3/class/6">&larr; Back to all 15 scenarios</a></p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,2535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>03_yelp_restaurants_m3_lab</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --text: #e6e8ec;
+    --text-dim: #9aa0aa;
+    --accent: #7aa2f7;
+    --accent-hover: #a5c0ff;
+    --border: #2a2f3a;
+    --code-bg: #11141a;
+    --table-header: #232732;
+    --quote-bar: #7aa2f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(26, 29, 36, 0.92);
+  }
+  .topbar-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .back-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .back-link:hover { color: var(--accent-hover); }
+  .pdf-link {
+    background: var(--accent);
+    color: #0f1115;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pdf-link:hover { background: var(--accent-hover); }
+  .pdf-link svg { width: 14px; height: 14px; }
+
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 56px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  p { margin-bottom: 16px; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+  strong { color: #fff; font-weight: 600; }
+  em { color: var(--text); font-style: italic; }
+
+  ul, ol { margin-bottom: 18px; padding-left: 28px; }
+  li { margin-bottom: 6px; }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 36px 0;
+  }
+
+  blockquote {
+    border-left: 4px solid var(--quote-bar);
+    background: var(--card);
+    padding: 14px 22px;
+    margin: 18px 0;
+    color: var(--text);
+    border-radius: 0 8px 8px 0;
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  blockquote strong { color: var(--accent); }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    font-size: 0.88em;
+    color: #f0a3b5;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 18px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text);
+    font-size: 1em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.94rem;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  thead { background: var(--table-header); }
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+
+  /* Checkboxes in self-check lists */
+  input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+
+  /* Anchored sections for nav */
+  h2[id], h3[id] { scroll-margin-top: 80px; }
+
+  footer.scenario-footer {
+    max-width: 920px;
+    margin: 60px auto 40px;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+  footer.scenario-footer a {
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    main { padding: 24px 16px 60px; }
+    h1 { font-size: 1.7rem; }
+    h2 { font-size: 1.35rem; }
+    h3 { font-size: 1.1rem; }
+    .topbar { padding: 10px 16px; }
+    pre { font-size: 0.8rem; padding: 12px 14px; }
+    table { font-size: 0.85rem; }
+    th, td { padding: 9px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="../../#/module/3/class/6">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <span style="display:inline-block;transform:translateY(-1px)">&larr;</span> Back to all scenarios
+    </a>
+    <a class="pdf-link" href="03_yelp_restaurants_m3_lab.pdf" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-4-4h3V4h2v8h3l-4 4zm-8 4v-2h16v2H4z"/></svg>
+      Download as PDF
+    </a>
+  </div>
+</div>
+
+<main>
+<h1 id="yelp-restaurants-module-3-lab-guide">Yelp Restaurants — Module 3
+Lab Guide</h1>
+<p><strong>Scenario:</strong> Yelp Open Dataset. Predict the star rating
+of a restaurant. <strong>Module:</strong> 3 (Data Preparation and
+Feature Engineering) <strong>Audience:</strong> Adult learners, A2
+English. New to AI. <strong>Tools:</strong> Google Colab (no install
+needed).</p>
+<hr />
+<h1 id="the-scenario-your-mission">The Scenario — Your Mission</h1>
+<h2 id="where-you-work">Where you work</h2>
+<p>You and your team are new data analysts at <strong>Yelp</strong>.
+Yelp is a big website in the USA. People go to Yelp to find a
+restaurant, a cafe, a bar, or a shop. They read reviews. They look at
+the star rating (from 1 to 5 stars).</p>
+<p>Every month: - <strong>Millions of people</strong> search on Yelp. -
+<strong>150,000 businesses</strong> are listed. - <strong>About
+50,000</strong> of them are restaurants. - People write <strong>6
+million+ reviews</strong>.</p>
+<p>The star rating (1.0 to 5.0, in steps of 0.5) is the most important
+number. A restaurant with 4.5 stars gets many customers. A restaurant
+with 2.0 stars gets very few.</p>
+<h2 id="the-problem">The problem</h2>
+<p>When a <strong>new restaurant</strong> opens, Yelp has a problem: -
+The restaurant has <strong>zero reviews</strong>. - So the rating is
+<strong>“unknown”</strong>. - The website shows it at the bottom of
+search results, or hides it. - Customers do not see it. They do not
+visit. The restaurant does not get reviews. - <strong>30% of new
+restaurants close in the first 90 days.</strong></p>
+<p>This is bad for Yelp: - The restaurant pays Yelp for ads, but gets
+nothing. - The restaurant owner tells friends: “Yelp is useless for new
+places.” - Yelp loses money and reputation.</p>
+<h2 id="your-managers-request">Your manager’s request</h2>
+<p>Your manager, <strong>Priya</strong> (VP of Local Search Quality at
+Yelp HQ), tells you:</p>
+<blockquote>
+<p>“When a new restaurant opens, our search ranking has no rating yet.
+We give it ‘unknown’ stars and hide it from results. We lose 30% of new
+restaurants in the first 90 days.</p>
+<p>Build a model that predicts the star rating <strong>from category,
+price, location, and metadata</strong> — before the first review
+arrives.</p>
+<p>If the model predicts 4.2 stars, we put the restaurant at the top. If
+it predicts 2.1 stars, we put it lower. We can change this later, when
+real reviews come in.</p>
+<p>I do not need 100% perfect. I need a good guess. Anything is better
+than ‘unknown’.”</p>
+</blockquote>
+<h2 id="your-teams-job-for-the-next-2-weeks-module-3">Your team’s job
+for the next 2 weeks (Module 3)</h2>
+<p>Priya cannot do this alone. Her data is in <strong>5 big JSON
+files</strong>. JSON is a format that looks like text. It is harder to
+read than CSV. Some columns are <strong>nested</strong> (a column inside
+a column). Some columns are <strong>missing 90% of the
+time</strong>.</p>
+<p>Your job in Module 3: &gt; <strong>Turn 5 messy JSON files into ONE
+clean file. The clean file will be used to train the model in Module
+4.</strong></p>
+<p>The clean file is called <code>yelp_restaurants_clean.parquet</code>.
+It must have <strong>22 specific columns</strong> (we will see them in
+Class 6).</p>
+<h2 id="after-module-3">After Module 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Module</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Module 4</strong></td>
+<td>Train the prediction model. Priya finally gets her “star score” for
+new restaurants.</td>
+</tr>
+<tr>
+<td><strong>Module 5</strong></td>
+<td>Find groups of restaurants (cheap-and-good vs expensive-and-bad,
+etc.). For marketing.</td>
+</tr>
+<tr>
+<td><strong>Module 7</strong></td>
+<td>Read the review text (in English). Find common complaints (slow
+service, cold food, etc.).</td>
+</tr>
+</tbody>
+</table>
+<p>You use the <strong>same Yelp dataset</strong> until the end of
+Module 7.</p>
+<h2 id="a-note-about-size">A note about size</h2>
+<p>The full Yelp dataset is <strong>6 million reviews and 150,000
+businesses</strong>. This is too big for Google Colab free tier. So in
+Module 3 we will: - <strong>Filter to restaurants only</strong> (about
+50,000 rows). - <strong>Filter to ONE city</strong> (Philadelphia,
+Tampa, or another big city in the data). This gives us about
+<strong>10,000 restaurants</strong> and a few hundred thousand reviews.
+Small enough for Colab.</p>
+<p>We will write code that <strong>works for any city</strong>. So in
+Module 6, we can run the same code on the full dataset.</p>
+<hr />
+<h1 id="how-this-guide-works-read-this-first">How This Guide Works (Read
+This First!)</h1>
+<h2 id="we-do-not-give-you-the-full-code">We do NOT give you the full
+code</h2>
+<p>In this guide you will see two kinds of content:</p>
+<h3 id="what-why-expected-explained-in-words">1. WHAT / WHY / EXPECTED —
+explained in words</h3>
+<p>For every step you read: - <strong>WHAT</strong> you have to do (in
+normal language) - <strong>WHY</strong> you do it (the reason) -
+<strong>HINTS</strong> — the function names, the arguments to remember -
+<strong>EXPECTED</strong> — the result you should see if you did it
+right</p>
+<h3 id="sometimes-a-tiny-code-skeleton-with-blanks">2. Sometimes a tiny
+code skeleton with blanks</h3>
+<p>For the harder steps we give you a code skeleton with
+<code>___</code> blanks. <strong>You fill in the blanks.</strong></p>
+<h3 id="why-no-full-code">Why no full code?</h3>
+<p>Because you will NOT learn if you copy-paste. - In Module 4, the
+model only works if YOU understand each step. - In your future job,
+nobody will give you the code. - Writing the code yourself takes 10
+minutes more today, but saves 10 hours later.</p>
+<p><strong>Rule:</strong> If you finish a step in 30 seconds by
+copy-pasting from a teammate’s notebook, do it AGAIN by yourself.
+Different variable names, same logic.</p>
+<hr />
+<h1 id="visualizations-two-modes">Visualizations — Two Modes</h1>
+<p>In every class you will make charts. There are <strong>two
+reasons</strong> to make a chart:</p>
+<h2 id="exploratory-charts-for-you">1. Exploratory charts (for YOU)</h2>
+<p>Made BEFORE you clean the data. To understand what the data looks
+like. - Fast, ugly, no labels needed. - Examples:
+<code>df.hist()</code>,
+<code>df['column'].value_counts().plot.bar()</code>.</p>
+<blockquote>
+<p>Goal: <strong>“What does this data look like?”</strong></p>
+</blockquote>
+<h2 id="explanatory-charts-for-priya">2. Explanatory charts (for
+PRIYA)</h2>
+<p>Made AFTER you understand. To EXPLAIN something to your manager. -
+Clean, labeled, one clear message. - Must have: title, x-label, y-label,
+source, and a 1-sentence takeaway.</p>
+<blockquote>
+<p>Goal: <strong>“Priya, look at this. This is what the data
+says.”</strong></p>
+</blockquote>
+<p>In every class you make BOTH kinds.</p>
+<h2 id="your-plotting-toolkit-you-learned-this-in-module-2-class-5">Your
+plotting toolkit (you learned this in Module 2 Class 5)</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Plot</th>
+<th>When to use it</th>
+<th>Function name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Histogram</td>
+<td>See the SHAPE of a numeric column</td>
+<td><code>plt.hist()</code> or <code>sns.histplot()</code></td>
+</tr>
+<tr>
+<td>Bar chart</td>
+<td>Count of each category</td>
+<td><code>df['col'].value_counts().plot.bar()</code></td>
+</tr>
+<tr>
+<td>Box plot</td>
+<td>See outliers in a numeric column</td>
+<td><code>sns.boxplot()</code></td>
+</tr>
+<tr>
+<td>Scatter plot</td>
+<td>See the relationship between 2 numbers</td>
+<td><code>plt.scatter()</code> or <code>sns.scatterplot()</code></td>
+</tr>
+<tr>
+<td>Heatmap</td>
+<td>See correlation between many columns</td>
+<td><code>sns.heatmap(df.corr())</code></td>
+</tr>
+<tr>
+<td>Map / geo scatter</td>
+<td>Show location on a map</td>
+<td><code>plt.scatter(lon, lat)</code></td>
+</tr>
+</tbody>
+</table>
+<p>Before you start: <code>import matplotlib.pyplot as plt</code> and
+<code>import seaborn as sns</code>.</p>
+<hr />
+<h1 id="before-you-start-google-colab-setup">Before You Start — Google
+Colab Setup</h1>
+<p>You will work in <strong>Google Colab</strong>. That means: - You do
+NOT install Python. - You do NOT install pandas, scikit-learn, or
+anything. - You just open a notebook in your web browser.</p>
+<h2 id="step-1-open-a-new-colab-notebook">Step 1 — Open a new Colab
+notebook</h2>
+<ol type="1">
+<li>Go to https://colab.research.google.com</li>
+<li>Sign in with your Google account.</li>
+<li>Click <strong>“New notebook”</strong> (top left).</li>
+<li>Name it <code>yelp_module_3.ipynb</code>.</li>
+</ol>
+<h2 id="step-2-connect-to-google-drive">Step 2 — Connect to Google
+Drive</h2>
+<p>Colab files <strong>disappear</strong> when you close the browser. So
+you must save your work to <strong>Google Drive</strong>.</p>
+<p>In the first cell:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> drive</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>drive.mount(<span class="st">&#39;/content/drive&#39;</span>)</span></code></pre></div>
+<p>A pop-up asks for permission. Click “Allow”. After this, Drive is
+available at <code>/content/drive/MyDrive/</code>.</p>
+<h2 id="step-3-create-a-project-folder">Step 3 — Create a project
+folder</h2>
+<p>In a new cell:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&#39;/content/drive/MyDrive/yelp_lab&#39;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>cd <span class="op">/</span>content<span class="op">/</span>drive<span class="op">/</span>MyDrive<span class="op">/</span>yelp_lab</span></code></pre></div>
+<p>Your team will save ALL files in this folder.</p>
+<h2 id="step-4-get-the-data">Step 4 — Get the data</h2>
+<p>The Yelp Open Dataset is at https://www.yelp.com/dataset</p>
+<p>It is <strong>about 4 GB</strong> when unzipped. This is big. Be
+patient.</p>
+<p><strong>Option A — Download from the Yelp website
+(recommended):</strong></p>
+<ol type="1">
+<li>Go to https://www.yelp.com/dataset.</li>
+<li>Click “Download Dataset”. Sign the agreement (academic +
+non-commercial use only).</li>
+<li>You will get a file <code>yelp_dataset.tar</code> (about 4 GB).</li>
+<li>Upload it to your Google Drive (not to Colab — Drive is
+permanent).</li>
+<li>In Colab:</li>
+</ol>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>cd <span class="op">/</span>content<span class="op">/</span>drive<span class="op">/</span>MyDrive<span class="op">/</span>yelp_lab</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>tar <span class="op">-</span>xf yelp_dataset.tar</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ls</span></code></pre></div>
+<p>You should see <strong>5 JSON files</strong>: -
+<code>yelp_academic_dataset_business.json</code> -
+<code>yelp_academic_dataset_review.json</code> -
+<code>yelp_academic_dataset_user.json</code> -
+<code>yelp_academic_dataset_checkin.json</code> -
+<code>yelp_academic_dataset_tip.json</code></p>
+<p><strong>Option B — Use a smaller mirror (if download is
+slow):</strong></p>
+<p>Some teachers prepare a smaller version (only one city, already
+filtered). Ask your mentor.</p>
+<h2 id="step-5-test-it-read-json-not-csv">Step 5 — Test it (read JSON,
+not CSV!)</h2>
+<p>JSON files are different from CSV. Each line of the file is one JSON
+object (one row). This is called <strong>JSON Lines</strong> or
+<strong>NDJSON</strong>.</p>
+<p>In Colab:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>business <span class="op">=</span> pd.read_json(<span class="st">&#39;yelp_academic_dataset_business.json&#39;</span>, lines<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(business.shape)</span></code></pre></div>
+<p>Should print something like <code>(150346, 14)</code>.
+<strong>150,000 businesses, 14 columns.</strong> You are ready.</p>
+<p><strong>Important:</strong> <code>lines=True</code> tells pandas
+“read line by line”. Without it, pandas tries to read the whole file as
+one big JSON object and crashes.</p>
+<h2 id="step-6-tell-colab-to-give-you-more-memory">Step 6 — Tell Colab
+to give you more memory</h2>
+<p>The full dataset is big. Click <strong>Runtime –&gt; Change runtime
+type –&gt; High-RAM</strong> if available (free in Colab for now).</p>
+<h2 id="colab-tips">Colab tips</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Save your notebook to Drive often</td>
+<td>Colab disconnects after 12 hours.</td>
+</tr>
+<tr>
+<td>Save intermediate <code>.parquet</code> files to Drive</td>
+<td>Files in <code>/content/</code> disappear when Colab
+disconnects.</td>
+</tr>
+<tr>
+<td>Share the notebook with teammates (Share button, top right)</td>
+<td>Editor access. Like Google Docs for code.</td>
+</tr>
+<tr>
+<td>Restart runtime if memory full</td>
+<td>Runtime –&gt; Restart runtime.</td>
+</tr>
+<tr>
+<td>Filter to ONE city as early as possible</td>
+<td>Saves memory. The full review file is 5 GB.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="class-1-data-cleaning">Class 1 — Data Cleaning</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Priya drops 5 big JSON files on
+your desk. The files include all kinds of businesses (dentists, salons,
+gyms, restaurants). Your job today: keep only restaurants, in one city,
+and understand what columns we have.</p>
+</blockquote>
+<h2 id="your-goal">Your goal</h2>
+<p>Make the 5 JSON files USABLE. Filter to restaurants. Filter to ONE
+city. Look at what columns exist.</p>
+<h2 id="inputs">Inputs</h2>
+<ul>
+<li>The 5 JSON files in
+<code>/content/drive/MyDrive/yelp_lab/</code></li>
+</ul>
+<h2 id="outputs">Outputs</h2>
+<ul>
+<li><code>business_step1.parquet</code> saved in your Drive folder</li>
+<li>3+ exploratory charts in your notebook</li>
+<li>1 explanatory chart for Priya</li>
+<li>Notes in markdown about every decision you made</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-15-minutes">Phase A — Explore the
+data first (15 minutes)</h2>
+<p>Before you clean anything, <strong>LOOK</strong> at the data.</p>
+<h3 id="exploratory-chart-1-how-many-businesses-per-city">Exploratory
+chart 1 — How many businesses per city?</h3>
+<ul>
+<li><strong>Question:</strong> “Yelp has businesses in many cities.
+Which cities have the most?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>business['city'].value_counts().head(20)</code>.</li>
+<li>Then <code>.plot.bar()</code> on the result.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The top 5 cities have most of the
+data. We will pick ONE city.</li>
+</ul>
+<h3 id="exploratory-chart-2-how-many-businesses-per-state">Exploratory
+chart 2 — How many businesses per state?</h3>
+<ul>
+<li><strong>Question:</strong> “Which US state has the most Yelp
+businesses?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>business['state'].value_counts()</code>.</li>
+<li>Plot as a bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Yelp covers many states. Most data
+is from a few big ones.</li>
+</ul>
+<h3 id="exploratory-chart-3-the-star-rating-distribution">Exploratory
+chart 3 — The star rating distribution</h3>
+<ul>
+<li><strong>Question:</strong> “What is the shape of the star column? Is
+it normal? Skewed?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>business['stars'].value_counts().sort_index().plot.bar()</code>.</li>
+<li>The stars are 1.0, 1.5, 2.0, … up to 5.0 (in 0.5 steps).</li>
+</ul></li>
+<li><strong>What you learn:</strong> Most restaurants have 3.5 to 4.5
+stars. Very few have 1.0 or 5.0. This is the target column for Module
+4.</li>
+</ul>
+<h3 id="exploratory-chart-4-missing-values-per-column">Exploratory chart
+4 — Missing values per column</h3>
+<ul>
+<li><strong>Question:</strong> “Which columns are mostly missing?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>business.isna().sum().sort_values(ascending=False)</code>.</li>
+<li>Plot it as a bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Some columns (like
+<code>hours</code>) are missing for many rows. We must decide what to
+do.</li>
+</ul>
+<hr />
+<h2 id="phase-b-filter-to-restaurants-in-one-city-45-minutes">Phase B —
+Filter to restaurants in one city (45 minutes)</h2>
+<h3 id="step-1-load-the-business-file">Step 1 — Load the business
+file</h3>
+<ul>
+<li><strong>WHAT:</strong> Load
+<code>yelp_academic_dataset_business.json</code> into a DataFrame called
+<code>business</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>pd.read_json(..., lines=True)</code>.</li>
+<li>Remember the <code>lines=True</code> argument. Without it the code
+crashes.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Around 150,346 rows and 14 columns.</li>
+</ul>
+<h3 id="step-2-look-at-the-columns">Step 2 — Look at the columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Check <code>.shape</code>,
+<code>.info()</code>, and <code>.head()</code> of
+<code>business</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Pay attention to the column types (<code>Dtype</code> column in
+<code>.info()</code>).</li>
+<li>Are <code>attributes</code> and <code>hours</code> stored as
+<code>object</code>? They are nested dictionaries inside cells. We will
+see this later.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Columns include:
+<code>business_id</code>, <code>name</code>, <code>address</code>,
+<code>city</code>, <code>state</code>, <code>latitude</code>,
+<code>longitude</code>, <code>stars</code>, <code>review_count</code>,
+<code>is_open</code>, <code>attributes</code>, <code>categories</code>,
+<code>hours</code>.</li>
+</ul>
+<h3 id="step-3-filter-to-restaurants-only">Step 3 — Filter to
+RESTAURANTS only</h3>
+<p>This is the most important filter. The <code>categories</code> column
+is a TEXT string like:</p>
+<pre><code>&quot;Mexican, Bars, Restaurants, Nightlife&quot;</code></pre>
+<p>We want to keep any row where the text contains the word
+“Restaurants”.</p>
+<ul>
+<li><strong>WHAT:</strong> Keep rows where <code>categories</code>
+contains the word <code>"Restaurants"</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>First, some rows have <code>None</code> (missing) in
+<code>categories</code>. You must handle this.</li>
+<li>Use <code>business['categories'].fillna('')</code> to replace
+<code>None</code> with empty string.</li>
+<li>Then use
+<code>.str.contains('Restaurants', case=False, na=False)</code>.</li>
+<li>Boolean mask, then filter.</li>
+</ul></li>
+<li><strong>WHY:</strong> Yelp has dentists, hair salons, gyms, etc. We
+only care about restaurants.</li>
+<li><strong>EXPECTED:</strong> About <strong>52,000 rows</strong>
+left.</li>
+</ul>
+<h3 id="step-4-look-at-top-cities-after-filtering">Step 4 — Look at top
+cities AFTER filtering</h3>
+<ul>
+<li><strong>WHAT:</strong> Now we have only restaurants. Where are
+they?</li>
+<li><strong>HINTS:</strong>
+<code>restaurants['city'].value_counts().head(10)</code>.</li>
+<li><strong>EXPECTED:</strong> Cities like Philadelphia, Tampa, Tucson,
+Indianapolis, Nashville.</li>
+</ul>
+<h3 id="step-5-pick-one-city">Step 5 — Pick ONE city</h3>
+<p>Pick the city with the most restaurants. (Or follow your mentor’s
+choice. Usually <code>Philadelphia</code> or <code>Tampa</code>.)</p>
+<ul>
+<li><strong>WHAT:</strong> Keep only rows where
+<code>city == 'Philadelphia'</code> (or your chosen city).</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Simple boolean mask:
+<code>restaurants[restaurants['city'] == 'Philadelphia']</code>.</li>
+<li>Add <code>.copy()</code> at the end. This avoids a warning
+later.</li>
+<li>Save the city name in a variable:
+<code>CITY = 'Philadelphia'</code>. Use it everywhere.</li>
+</ul></li>
+<li><strong>WHY:</strong> The full restaurant table is 50,000 rows. With
+reviews, this is too big for Colab. One city gives us ~5,000 to ~10,000
+restaurants. Small enough.</li>
+<li><strong>EXPECTED:</strong> About <strong>5,000 to 10,000
+rows</strong> left, depending on the city.</li>
+</ul>
+<h3
+id="step-6-filter-to-open-restaurants-only-optional-but-recommended">Step
+6 — Filter to OPEN restaurants only (optional but recommended)</h3>
+<ul>
+<li><strong>WHAT:</strong> The column <code>is_open</code> is 1 if the
+restaurant is still open, 0 if closed.</li>
+<li><strong>HINTS:</strong>
+<code>restaurants[restaurants['is_open'] == 1]</code>.</li>
+<li><strong>WHY:</strong> Closed restaurants are not useful for Priya.
+She wants to predict ratings of NEW open restaurants.</li>
+<li><strong>NOTE:</strong> You can also keep closed ones for analysis.
+Discuss with your team. Write down your choice.</li>
+</ul>
+<h3 id="step-7-find-missing-values">Step 7 — Find missing values</h3>
+<ul>
+<li><strong>WHAT:</strong> Count missing values per column.</li>
+<li><strong>HINTS:</strong> <code>.isna().sum()</code> per column. Sort
+it.</li>
+<li><strong>EXPECTED:</strong> <code>attributes</code>,
+<code>hours</code>, <code>address</code> may have some missing.
+<code>stars</code>, <code>business_id</code>, <code>latitude</code>,
+<code>longitude</code> should be 0 missing.</li>
+</ul>
+<h3 id="step-8-write-down-what-you-did">Step 8 — Write down what you
+did</h3>
+<p>In a markdown cell, write: - Starting rows: ~150,346 businesses -
+After “Restaurants” filter: ~52,000 - After city filter: ~6,000 (your
+number) - After <code>is_open</code> filter: ~5,000 (your number) - WHY
+you removed each group.</p>
+<h3 id="step-9-save-to-drive">Step 9 — Save to Drive</h3>
+<ul>
+<li><strong>WHAT:</strong> Save your filtered business DataFrame as
+parquet.</li>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/yelp_lab/business_step1.parquet')</code>.</li>
+<li><strong>WHY parquet, not CSV?</strong> Parquet is smaller and
+faster. It keeps column types (CSV loses them).</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-priya-15-minutes">Phase C — Make ONE
+chart for Priya (15 minutes)</h2>
+<p>She does not have time to read your code. She wants ONE picture.</p>
+<h3 id="priyas-chart-how-did-we-filter-the-data">Priya’s chart — “How
+did we filter the data?”</h3>
+<p>Make a bar chart showing the row count after each filter step:</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Rows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All businesses</td>
+<td>150,346</td>
+</tr>
+<tr>
+<td>After “Restaurants” filter</td>
+<td>~52,000</td>
+</tr>
+<tr>
+<td>After city filter</td>
+<td>~6,000</td>
+</tr>
+<tr>
+<td>After “is_open” filter</td>
+<td>~5,000</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>plt.bar()</code> with 4 bars.</li>
+<li>Add the title:
+<code>"Yelp data filtering - we kept the right slice"</code>.</li>
+<li>X-label: filter step name.</li>
+<li>Y-label: row count.</li>
+<li>Put the number on top of each bar (<code>plt.text(...)</code>).</li>
+</ul></li>
+<li><strong>Takeaway for Priya:</strong> “We started with 150,000
+businesses. We kept 5,000 open restaurants in Philadelphia. This is
+enough to train a model.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-1">Common mistakes in Class 1</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Forget <code>lines=True</code> in <code>pd.read_json</code></td>
+<td>Code crashes or memory explodes.</td>
+</tr>
+<tr>
+<td>Forget <code>.fillna('')</code> before
+<code>.str.contains</code></td>
+<td>Code crashes on rows with <code>None</code> in
+<code>categories</code>.</td>
+</tr>
+<tr>
+<td>Forget <code>.copy()</code> after a filter</td>
+<td>Pandas warns “SettingWithCopyWarning”.</td>
+</tr>
+<tr>
+<td>Save to <code>/content/</code> instead of Drive</td>
+<td>File disappears when Colab disconnects.</td>
+</tr>
+<tr>
+<td>Pick a city with only 50 restaurants</td>
+<td>Too small. Model cannot learn. Pick a top-5 city.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-2">Self-check before Class 2</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>business</code> DataFrame
+loaded from JSON.</label></li>
+<li><label><input type="checkbox" />Filter to “Restaurants”
+works.</label></li>
+<li><label><input type="checkbox" />You picked ONE city and saved the
+name in a variable.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory charts in
+your notebook.</label></li>
+<li><label><input type="checkbox" />1 polished chart for
+Priya.</label></li>
+<li><label><input type="checkbox" />You saved
+<code>business_step1.parquet</code> to your Drive folder.</label></li>
+<li><label><input type="checkbox" />You wrote down (in markdown) what
+you did and WHY.</label></li>
+</ul>
+<hr />
+<h1 id="class-2-encoding-and-scaling">Class 2 — Encoding and
+Scaling</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Priya looks at your filtered
+data. She is happy. But she says: “The model is a math model. It does
+not understand the word ‘Mexican’ or ‘$$’. Turn the words into numbers.
+Also, the <code>attributes</code> column is a mess — it is a nested
+JSON. Open it up.”</p>
+</blockquote>
+<h2 id="your-goal-1">Your goal</h2>
+<p>Open the nested columns. Turn TEXT columns into numbers. Make all
+numeric columns about the same size.</p>
+<h2 id="inputs-1">Inputs</h2>
+<ul>
+<li><code>business_step1.parquet</code> from Class 1</li>
+<li>(The other JSON files are still in your folder. We will use
+<code>review</code> later.)</li>
+</ul>
+<h2 id="outputs-1">Outputs</h2>
+<ul>
+<li><code>business_step2.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Priya</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first">Phase A — Explore the data
+first</h2>
+<h3
+id="exploratory-chart-1-look-inside-the-attributes-column">Exploratory
+chart 1 — Look INSIDE the <code>attributes</code> column</h3>
+<ul>
+<li><strong>Question:</strong> “What does an <code>attributes</code>
+cell look like? It is a dictionary, not a number.”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Print one row:
+<code>print(business['attributes'].iloc[0])</code>.</li>
+<li>You see a Python dictionary like
+<code>{'RestaurantsTakeOut': 'True', 'BusinessParking': "{'garage': False, 'street': True, ...}", 'Alcohol': "u'full_bar'"}</code>.</li>
+<li>Note the <strong>quotes around True/False</strong> — they are
+strings, not booleans. Strange!</li>
+</ul></li>
+<li><strong>What you learn:</strong> This column is nested. We must
+expand it.</li>
+</ul>
+<h3 id="exploratory-chart-2-how-many-attributes-are-missing">Exploratory
+chart 2 — How many attributes are missing?</h3>
+<ul>
+<li><strong>Question:</strong> “Many attributes are filled only for some
+restaurants. Which ones are useful?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>First expand attributes (see Phase B Step 1).</li>
+<li>Then <code>.isna().sum() / len(df) * 100</code> to get percent
+missing.</li>
+<li>Plot as a bar chart, sorted.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Some attributes are 95% missing. We
+will drop them.</li>
+</ul>
+<h3 id="exploratory-chart-3-price_range-counts">Exploratory chart 3 —
+<code>price_range</code> counts</h3>
+<ul>
+<li><strong>Question:</strong> “How many restaurants are cheap, medium,
+expensive?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Inside <code>attributes</code>, look at
+<code>RestaurantsPriceRange2</code>. It is 1, 2, 3, or 4 (number of $
+signs).</li>
+<li><code>value_counts().plot.bar()</code> on this column.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Most restaurants are <span
+class="math display">(<em>m</em><em>e</em><em>d</em><em>i</em><em>u</em><em>m</em>).<em>V</em><em>e</em><em>r</em><em>y</em><em>f</em><em>e</em><em>w</em><em>a</em><em>r</em><em>e</em></span>$$.</li>
+</ul>
+<h3 id="exploratory-chart-4-categories-top-cuisines">Exploratory chart 4
+— <code>categories</code> — top cuisines</h3>
+<ul>
+<li><strong>Question:</strong> “What kinds of food are in our
+city?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>The <code>categories</code> column is a comma-separated string.</li>
+<li>Split it:
+<code>df['categories'].str.split(', ').explode()</code>.</li>
+<li>Then <code>value_counts().head(20).plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Top cuisines: American, Pizza,
+Italian, Chinese, Mexican, etc.</li>
+</ul>
+<hr />
+<h2 id="phase-b-encode-and-scale">Phase B — Encode and scale</h2>
+<h3 id="step-1-expand-the-nested-attributes-column">Step 1 — Expand the
+nested <code>attributes</code> column</h3>
+<p>The <code>attributes</code> cell is a dictionary. We want each key to
+become its own column.</p>
+<ul>
+<li><strong>WHAT:</strong> Turn the <code>attributes</code> column into
+many columns (one per attribute).</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>pd.json_normalize(df['attributes'])</code>.</li>
+<li>If some rows have <code>None</code> in <code>attributes</code>,
+replace with empty dict first:
+<code>df['attributes'].apply(lambda x: x if isinstance(x, dict) else {})</code>.</li>
+<li>The result is a NEW DataFrame. Concatenate it to <code>df</code>
+with <code>pd.concat([df, attrs], axis=1)</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> About 30 to 40 new columns:
+<code>RestaurantsTakeOut</code>, <code>RestaurantsDelivery</code>,
+<code>Alcohol</code>, <code>WiFi</code>, <code>BusinessParking</code>,
+etc.</li>
+</ul>
+<h3 id="step-2-fix-the-weird-string-values">Step 2 — Fix the weird
+string values</h3>
+<p>Yelp stores boolean values as <strong>strings</strong>, not Python
+booleans. You will see: - <code>'True'</code>, <code>'False'</code>,
+<code>'None'</code> — these are strings! - <code>"u'full_bar'"</code> —
+a Python 2 unicode string literal. Strange. -
+<code>"{'garage': False, 'street': True}"</code> — a string that LOOKS
+like a dictionary.</p>
+<ul>
+<li><strong>WHAT:</strong> Clean up the values.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>For columns like <code>RestaurantsTakeOut</code>: replace
+<code>'True'</code> –&gt; 1, <code>'False'</code> –&gt; 0, anything else
+–&gt; NaN.</li>
+<li>You can use <code>.map({'True': 1, 'False': 0})</code> or a small
+function.</li>
+<li>For columns like <code>Alcohol</code>: the values are
+<code>"u'full_bar'"</code>, <code>"u'beer_and_wine'"</code>,
+<code>"'none'"</code>. Use
+<code>.str.replace("u'", "").str.replace("'", "")</code> to clean.</li>
+</ul></li>
+</ul>
+<h3 id="step-3-build-the-simple-boolean-flags">Step 3 — Build the simple
+boolean flags</h3>
+<p>For Priya’s model, we want easy 0/1 flags. Pick these attributes:</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>New column</th>
+<th>From which attribute</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>has_wifi</code></td>
+<td><code>WiFi</code> (1 if <code>'free'</code> or <code>'paid'</code>,
+else 0)</td>
+</tr>
+<tr>
+<td><code>accepts_credit_cards</code></td>
+<td><code>BusinessAcceptsCreditCards</code> (1 if True, else 0)</td>
+</tr>
+<tr>
+<td><code>has_parking</code></td>
+<td><code>BusinessParking</code> (1 if any value inside is True)</td>
+</tr>
+<tr>
+<td><code>outdoor_seating</code></td>
+<td><code>OutdoorSeating</code></td>
+</tr>
+<tr>
+<td><code>takes_reservations</code></td>
+<td><code>RestaurantsReservations</code></td>
+</tr>
+<tr>
+<td><code>good_for_groups</code></td>
+<td><code>RestaurantsGoodForGroups</code></td>
+</tr>
+<tr>
+<td><code>has_tv</code></td>
+<td><code>HasTV</code></td>
+</tr>
+<tr>
+<td><code>noise_level_num</code></td>
+<td><code>NoiseLevel</code> –&gt; 1=quiet, 2=average, 3=loud,
+4=very_loud</td>
+</tr>
+<tr>
+<td><code>alcohol_num</code></td>
+<td><code>Alcohol</code> –&gt; 0=none, 1=beer_and_wine, 2=full_bar</td>
+</tr>
+<tr>
+<td><code>price_range_num</code></td>
+<td><code>RestaurantsPriceRange2</code> (already a number 1-4)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>For <code>has_parking</code>, the value is a string like
+<code>"{'garage': False, 'street': True}"</code>. Use
+<code>eval()</code> carefully or <code>ast.literal_eval()</code>. Or
+just check if <code>"True"</code> is in the string.</li>
+<li>Many of these will be missing. That is OK. Fill missing with 0 (or
+with the most common value) — your choice. Write it down.</li>
+</ul></li>
+</ul>
+<h3 id="step-4-drop-the-messy-original-columns">Step 4 — Drop the messy
+original columns</h3>
+<p>Now that you have clean 0/1 flags, drop the old messy columns:
+<code>attributes</code>, <code>RestaurantsTakeOut</code> (original
+string version), <code>Alcohol</code>, etc. Keep only the clean
+ones.</p>
+<ul>
+<li><strong>HINTS:</strong> <code>df.drop(columns=[...])</code>.</li>
+</ul>
+<h3 id="step-5-one-hot-encode-state">Step 5 — One-hot encode
+<code>state</code></h3>
+<p>Even though we filtered to ONE city, the state column may have only 1
+or 2 values. But the model still needs numbers.</p>
+<ul>
+<li><strong>WHAT:</strong> Use one-hot encoding on
+<code>state</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>pd.get_dummies(df, columns=['state'], prefix='state')</code>.</li>
+</ul></li>
+<li><strong>NOTE:</strong> If only one state remains after filtering,
+you may skip this. Discuss with your team.</li>
+</ul>
+<h3 id="step-6-count-categories-per-restaurant">Step 6 — Count
+categories per restaurant</h3>
+<ul>
+<li><strong>WHAT:</strong> Make a column <code>n_categories</code> = how
+many categories a restaurant has.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['categories'].str.split(', ').str.len()</code>.</li>
+<li>Be careful: some rows may have <code>None</code>. Handle them.</li>
+</ul></li>
+<li><strong>WHY:</strong> A restaurant labeled “Mexican, Bars,
+Nightlife, Vegan, Gluten-Free” is different from one labeled just
+“Restaurants”. The count is a useful signal.</li>
+</ul>
+<h3 id="step-7-log-transform-review_count">Step 7 — Log-transform
+<code>review_count</code></h3>
+<p>The <code>review_count</code> column has a very long tail. Some
+restaurants have 5 reviews, some have 2,000.</p>
+<ul>
+<li><strong>WHAT:</strong> Apply <code>np.log1p()</code>.</li>
+<li><strong>HINTS:</strong>
+<code>df['log_review_count'] = np.log1p(df['review_count'])</code>.</li>
+<li><strong>WHY <code>log1p</code> and not <code>log</code>?</strong>
+<code>log(0)</code> is <code>-inf</code>.
+<code>log1p(x) = log(x + 1)</code> is safe for zeros.</li>
+</ul>
+<h3 id="step-8-scale-numeric-columns-preview-only">Step 8 — Scale
+numeric columns (preview only)</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>StandardScaler</code> to make every
+numeric column have mean = 0, std = 1.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.preprocessing import StandardScaler</code>.</li>
+<li><code>scaler = StandardScaler()</code>.</li>
+<li><code>scaler.fit_transform(df[numeric_cols])</code>.</li>
+</ul></li>
+<li><strong>WARNING:</strong> This is for inspection only. In Class 5,
+scaling goes INSIDE the Pipeline. Do NOT save the scaled version as your
+final file.</li>
+</ul>
+<h3 id="step-9-save">Step 9 — Save</h3>
+<ul>
+<li><strong>WHAT:</strong> Save the UNSCALED version.
+<code>df.to_parquet('/content/drive/MyDrive/yelp_lab/business_step2.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-priya">Phase C — Make ONE chart for
+Priya</h2>
+<h3 id="priyas-chart-cuisines-in-our-city">Priya’s chart — “Cuisines in
+our city”</h3>
+<p>A horizontal bar chart of the top 15 cuisine types in your city.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['categories'].str.split(', ').explode().value_counts()</code>.</li>
+<li><strong>Remove</strong> the word “Restaurants” itself (it is on
+every row, not useful).</li>
+<li><code>.head(15).plot.barh()</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Top 15 cuisines in Philadelphia - American
+and Pizza dominate”.</li>
+<li><strong>X-label:</strong> Number of restaurants.</li>
+<li><strong>Y-label:</strong> Cuisine.</li>
+<li><strong>Takeaway:</strong> “Most of our market is American, Pizza,
+and Italian. Asian and Mexican are smaller but growing categories.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-2">Common mistakes in Class 2</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Treat <code>'True'</code> (string) as <code>True</code>
+(boolean)</td>
+<td>Wrong values. The flag is always 0.</td>
+</tr>
+<tr>
+<td>Forget to replace <code>None</code> in attributes</td>
+<td>Crash on <code>pd.json_normalize</code>.</td>
+</tr>
+<tr>
+<td>Scale BEFORE train/test split</td>
+<td>Leakage. Scaler sees test data.</td>
+</tr>
+<tr>
+<td>One-hot encode <code>categories</code> directly</td>
+<td>1,200+ columns. Table explodes.</td>
+</tr>
+<tr>
+<td>Forget <code>np.log1p</code> and use <code>np.log</code> on
+zeros</td>
+<td><code>np.log(0) = -inf</code>. Crash.</td>
+</tr>
+<tr>
+<td>Save the scaled version</td>
+<td>Class 5 scales again inside the pipeline. Double scaling = wrong
+numbers.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-3">Self-check before Class 3</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>attributes</code> column is
+expanded into many columns.</label></li>
+<li><label><input type="checkbox" />Boolean flags
+(<code>has_wifi</code>, <code>has_parking</code>, etc.) are clean
+0/1.</label></li>
+<li><label><input type="checkbox" /><code>n_categories</code>
+exists.</label></li>
+<li><label><input type="checkbox" /><code>log_review_count</code>
+exists.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory
+charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Priya.</label></li>
+<li><label><input type="checkbox" /><code>business_step2.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-3-feature-engineering">Class 3 — Feature Engineering</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Priya says: “The raw columns are
+not enough. The TRULY useful columns are not there. We must MAKE them.
+For example, <strong>how many hours per week is the restaurant
+open?</strong> A 24-hour diner is very different from a brunch place.
+Build features like this.”</p>
+</blockquote>
+<h2 id="your-goal-2">Your goal</h2>
+<p>Make NEW columns from the existing ones. These will help the model
+predict the star rating.</p>
+<h2 id="inputs-2">Inputs</h2>
+<ul>
+<li><code>business_step2.parquet</code> (with expanded attributes)</li>
+<li><code>yelp_academic_dataset_review.json</code> (the review file — we
+will sample it)</li>
+<li>The <code>hours</code> column inside
+<code>business_step1.parquet</code> (nested JSON)</li>
+</ul>
+<h2 id="outputs-2">Outputs</h2>
+<ul>
+<li><code>business_step3.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Priya</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-1">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-hours-column-structure">Exploratory chart 1
+— <code>hours</code> column structure</h3>
+<ul>
+<li><strong>Question:</strong> “What does a <code>hours</code> cell look
+like?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Print one row: <code>print(business['hours'].iloc[0])</code>.</li>
+<li>You see something like
+<code>{'Monday': '11:0-22:0', 'Tuesday': '11:0-22:0', ..., 'Sunday': '11:0-21:0'}</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Hours are stored as a nested
+dictionary. We must parse the strings to get total hours per week.</li>
+</ul>
+<h3 id="exploratory-chart-2-stars-vs-review_count">Exploratory chart 2 —
+<code>stars</code> vs <code>review_count</code></h3>
+<ul>
+<li><strong>Question:</strong> “Do popular restaurants (many reviews)
+have higher or lower stars?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Scatter plot:
+<code>plt.scatter(df['review_count'], df['stars'])</code>.</li>
+<li>Use <code>alpha=0.3</code> to see the density.</li>
+</ul></li>
+<li><strong>What you learn:</strong> There may be a small positive
+correlation. But many cheap places with few reviews also have 4.5
+stars.</li>
+</ul>
+<h3
+id="exploratory-chart-3-latitude-longitude-map-of-your-city">Exploratory
+chart 3 — Latitude / Longitude map of your city</h3>
+<ul>
+<li><strong>Question:</strong> “Where in the city are the
+restaurants?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>plt.scatter(df['longitude'], df['latitude'], c=df['stars'], cmap='RdYlGn', alpha=0.5)</code>.</li>
+<li>Add a colorbar.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Are downtown restaurants
+higher-rated? Are suburb ones lower? Geographic patterns.</li>
+</ul>
+<h3
+id="exploratory-chart-4-hours-open-per-week-after-you-compute-it-in-step-1">Exploratory
+chart 4 — Hours open per week (after you compute it in Step 1)</h3>
+<ul>
+<li><strong>HINTS:</strong> Histogram, <code>bins=30</code>.</li>
+<li><strong>What you learn:</strong> Most restaurants open 40-80 hours
+per week. Some are 24/7. Some are weekend-only.</li>
+</ul>
+<hr />
+<h2 id="phase-b-engineer-the-features">Phase B — Engineer the
+features</h2>
+<h3 id="step-1-parse-the-hours-column">Step 1 — Parse the
+<code>hours</code> column</h3>
+<p>This is the <strong>hardest</strong> feature. The cell value is a
+dictionary. Each value is a string like <code>"11:0-22:0"</code>.</p>
+<p><strong>Sub-step 1a — Handle missing values.</strong> -
+<strong>HINTS:</strong> Some rows have <code>None</code> in
+<code>hours</code>. Replace with an empty dict, or skip them.</p>
+<p><strong>Sub-step 1b — Write a function to compute hours per
+day.</strong></p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hours_for_one_day(time_string):</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># time_string looks like &quot;11:0-22:0&quot; (open 11am to 10pm)</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> time_string <span class="kw">is</span> <span class="va">None</span> <span class="kw">or</span> time_string <span class="op">==</span> <span class="st">&#39;&#39;</span>:</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    open_str, close_str <span class="op">=</span> time_string.split(<span class="st">&#39;-&#39;</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    open_h, open_m <span class="op">=</span> open_str.split(<span class="st">&#39;:&#39;</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    close_h, close_m <span class="op">=</span> close_str.split(<span class="st">&#39;:&#39;</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    open_time  <span class="op">=</span> <span class="bu">int</span>(___) <span class="op">+</span> <span class="bu">int</span>(___) <span class="op">/</span> <span class="dv">60</span>     <span class="co"># YOU fill in</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    close_time <span class="op">=</span> <span class="bu">int</span>(___) <span class="op">+</span> <span class="bu">int</span>(___) <span class="op">/</span> <span class="dv">60</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> close_time <span class="op">&lt;</span> open_time:</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        close_time <span class="op">+=</span> <span class="dv">24</span>                      <span class="co"># closes after midnight</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> close_time <span class="op">-</span> open_time</span></code></pre></div>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Test on one value first:
+<code>print(hours_for_one_day('11:0-22:0'))</code> should be
+<code>11.0</code>.</li>
+<li>Test on <code>'17:0-1:0'</code> (open 5pm, closes 1am) should be
+<code>8.0</code>.</li>
+</ul></li>
+</ul>
+<p><strong>Sub-step 1c — Sum over the 7 days.</strong></p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hours_per_week(hours_dict):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> <span class="bu">isinstance</span>(hours_dict, <span class="bu">dict</span>):</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    days <span class="op">=</span> [<span class="st">&#39;Monday&#39;</span>, <span class="st">&#39;Tuesday&#39;</span>, <span class="st">&#39;Wednesday&#39;</span>, <span class="st">&#39;Thursday&#39;</span>, <span class="st">&#39;Friday&#39;</span>, <span class="st">&#39;Saturday&#39;</span>, <span class="st">&#39;Sunday&#39;</span>]</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    total <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> day <span class="kw">in</span> days:</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> day <span class="kw">in</span> hours_dict:</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>            total <span class="op">+=</span> hours_for_one_day(___)    <span class="co"># YOU fill in</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> total</span></code></pre></div>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Apply this to your <code>hours</code> column:
+<code>df['hours_open_per_week'] = df['hours'].apply(hours_per_week)</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Values 0 to ~168 (168 = 24/7). Most are
+50 to 100.</li>
+</ul>
+<h3 id="step-2-day-of-week-features">Step 2 — Day-of-week features</h3>
+<p>Make these new columns:</p>
+<table>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>open_on_monday</code></td>
+<td>1 if Monday is in the hours dict, else 0</td>
+</tr>
+<tr>
+<td><code>open_on_sunday</code></td>
+<td>1 if Sunday is in the hours dict, else 0</td>
+</tr>
+<tr>
+<td><code>n_days_open</code></td>
+<td>Number of days per week the restaurant is open</td>
+</tr>
+<tr>
+<td><code>opens_late</code></td>
+<td>1 if any day closes after midnight</td>
+</tr>
+<tr>
+<td><code>opens_early</code></td>
+<td>1 if any day opens before 8am</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>.apply()</code> with a small function.</li>
+<li>For <code>opens_late</code>, look at the close time of each day. If
+close &lt; open, it crosses midnight.</li>
+</ul></li>
+<li><strong>WHY:</strong> A breakfast place (opens early) is rated
+differently from a late-night bar. These features capture that.</li>
+</ul>
+<h3 id="step-3-geographic-features">Step 3 — Geographic features</h3>
+<table>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dist_from_center</code></td>
+<td>Distance in km from the city center (lat/lon)</td>
+</tr>
+<tr>
+<td><code>lat_rounded</code></td>
+<td>Latitude rounded to 2 decimals (creates “zones”)</td>
+</tr>
+<tr>
+<td><code>lon_rounded</code></td>
+<td>Longitude rounded to 2 decimals</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>For city center: find the mean lat/lon of all restaurants. Or look
+up the real city center.</li>
+<li>For distance, use the Haversine formula (you may have learned it in
+the Olist scenario):</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> haversine(lat1, lon1, lat2, lon2):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    R <span class="op">=</span> <span class="dv">6371</span>                  <span class="co"># Earth radius in km</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    phi1 <span class="op">=</span> np.radians(___)    <span class="co"># YOU fill in</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    phi2 <span class="op">=</span> np.radians(___)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    dphi <span class="op">=</span> np.radians(___ <span class="op">-</span> ___)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    dlam <span class="op">=</span> np.radians(___ <span class="op">-</span> ___)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> np.sin(dphi<span class="op">/</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> np.cos(phi1)<span class="op">*</span>np.cos(phi2) <span class="op">*</span> np.sin(dlam<span class="op">/</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">2</span> <span class="op">*</span> R <span class="op">*</span> np.arcsin(np.sqrt(a))</span></code></pre></div>
+<ul>
+<li><strong>WHY:</strong> Restaurants near the city center may be rated
+differently than ones far away. The model can learn the pattern.</li>
+</ul>
+<h3 id="step-4-category-based-features">Step 4 — Category-based
+features</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>is_pizza</code></td>
+<td>1 if “Pizza” in categories</td>
+</tr>
+<tr>
+<td><code>is_chinese</code></td>
+<td>1 if “Chinese” in categories</td>
+</tr>
+<tr>
+<td><code>is_italian</code></td>
+<td>1 if “Italian” in categories</td>
+</tr>
+<tr>
+<td><code>is_mexican</code></td>
+<td>1 if “Mexican” in categories</td>
+</tr>
+<tr>
+<td><code>is_american</code></td>
+<td>1 if “American (Traditional)” or “American (New)” in categories</td>
+</tr>
+<tr>
+<td><code>is_bar</code></td>
+<td>1 if “Bars” or “Pubs” in categories</td>
+</tr>
+<tr>
+<td><code>is_fast_food</code></td>
+<td>1 if “Fast Food” in categories</td>
+</tr>
+<tr>
+<td><code>is_cafe</code></td>
+<td>1 if “Cafes” or “Coffee &amp; Tea” in categories</td>
+</tr>
+<tr>
+<td><code>is_vegan</code></td>
+<td>1 if “Vegan” or “Vegetarian” in categories</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>df['categories'].str.contains('Pizza', case=False, na=False).astype(int)</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> The model needs to know the cuisine type.
+Pizza places have different rating patterns than vegan places.</li>
+</ul>
+<h3 id="step-5-review-based-features-the-important-ones">Step 5 —
+Review-based features (the IMPORTANT ones)</h3>
+<p>Now we use the <code>review</code> file. This file is BIG (5 GB). We
+must sample it.</p>
+<p><strong>Sub-step 5a — Load reviews for restaurants in your city
+only.</strong></p>
+<p>This is tricky. The review file has 6 million rows. We want only
+reviews of OUR restaurants (the ~5,000 we kept).</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Get the set of business IDs we kept:
+<code>kept_ids = set(df['business_id'])</code>.</li>
+<li>Read the JSON file in <strong>chunks</strong>:
+<code>pd.read_json(..., lines=True, chunksize=100000)</code>.</li>
+<li>For each chunk, filter to rows where <code>business_id</code> is in
+<code>kept_ids</code>. Append to a list. Concat at the end.</li>
+<li>Skeleton:</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>chunks <span class="op">=</span> []</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>reader <span class="op">=</span> pd.read_json(<span class="st">&#39;yelp_academic_dataset_review.json&#39;</span>, lines<span class="op">=</span><span class="va">True</span>, chunksize<span class="op">=</span>___)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> chunk <span class="kw">in</span> reader:</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    keep <span class="op">=</span> chunk[chunk[<span class="st">&#39;business_id&#39;</span>].isin(___)]</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    chunks.append(keep)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>reviews <span class="op">=</span> pd.concat(chunks, ignore_index<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
+<ul>
+<li><strong>EXPECTED:</strong> A few hundred thousand reviews for our
+restaurants. Manageable.</li>
+</ul>
+<p><strong>Sub-step 5b — Compute review-based features per
+restaurant.</strong></p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mean_review_length</code></td>
+<td>Average length (in characters) of the reviews of this
+restaurant</td>
+</tr>
+<tr>
+<td><code>mean_review_sentiment_score</code></td>
+<td>Simple sentiment: count of positive words minus negative words</td>
+</tr>
+<tr>
+<td><code>review_velocity</code></td>
+<td>Number of reviews per year (review_count / years_active)</td>
+</tr>
+<tr>
+<td><code>first_review_year</code></td>
+<td>Year of the first review</td>
+</tr>
+<tr>
+<td><code>last_review_year</code></td>
+<td>Year of the last review</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Group reviews by <code>business_id</code>:
+<code>reviews.groupby('business_id')</code>.</li>
+<li>For <code>mean_review_length</code>:
+<code>reviews['text'].str.len()</code> then group and average.</li>
+<li>For <code>mean_review_sentiment_score</code>: define a small word
+list. Example: positive =
+<code>{'good', 'great', 'amazing', 'love', 'delicious'}</code>. Negative
+= <code>{'bad', 'awful', 'cold', 'slow', 'rude'}</code>. Count
+occurrences. (We will improve this in Module 7.)</li>
+<li>For <code>review_velocity</code>:
+<code>review_count / (last_review_year - first_review_year + 1)</code>.</li>
+</ul></li>
+<li><strong>WARNING — Leakage!</strong>
+<ul>
+<li><code>mean_review_sentiment_score</code> uses review TEXT. In
+production, we predict for NEW restaurants with NO reviews. So this
+feature is NOT available at prediction time!</li>
+<li><strong>For Module 3 we will compute it anyway</strong>, but mark it
+clearly. In Module 4 we will split features into two sets: “available at
+launch” and “available after some reviews”. The model will use only the
+launch-time features for the cold-start problem.</li>
+</ul></li>
+</ul>
+<h3 id="step-6-save">Step 6 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/yelp_lab/business_step3.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-priya-1">Phase C — Make ONE chart for
+Priya</h2>
+<h3 id="priyas-chart-hours-open-per-week-vs-star-rating">Priya’s chart —
+“Hours open per week vs star rating”</h3>
+<p>A box plot showing the star rating distribution for restaurants in
+different “hours per week” buckets.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Bucket hours per week:
+<code>pd.cut(df['hours_open_per_week'], bins=[0, 30, 60, 90, 120, 168])</code>.</li>
+<li>Make a box plot:
+<code>sns.boxplot(x=buckets, y=df['stars'])</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Star rating by weekly opening hours —
+restaurants open 60-90 h/week have the highest median rating”.</li>
+<li><strong>Takeaway for Priya:</strong> “Restaurants that are open
+‘normal’ hours (60-90 per week) score best. 24/7 places (often fast
+food) score lower. Closed-most-of-the-week places score highest only if
+they are specialty (brunch, weekend pop-ups).”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-3">Common mistakes in Class 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Forget to handle midnight-crossing in hours_for_one_day</td>
+<td>Negative hours. Or 0.</td>
+</tr>
+<tr>
+<td>Read the full review file without chunking</td>
+<td>Colab runs out of memory.</td>
+</tr>
+<tr>
+<td>Forget to filter reviews to kept business_ids before concat</td>
+<td>Concat the whole 5 GB file. Crash.</td>
+</tr>
+<tr>
+<td>Use review text features as model input in M4</td>
+<td>Leakage — these are NOT available for new restaurants.</td>
+</tr>
+<tr>
+<td>Use Euclidean distance instead of Haversine</td>
+<td>Wrong distances in km.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-4">Self-check before Class 4</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>hours_open_per_week</code>
+exists. Values 0 to 168.</label></li>
+<li><label><input type="checkbox" />At least 5 cuisine flags exist
+(<code>is_pizza</code>, etc.).</label></li>
+<li><label><input type="checkbox" />Review-based features exist
+(<code>mean_review_length</code>, etc.).</label></li>
+<li><label><input type="checkbox" />Geographic feature
+(<code>dist_from_center</code>) exists.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 explanatory chart.</label></li>
+<li><label><input type="checkbox" /><code>business_step3.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-4-feature-selection">Class 4 — Feature Selection</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Now you have ~40 columns. Priya
+says: “Too many. Some are duplicates. Some are useless. I want 15-20
+GOOD columns. Pick them.”</p>
+</blockquote>
+<h2 id="your-goal-3">Your goal</h2>
+<p>Pick the best 15-20 columns. Drop the rest. Justify every choice.</p>
+<h2 id="inputs-3">Inputs</h2>
+<ul>
+<li><code>business_step3.parquet</code></li>
+</ul>
+<h2 id="outputs-3">Outputs</h2>
+<ul>
+<li><code>business_step4.parquet</code> in Drive (only the selected
+columns + <code>stars</code>)</li>
+<li>3+ exploratory charts (correlation heatmap, mutual info bars,
+importance bars)</li>
+<li>A short markdown report explaining your choices</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-2">Phase A — Explore the data
+first</h2>
+<h3
+id="exploratory-chart-1-correlation-heatmap-of-numeric-columns">Exploratory
+chart 1 — Correlation heatmap of numeric columns</h3>
+<ul>
+<li><strong>Question:</strong> “Which columns say the same thing as each
+other?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute <code>df[numeric_cols].corr()</code>.</li>
+<li>Plot with <code>sns.heatmap()</code>.</li>
+<li>Use <code>annot=True</code> and <code>fmt='.2f'</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Pairs with |corr| &gt; 0.9 are
+redundant. For example, <code>review_count</code> and
+<code>log_review_count</code> are perfectly correlated — keep only
+one.</li>
+</ul>
+<h3 id="exploratory-chart-2-mutual-information-bar-chart">Exploratory
+chart 2 — Mutual information bar chart</h3>
+<ul>
+<li>After you compute mutual info (Step 4 below), plot it.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Sort the values, then bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Which columns predict
+<code>stars</code> strongest.</li>
+</ul>
+<h3
+id="exploratory-chart-3-random-forest-feature-importance">Exploratory
+chart 3 — Random Forest feature importance</h3>
+<ul>
+<li>After you train the RF (Step 5 below), plot the importances.</li>
+<li><strong>HINTS:</strong>
+<code>pd.Series(rf.feature_importances_, index=...).sort_values().plot.barh()</code>.</li>
+<li><strong>What you learn:</strong> A second opinion on feature
+importance.</li>
+</ul>
+<hr />
+<h2 id="phase-b-select-features">Phase B — Select features</h2>
+<h3 id="step-1-split-into-train-and-test-first">Step 1 — Split into
+train and test FIRST</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>train_test_split</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.model_selection import train_test_split</code>.</li>
+<li><code>X = df.drop('stars', axis=1); y = df['stars']</code>.</li>
+<li>Pass: <code>test_size=0.2</code>, <code>random_state=42</code>.</li>
+<li>For regression (continuous target) you do NOT use
+<code>stratify=y</code> directly. If you treat it as multi-class (9
+levels), you can stratify.</li>
+</ul></li>
+<li><strong>WHY:</strong> All next steps use TRAIN ONLY. Otherwise
+leakage.</li>
+</ul>
+<h3 id="step-2-remove-low-variance-columns">Step 2 — Remove low-variance
+columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop columns where almost all values are the
+same.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import VarianceThreshold</code>.</li>
+<li><code>VarianceThreshold(threshold=0.01)</code> then
+<code>.fit_transform(X_train[numeric_cols])</code>.</li>
+</ul></li>
+<li><strong>EXAMPLE:</strong> If 99% of restaurants have
+<code>state == 'PA'</code> after city filtering, this column has no
+variance. Drop it.</li>
+</ul>
+<h3 id="step-3-remove-highly-correlated-columns">Step 3 — Remove highly
+correlated columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop one of each pair where |corr| &gt;
+0.9.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute correlation matrix.</li>
+<li>Get the upper triangle with <code>np.triu(...)</code>.</li>
+<li>For each column, if any of its upper-triangle correlations is &gt;
+0.9, mark it for dropping.</li>
+</ul></li>
+<li><strong>EXAMPLE:</strong> <code>review_count</code> and
+<code>log_review_count</code> are perfectly correlated. Keep
+<code>log_review_count</code> (better shape).</li>
+</ul>
+<h3 id="step-4-rank-by-mutual-information">Step 4 — Rank by mutual
+information</h3>
+<ul>
+<li><strong>WHAT:</strong> Score each column by how much it tells you
+about <code>stars</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>For regression:
+<code>from sklearn.feature_selection import mutual_info_regression</code>.</li>
+<li><code>mi = mutual_info_regression(X_train_numeric, y_train)</code>.</li>
+<li>Put in a Series, sort.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> <code>mean_review_length</code>,
+<code>price_range_num</code>, <code>log_review_count</code>,
+<code>hours_open_per_week</code> should be near the top.</li>
+</ul>
+<h3 id="step-5-random-forest-importance-second-opinion">Step 5 — Random
+Forest importance (second opinion)</h3>
+<ul>
+<li><strong>WHAT:</strong> Train a small RF, look at
+<code>feature_importances_</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.ensemble import RandomForestRegressor</code> (for
+regression).</li>
+<li><code>RandomForestRegressor(n_estimators=50, max_depth=8, n_jobs=-1, random_state=42)</code>.</li>
+<li><code>.fit(X_train, y_train)</code>.</li>
+<li>Look at <code>.feature_importances_</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-6-pick-the-final-15-20-columns">Step 6 — Pick the final
+15-20 columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Combine the rankings. Pick columns that:
+<ul>
+<li>Are high in mutual info, AND</li>
+<li>Are high in RF importance, AND</li>
+<li>Were not dropped by variance/correlation pruning.</li>
+</ul></li>
+<li><strong>WRITE DOWN:</strong> In your notebook, list the columns.
+Explain in 1 sentence why each one is in.</li>
+</ul>
+<h3 id="step-7-mark-the-leakage-features">Step 7 — Mark the leakage
+features</h3>
+<p>For each kept feature, label it: - <strong>AT-LAUNCH:</strong>
+Available for a brand-new restaurant (category, price, location, hours).
+- <strong>AFTER-REVIEWS:</strong> Only available after some reviews come
+in (mean_review_length, mean_review_sentiment_score,
+review_velocity).</p>
+<p>In Module 4, we will train TWO models: one for cold-start (AT-LAUNCH
+only), one for warm-start.</p>
+<h3 id="step-8-save">Step 8 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong> Keep only the selected columns +
+<code>stars</code>. Save as <code>business_step4.parquet</code> to
+Drive.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-priya-2">Phase C — Make ONE chart for
+Priya</h2>
+<h3 id="priyas-chart-these-are-the-15-most-important-columns">Priya’s
+chart — “These are the 15 most important columns”</h3>
+<p>A horizontal bar chart of your top 15 features and their importance
+score. <strong>Color the bars:</strong> green for “AT-LAUNCH” features,
+orange for “AFTER-REVIEWS” features.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use the RF importance.</li>
+<li><code>sort_values()</code> then <code>.head(15)</code> then
+<code>.plot.barh()</code>.</li>
+<li>Set the color list based on each feature’s label.</li>
+</ul></li>
+<li><strong>Title:</strong> “Top 15 predictors of star rating - green =
+available at launch”.</li>
+<li><strong>Y-axis:</strong> column names.</li>
+<li><strong>X-axis:</strong> Random Forest importance.</li>
+<li><strong>Takeaway:</strong> “The strongest signals are review-based
+(orange). But for new restaurants we only have the green ones. We must
+work hard to make them good.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-4">Common mistakes in Class 4</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compute mutual info on the FULL data</td>
+<td>Leakage.</td>
+</tr>
+<tr>
+<td>Use <code>mutual_info_classif</code> instead of
+<code>mutual_info_regression</code></td>
+<td>Wrong scoring for our continuous target.</td>
+</tr>
+<tr>
+<td>Drop columns without writing why</td>
+<td>Module 4 students will not understand.</td>
+</tr>
+<tr>
+<td>Keep too many columns (50+)</td>
+<td>Slow training. Overfitting risk.</td>
+</tr>
+<tr>
+<td>Forget to mark leakage features</td>
+<td>Module 4 model “works” but fails in production.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-5">Self-check before Class 5</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Train/test split done
+FIRST.</label></li>
+<li><label><input type="checkbox" />15-20 columns remain +
+<code>stars</code>.</label></li>
+<li><label><input type="checkbox" />Each kept column is labeled
+AT-LAUNCH or AFTER-REVIEWS.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Priya.</label></li>
+<li><label><input type="checkbox" /><code>business_step4.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-5-pipelines">Class 5 — Pipelines</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Priya says: “Your cleaning code
+is in 4 different notebooks. When a new restaurant signs up tomorrow,
+you cannot run 4 notebooks. We need ONE object that does everything —
+from raw JSON row to a star prediction.”</p>
+</blockquote>
+<h2 id="your-goal-4">Your goal</h2>
+<p>Put EVERY cleaning step inside ONE Pipeline object. Production-ready
+code.</p>
+<h2 id="inputs-4">Inputs</h2>
+<ul>
+<li><code>business_step4.parquet</code> (selected columns)</li>
+</ul>
+<h2 id="outputs-4">Outputs</h2>
+<ul>
+<li><code>yelp_pipeline.joblib</code> saved in Drive</li>
+<li>1 scatter plot of predicted vs actual stars</li>
+<li>1 residual plot</li>
+<li>A pipeline that takes RAW input and produces predictions</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-3">Phase A — Explore the data
+first</h2>
+<h3
+id="exploratory-chart-1-predicted-vs-actual-scatter-after-training">Exploratory
+chart 1 — Predicted vs actual scatter (after training)</h3>
+<ul>
+<li>After Step 6, predict on the test set.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>y_pred = pipeline.predict(X_test)</code>.</li>
+<li><code>plt.scatter(y_test, y_pred, alpha=0.3)</code>.</li>
+<li>Add a diagonal line <code>y = x</code> for reference.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Are predictions close to the
+diagonal? Or scattered?</li>
+</ul>
+<h3 id="exploratory-chart-2-residual-plot">Exploratory chart 2 —
+Residual plot</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>residuals = y_test - y_pred</code>.</li>
+<li><code>plt.scatter(y_pred, residuals)</code>.</li>
+<li>Add a horizontal line at 0.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Are residuals random (good)? Or do
+they have a pattern (bad — model misses something)?</li>
+</ul>
+<hr />
+<h2 id="phase-b-build-the-pipeline">Phase B — Build the pipeline</h2>
+<h3
+id="step-1-decide-which-columns-are-numeric-and-which-are-categorical">Step
+1 — Decide which columns are numeric and which are categorical</h3>
+<ul>
+<li><strong>HINTS:</strong> Make two lists.</li>
+<li><strong>EXAMPLE:</strong>
+<ul>
+<li>numeric: <code>price_range_num</code>, <code>n_categories</code>,
+<code>log_review_count</code>, <code>hours_open_per_week</code>,
+<code>dist_from_center</code>, <code>latitude</code>,
+<code>longitude</code>, <code>mean_review_length</code>,
+<code>review_velocity</code>, <code>n_days_open</code>.</li>
+<li>categorical: <code>state</code> (if you kept it). Or none, if all
+flags are 0/1 already.</li>
+<li>The 0/1 flags (like <code>has_wifi</code>, <code>is_pizza</code>)
+are technically numeric. Treat them as numeric.</li>
+</ul></li>
+</ul>
+<h3 id="step-2-build-the-numeric-mini-pipeline">Step 2 — Build the
+numeric mini-pipeline</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer (fill missing) +
+scaler.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.pipeline import Pipeline</code>.</p></li>
+<li><p><code>from sklearn.impute import SimpleImputer</code>.</p></li>
+<li><p><code>from sklearn.preprocessing import StandardScaler</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>numeric_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;scaler&#39;</span>,  StandardScaler()),</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in the blank: best strategy for numeric?
+(<code>'median'</code>)</p></li>
+</ul></li>
+</ul>
+<h3
+id="step-3-build-the-categorical-mini-pipeline-if-you-have-any-categorical">Step
+3 — Build the categorical mini-pipeline (if you have any
+categorical)</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer + one-hot encoder.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.preprocessing import OneHotEncoder</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>categorical_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;onehot&#39;</span>,  OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">&#39;___&#39;</span>, sparse_output<span class="op">=</span>___)),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in blanks. (Strategy <code>'most_frequent'</code>,
+handle_unknown <code>'ignore'</code>, sparse_output
+<code>False</code>.)</p></li>
+</ul></li>
+<li><strong>WHY <code>handle_unknown='ignore'</code>?</strong> In
+production, a new restaurant in a new state may appear. We do not want
+the code to crash.</li>
+</ul>
+<h3 id="step-4-combine-into-a-columntransformer">Step 4 — Combine into a
+ColumnTransformer</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.compose import ColumnTransformer</code>.</li>
+<li>It takes a list of tuples:
+<code>(name, transformer, list_of_columns)</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-5-add-the-model-on-top">Step 5 — Add the model on top</h3>
+<p>For a REGRESSION problem (predict a number 1.0 to 5.0):</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.linear_model import Ridge</code>.</li>
+<li><code>Ridge(alpha=1.0, random_state=42)</code>.</li>
+<li>Put it in a Pipeline with the preprocessor.</li>
+</ul></li>
+</ul>
+<p>If you prefer multi-class (9 levels: 1.0, 1.5, 2.0, …, 5.0): -
+<code>from sklearn.ensemble import RandomForestClassifier</code>.</p>
+<p><strong>Recommendation for Module 3:</strong> Use Ridge regression.
+It is simple. In Module 4 we will try better models (Random Forest
+Regressor, Gradient Boosting).</p>
+<h3 id="step-6-train-and-evaluate">Step 6 — Train and evaluate</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>full_pipeline.fit(X_train, y_train)</code>.</li>
+<li><code>y_pred = full_pipeline.predict(X_test)</code>.</li>
+<li><code>from sklearn.metrics import mean_absolute_error, r2_score</code>.</li>
+<li>Print <code>MAE</code> (Mean Absolute Error): “on average, we are
+off by X stars”.</li>
+<li>Print <code>R^2</code> score.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> MAE around 0.5 to 0.7 stars. R^2 around
+0.2 to 0.4. (Module 4 will improve this.)</li>
+</ul>
+<h3 id="step-7-save-the-trained-pipeline">Step 7 — Save the trained
+pipeline</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>import joblib</code>.</li>
+<li><code>joblib.dump(full_pipeline, '/content/drive/MyDrive/yelp_lab/yelp_pipeline.joblib')</code>.</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-priya-3">Phase C — Make ONE chart for
+Priya</h2>
+<h3 id="priyas-chart-how-close-are-our-predictions">Priya’s chart — “How
+close are our predictions?”</h3>
+<p>A scatter plot of <code>y_test</code> (actual stars) vs
+<code>y_pred</code> (predicted stars).</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>plt.scatter(y_test, y_pred, alpha=0.3)</code>.</li>
+<li>Add a red diagonal line:
+<code>plt.plot([1, 5], [1, 5], 'r--')</code>.</li>
+<li>X-label: “Actual stars”.</li>
+<li>Y-label: “Predicted stars”.</li>
+</ul></li>
+<li><strong>Title:</strong> “Predicted vs actual stars - MAE = 0.6 (we
+are off by about half a star on average)”.</li>
+<li><strong>Takeaway for Priya:</strong> “Half a star is not perfect,
+but it is far better than ‘unknown’. We can already use this for
+cold-start ranking. Module 4 will improve the accuracy.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-5">Common mistakes in Class 5</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Build the pipeline AFTER you scaled the data manually</td>
+<td>Pipeline scales it twice. Numbers wrong.</td>
+</tr>
+<tr>
+<td>Forget <code>sparse_output=False</code> in OneHotEncoder</td>
+<td>Some downstream code breaks.</td>
+</tr>
+<tr>
+<td>Use <code>LogisticRegression</code> for regression target</td>
+<td>Logistic is for 0/1 classification. Wrong tool.</td>
+</tr>
+<tr>
+<td>Forget <code>random_state</code></td>
+<td>Results change every run. Hard to debug.</td>
+</tr>
+<tr>
+<td>Use <code>mean_review_sentiment_score</code> in the cold-start
+model</td>
+<td>Leakage — not available for a new restaurant.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-6">Self-check before Class 6</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Pipeline has preprocessor +
+model.</label></li>
+<li><label><input type="checkbox" />Preprocessor has numeric + (maybe)
+categorical transformers.</label></li>
+<li><label><input type="checkbox" /><code>handle_unknown='ignore'</code>
+set (if categorical pipeline used).</label></li>
+<li><label><input type="checkbox" />Predicted-vs-actual chart in
+notebook.</label></li>
+<li><label><input type="checkbox" />Residual chart in
+notebook.</label></li>
+<li><label><input type="checkbox" /><code>yelp_pipeline.joblib</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-6-end-to-end-lab-the-big-one">Class 6 — End-to-End Lab
+(THE BIG ONE)</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Priya is in the meeting room. She
+wants the FINAL clean dataset on her desk in 90 minutes. This is the
+lab.</p>
+</blockquote>
+<h2 id="your-goal-5">Your goal</h2>
+<p>Take 5 raw JSON files. Produce ONE final <code>.parquet</code> file
+with the exact 22-column schema. Plus a 1-page findings report.</p>
+<h2 id="time">Time</h2>
+<p><strong>90 minutes</strong> of focused work.</p>
+<h2 id="inputs-5">Inputs</h2>
+<ul>
+<li>The 5 raw JSON files in your Drive folder</li>
+</ul>
+<h2 id="outputs-5">Outputs</h2>
+<ul>
+<li><code>yelp_restaurants_clean.parquet</code> (~5,000 to ~10,000 rows
+× 22 columns) in Drive</li>
+<li><code>findings.md</code> (~1 page)</li>
+<li>Your full Colab notebook</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-10-minutes">Phase A — Explore the
+data first (10 minutes)</h2>
+<p>You will reuse charts from Classes 1-5. Pick 3 of them. Put them all
+on ONE PAGE of your notebook with markdown headers: 1.
+<code>stars</code> distribution (the target) 2. Top 15 cuisines in your
+city 3. Top 15 most important features (with AT-LAUNCH vs AFTER-REVIEWS
+colors)</p>
+<p>These 3 charts tell Priya the whole story.</p>
+<hr />
+<h2 id="phase-b-build-the-final-dataset-70-minutes">Phase B — Build the
+final dataset (70 minutes)</h2>
+<h3 id="required-output-schema">Required output schema</h3>
+<p>Your <code>yelp_restaurants_clean.parquet</code> MUST have these 22
+columns, with these names and types:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>Column</th>
+<th>Type</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>business_id</code></td>
+<td>string</td>
+<td>business</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>state</code></td>
+<td>string</td>
+<td>business</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>city</code></td>
+<td>string</td>
+<td>business</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>latitude</code></td>
+<td>float</td>
+<td>business</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>longitude</code></td>
+<td>float</td>
+<td>business</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>dist_from_center</code></td>
+<td>float</td>
+<td>engineered (Haversine)</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>n_categories</code></td>
+<td>int</td>
+<td>engineered (split categories)</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>price_range_num</code></td>
+<td>int (1-4)</td>
+<td>from <code>attributes.RestaurantsPriceRange2</code></td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>has_wifi</code></td>
+<td>int (0/1)</td>
+<td>from <code>attributes.WiFi</code></td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>has_parking</code></td>
+<td>int (0/1)</td>
+<td>from <code>attributes.BusinessParking</code></td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>accepts_credit_cards</code></td>
+<td>int (0/1)</td>
+<td>from <code>attributes.BusinessAcceptsCreditCards</code></td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>outdoor_seating</code></td>
+<td>int (0/1)</td>
+<td>from <code>attributes.OutdoorSeating</code></td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>alcohol_num</code></td>
+<td>int (0-2)</td>
+<td>from <code>attributes.Alcohol</code></td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>noise_level_num</code></td>
+<td>int (1-4)</td>
+<td>from <code>attributes.NoiseLevel</code></td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>hours_open_per_week</code></td>
+<td>float</td>
+<td>engineered from <code>hours</code></td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>n_days_open</code></td>
+<td>int (0-7)</td>
+<td>engineered from <code>hours</code></td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>review_count</code></td>
+<td>int</td>
+<td>business</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>log_review_count</code></td>
+<td>float</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>review_velocity</code></td>
+<td>float</td>
+<td>engineered (reviews per year)</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>mean_review_length</code></td>
+<td>float</td>
+<td>engineered (from review.json)</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>mean_review_sentiment_score</code></td>
+<td>float</td>
+<td>engineered (from review.json — for Module 7!)</td>
+</tr>
+<tr>
+<td>22</td>
+<td><code>stars</code></td>
+<td>float (1.0-5.0)</td>
+<td>TARGET (from business)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lab-phases-timed">Lab phases (timed)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Time</th>
+<th>What you do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Load + filter</td>
+<td>15 min</td>
+<td>Load business JSON. Filter to Restaurants, one city, is_open.</td>
+</tr>
+<tr>
+<td>2. Expand attributes</td>
+<td>10 min</td>
+<td><code>pd.json_normalize</code>. Build 0/1 flags. Build
+<code>price_range_num</code>.</td>
+</tr>
+<tr>
+<td>3. Parse hours</td>
+<td>10 min</td>
+<td>Compute <code>hours_open_per_week</code>,
+<code>n_days_open</code>.</td>
+</tr>
+<tr>
+<td>4. Geo features</td>
+<td>5 min</td>
+<td>Compute <code>dist_from_center</code> (Haversine).</td>
+</tr>
+<tr>
+<td>5. Category counts</td>
+<td>5 min</td>
+<td>Compute <code>n_categories</code>.</td>
+</tr>
+<tr>
+<td>6. Read reviews (chunked)</td>
+<td>15 min</td>
+<td>Filter review.json to kept business_ids. Compute mean length,
+sentiment, velocity.</td>
+</tr>
+<tr>
+<td>7. Validate schema + save</td>
+<td>5 min</td>
+<td>Check 22 columns. Save <code>.parquet</code>.</td>
+</tr>
+<tr>
+<td>8. Findings</td>
+<td>10 min</td>
+<td>Write <code>findings.md</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total: 90 minutes.</strong></p>
+<hr />
+<h2 id="phase-c-findings-report-for-priya-10-minutes">Phase C — Findings
+report for Priya (10 minutes)</h2>
+<p>Write <code>findings.md</code> with these sections:</p>
+<h3 id="final-numbers">Final numbers</h3>
+<ul>
+<li>City: ____ (e.g., Philadelphia)</li>
+<li>Final row count: ____</li>
+<li>Mean stars: ____ (should be around 3.5)</li>
+<li>Number of AT-LAUNCH features: ____</li>
+<li>Number of AFTER-REVIEWS features: ____</li>
+</ul>
+<h3 id="top-3-insights">Top 3 insights</h3>
+<ol type="1">
+<li>_____ (e.g., “Pizza restaurants score 0.4 stars below the city
+average.”)</li>
+<li>_____ (e.g., “Restaurants open 60-90 hours/week score
+highest.”)</li>
+<li>_____ (e.g., “Distance from center is weakly negatively correlated
+with stars.”)</li>
+</ol>
+<h3 id="one-question-to-investigate-in-module-4">One question to
+investigate in Module 4</h3>
+<ul>
+<li>_____ (e.g., “Can we beat MAE = 0.6 with Gradient Boosting?”)</li>
+</ul>
+<h3 id="one-chart-that-summarizes-everything">One chart that summarizes
+everything</h3>
+<p>Embed your most important chart (the top 15 features one, with
+AT-LAUNCH vs AFTER-REVIEWS colors).</p>
+<hr />
+<h2 id="grading-rubric-100-points">Grading rubric (100 points)</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Item</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All 22 columns exist with the right names and dtypes</td>
+<td>25</td>
+</tr>
+<tr>
+<td>Cleaning decisions written in markdown</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Pipeline is reproducible (re-run from 5 JSON files in ONE
+command)</td>
+<td>15</td>
+</tr>
+<tr>
+<td><code>hours_open_per_week</code> correctly handles midnight
+crossing</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Review file read with chunking (no memory crash)</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>At least 3 exploratory + 1 explanatory chart per
+class</strong></td>
+<td><strong>15</strong></td>
+</tr>
+<tr>
+<td><code>findings.md</code> has insights, not just numbers</td>
+<td>10</td>
+</tr>
+<tr>
+<td>AT-LAUNCH vs AFTER-REVIEWS labels in your notes</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<h2 id="submit">Submit</h2>
+<p>Upload to
+<code>module-3/class_6/submissions/&lt;YourTeamName&gt;/</code>: -
+<code>yelp_restaurants_clean.parquet</code> - Your Colab notebook
+(<code>File --&gt; Download --&gt; Download .ipynb</code>) -
+<code>findings.md</code></p>
+<hr />
+<h1 id="tips-for-the-whole-module">Tips for the whole module</h1>
+<ol type="1">
+<li><strong>Do NOT copy-paste code from this guide.</strong> This guide
+gives you HINTS only. Write the code yourself. You will learn much
+faster.</li>
+<li><strong>Save your notebook to Drive often.</strong> Colab
+disconnects after 12 hours.</li>
+<li><strong>Save intermediate <code>.parquet</code> files to
+Drive</strong> (business_step1, business_step2, etc.). If something
+breaks, you do not redo everything.</li>
+<li><strong>Pair-program.</strong> One student types, one reads. Switch
+every 20 minutes.</li>
+<li><strong>Make a chart BEFORE you write cleaning code.</strong> You
+must SEE the problem before you can fix it.</li>
+<li><strong>Make a chart AFTER each step.</strong> Confirm your code did
+what you expected.</li>
+<li><strong>Always pass <code>lines=True</code> to
+<code>pd.read_json</code></strong> for Yelp data. The file is JSON
+Lines, not standard JSON.</li>
+<li><strong>Filter as early as possible.</strong> Restaurants + one city
++ open = the only data you need. Doing the filter on row 1 saves memory
+and time.</li>
+<li><strong>For the review file, always use
+<code>chunksize</code>.</strong> Never load 5 GB at once.</li>
+<li><strong>Mark leakage features.</strong> Any feature built from
+review text is NOT available for a new restaurant.</li>
+<li><strong>Ask the mentor early.</strong> If you are stuck for 20
+minutes, ask. Do not waste an afternoon.</li>
+</ol>
+<p>Good luck.</p>
+</main>
+
+<footer class="scenario-footer">
+  <p><a href="../../#/module/3/class/6">&larr; Back to all 15 scenarios</a></p>
+</footer>
+
+</body>
+</html>

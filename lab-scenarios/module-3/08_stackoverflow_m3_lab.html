@@ -1,0 +1,1962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>08_stackoverflow_m3_lab</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --text: #e6e8ec;
+    --text-dim: #9aa0aa;
+    --accent: #7aa2f7;
+    --accent-hover: #a5c0ff;
+    --border: #2a2f3a;
+    --code-bg: #11141a;
+    --table-header: #232732;
+    --quote-bar: #7aa2f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(26, 29, 36, 0.92);
+  }
+  .topbar-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .back-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .back-link:hover { color: var(--accent-hover); }
+  .pdf-link {
+    background: var(--accent);
+    color: #0f1115;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pdf-link:hover { background: var(--accent-hover); }
+  .pdf-link svg { width: 14px; height: 14px; }
+
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 56px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  p { margin-bottom: 16px; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+  strong { color: #fff; font-weight: 600; }
+  em { color: var(--text); font-style: italic; }
+
+  ul, ol { margin-bottom: 18px; padding-left: 28px; }
+  li { margin-bottom: 6px; }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 36px 0;
+  }
+
+  blockquote {
+    border-left: 4px solid var(--quote-bar);
+    background: var(--card);
+    padding: 14px 22px;
+    margin: 18px 0;
+    color: var(--text);
+    border-radius: 0 8px 8px 0;
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  blockquote strong { color: var(--accent); }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    font-size: 0.88em;
+    color: #f0a3b5;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 18px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text);
+    font-size: 1em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.94rem;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  thead { background: var(--table-header); }
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+
+  /* Checkboxes in self-check lists */
+  input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+
+  /* Anchored sections for nav */
+  h2[id], h3[id] { scroll-margin-top: 80px; }
+
+  footer.scenario-footer {
+    max-width: 920px;
+    margin: 60px auto 40px;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+  footer.scenario-footer a {
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    main { padding: 24px 16px 60px; }
+    h1 { font-size: 1.7rem; }
+    h2 { font-size: 1.35rem; }
+    h3 { font-size: 1.1rem; }
+    .topbar { padding: 10px 16px; }
+    pre { font-size: 0.8rem; padding: 12px 14px; }
+    table { font-size: 0.85rem; }
+    th, td { padding: 9px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="../../#/module/3/class/6">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <span style="display:inline-block;transform:translateY(-1px)">&larr;</span> Back to all scenarios
+    </a>
+    <a class="pdf-link" href="08_stackoverflow_m3_lab.pdf" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-4-4h3V4h2v8h3l-4 4zm-8 4v-2h16v2H4z"/></svg>
+      Download as PDF
+    </a>
+  </div>
+</div>
+
+<main>
+<h1 id="stack-overflow-questions-module-3-lab-guide">Stack Overflow
+Questions — Module 3 Lab Guide</h1>
+<p><strong>Scenario:</strong> Programmer Q&amp;A community. Predict if a
+question will get answered. <strong>Module:</strong> 3 (Data Preparation
+and Feature Engineering) <strong>Audience:</strong> Adult learners, A2
+English. New to AI. <strong>Tools:</strong> Google Colab (no install
+needed).</p>
+<hr />
+<h1 id="the-scenario-your-mission">The Scenario — Your Mission</h1>
+<h2 id="where-you-work">Where you work</h2>
+<p>You and your team are new data analysts at <strong>Stack
+Exchange</strong>, the company that runs <strong>Stack
+Overflow</strong>. Stack Overflow is the biggest website where
+programmers ask questions and other programmers answer.</p>
+<p>Every day: - <strong>8,000 new questions</strong> are posted. - Some
+get an answer in 5 minutes. - About <strong>30% never get any
+answer</strong>.</p>
+<h2 id="the-problem">The problem</h2>
+<p>When a user posts a question and nobody answers, the user feels
+rejected. They never post again. The community loses members.</p>
+<p>Tom is worried. He calls your team into a meeting.</p>
+<h2 id="your-managers-request">Your manager’s request</h2>
+<p>Your manager, <strong>Tom</strong> (Community Quality Manager), tells
+you:</p>
+<blockquote>
+<p>“We lose 30% of new questions to silence. The user gets discouraged.
+They never come back.</p>
+<p>I need a different tool. When a user is TYPING a draft question, we
+read it BEFORE they click submit.</p>
+<p>If our model says ‘this question is unclear and will not get an
+answer’, we show a pop-up: ‘Your question is missing detail. Try adding
+sample code and what you have tried.’</p>
+<p>If we save even 1 in 5 of these dying questions, we keep thousands of
+community members.”</p>
+</blockquote>
+<h2 id="your-teams-job-for-the-next-2-weeks-module-3">Your team’s job
+for the next 2 weeks (Module 3)</h2>
+<p>Tom shows you the raw data. It is one big CSV with about 100,000
+questions. Each row has the title, body, tags, view count, score, and
+timing.</p>
+<p>Your job in Module 3: &gt; <strong>Turn this messy CSV into ONE clean
+file. The clean file will be used to train the model in Module
+4.</strong></p>
+<p>The clean file is called
+<code>stackoverflow_questions_clean.parquet</code>. It must have
+<strong>21 specific columns</strong> (we will see them in Class 6).</p>
+<h2 id="after-module-3">After Module 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Module</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Module 4</strong></td>
+<td>Train the prediction model. Tom finally gets his “no-answer risk
+score”.</td>
+</tr>
+<tr>
+<td><strong>Module 5</strong></td>
+<td>Find groups of similar questions. Detect possible duplicates.</td>
+</tr>
+<tr>
+<td><strong>Module 7</strong></td>
+<td>Use the title and body text. Predict tags from the text alone.</td>
+</tr>
+</tbody>
+</table>
+<p>You use the <strong>same Stack Overflow dataset</strong> until the
+end of Module 7.</p>
+<hr />
+<h1 id="how-this-guide-works-read-this-first">How This Guide Works (Read
+This First!)</h1>
+<h2 id="we-do-not-give-you-the-full-code">We do NOT give you the full
+code</h2>
+<p>In this guide you will see two kinds of content:</p>
+<h3 id="what-why-expected-explained-in-words">1. WHAT / WHY / EXPECTED —
+explained in words</h3>
+<p>For every step you read: - <strong>WHAT</strong> you have to do (in
+normal language) - <strong>WHY</strong> you do it (the reason) -
+<strong>HINTS</strong> — the function names, the arguments to remember -
+<strong>EXPECTED</strong> — the result you should see if you did it
+right</p>
+<h3 id="sometimes-a-tiny-code-skeleton-with-blanks">2. Sometimes a tiny
+code skeleton with blanks</h3>
+<p>For the harder steps we give you a code skeleton with
+<code>___</code> blanks. <strong>You fill in the blanks.</strong></p>
+<h3 id="why-no-full-code">Why no full code?</h3>
+<p>Because you will NOT learn if you copy-paste. - In Module 4, the
+model only works if YOU understand each step. - In your future job,
+nobody will give you the code. - Writing the code yourself takes 10
+minutes more today, but saves 10 hours later.</p>
+<p><strong>Rule:</strong> If you finish a step in 30 seconds by
+copy-pasting from a teammate’s notebook, do it AGAIN by yourself.
+Different variable names, same logic.</p>
+<hr />
+<h1 id="visualizations-two-modes">Visualizations — Two Modes</h1>
+<p>In every class you will make charts. There are <strong>two
+reasons</strong> to make a chart:</p>
+<h2 id="exploratory-charts-for-you">1. Exploratory charts (for YOU)</h2>
+<p>Made BEFORE you clean the data. To understand what the data looks
+like. - Fast, ugly, no labels needed. - Examples:
+<code>df.hist()</code>,
+<code>df['column'].value_counts().plot.bar()</code>.</p>
+<blockquote>
+<p>Goal: <strong>“What does this data look like?”</strong></p>
+</blockquote>
+<h2 id="explanatory-charts-for-tom">2. Explanatory charts (for TOM)</h2>
+<p>Made AFTER you understand. To EXPLAIN something to your manager. -
+Clean, labeled, one clear message. - Must have: title, x-label, y-label,
+source, and a 1-sentence takeaway.</p>
+<blockquote>
+<p>Goal: <strong>“Tom, look at this. This is the problem.”</strong></p>
+</blockquote>
+<p>In every class you make BOTH kinds.</p>
+<h2 id="your-plotting-toolkit">Your plotting toolkit</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Plot</th>
+<th>When to use it</th>
+<th>Function name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Histogram</td>
+<td>See the SHAPE of a numeric column</td>
+<td><code>plt.hist()</code> or <code>sns.histplot()</code></td>
+</tr>
+<tr>
+<td>Bar chart</td>
+<td>Count of each category</td>
+<td><code>df['col'].value_counts().plot.bar()</code></td>
+</tr>
+<tr>
+<td>Box plot</td>
+<td>See outliers in a numeric column</td>
+<td><code>sns.boxplot()</code></td>
+</tr>
+<tr>
+<td>Scatter plot</td>
+<td>See the relationship between 2 numbers</td>
+<td><code>plt.scatter()</code></td>
+</tr>
+<tr>
+<td>Heatmap</td>
+<td>See correlation between many columns</td>
+<td><code>sns.heatmap(df.corr())</code></td>
+</tr>
+<tr>
+<td>Line plot</td>
+<td>See change over time</td>
+<td><code>plt.plot()</code></td>
+</tr>
+</tbody>
+</table>
+<p>Before you start: <code>import matplotlib.pyplot as plt</code> and
+<code>import seaborn as sns</code>.</p>
+<hr />
+<h1 id="before-you-start-google-colab-setup">Before You Start — Google
+Colab Setup</h1>
+<p>You will work in <strong>Google Colab</strong>. That means: - You do
+NOT install Python. - You do NOT install pandas, scikit-learn, or
+anything. - You just open a notebook in your web browser.</p>
+<h2 id="step-1-open-a-new-colab-notebook">Step 1 — Open a new Colab
+notebook</h2>
+<ol type="1">
+<li>Go to https://colab.research.google.com</li>
+<li>Sign in with your Google account.</li>
+<li>Click <strong>“New notebook”</strong> (top left).</li>
+<li>Name it <code>stackoverflow_module_3.ipynb</code>.</li>
+</ol>
+<h2 id="step-2-connect-to-google-drive">Step 2 — Connect to Google
+Drive</h2>
+<p>Colab files <strong>disappear</strong> when you close the browser. So
+you must save your work to <strong>Google Drive</strong>.</p>
+<p>In the first cell:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> drive</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>drive.mount(<span class="st">&#39;/content/drive&#39;</span>)</span></code></pre></div>
+<p>A pop-up asks for permission. Click “Allow”. After this, Drive is
+available at <code>/content/drive/MyDrive/</code>.</p>
+<h2 id="step-3-create-a-project-folder">Step 3 — Create a project
+folder</h2>
+<p>In a new cell:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&#39;/content/drive/MyDrive/stackoverflow_lab&#39;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>cd <span class="op">/</span>content<span class="op">/</span>drive<span class="op">/</span>MyDrive<span class="op">/</span>stackoverflow_lab</span></code></pre></div>
+<p>Your team will save ALL files in this folder.</p>
+<h2 id="step-4-get-the-data">Step 4 — Get the data</h2>
+<p><strong>Option A — Direct from Kaggle (recommended):</strong></p>
+<ol type="1">
+<li>Make a free Kaggle account.</li>
+<li>Go to kaggle.com/settings/account, scroll to “API”, click “Create
+New Token”. Save the <code>kaggle.json</code> file.</li>
+<li>In Colab:</li>
+</ol>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> files</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>files.upload()    <span class="co"># pick kaggle.json</span></span></code></pre></div>
+<ol start="4" type="1">
+<li>Then:</li>
+</ol>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>mkdir <span class="op">-</span>p <span class="op">~/</span>.kaggle <span class="op">&amp;&amp;</span> mv kaggle.json <span class="op">~/</span>.kaggle<span class="op">/</span> <span class="op">&amp;&amp;</span> chmod <span class="dv">600</span> <span class="op">~/</span>.kaggle<span class="op">/</span>kaggle.json</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install kaggle <span class="op">-</span>q</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kaggle datasets download <span class="op">-</span>d stackoverflow<span class="op">/</span>stackoverflow</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>unzip <span class="op">-</span>q stackoverflow.<span class="bu">zip</span> <span class="op">-</span>d data</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ls data<span class="op">/</span></span></code></pre></div>
+<p>You should see the <strong>CSV files</strong> inside
+<code>data/</code>.</p>
+<p><strong>Option B — Upload by hand:</strong></p>
+<ol type="1">
+<li>Download the zip from
+kaggle.com/datasets/stackoverflow/stackoverflow on your laptop.</li>
+<li>Unzip it.</li>
+<li>In Colab’s file panel (left sidebar), upload the questions
+file.</li>
+</ol>
+<h2 id="step-5-sample-100000-rows">Step 5 — Sample 100,000 rows</h2>
+<p>The full dataset has 10 MILLION rows. Your laptop CANNOT load that.
+Sample 100,000:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;data/questions.csv&#39;</span>, nrows<span class="op">=</span><span class="dv">100_000</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.shape)</span></code></pre></div>
+<p>Should print <code>(100000, ___)</code>. You are ready.</p>
+<h2 id="colab-tips">Colab tips</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Save your notebook to Drive often</td>
+<td>Colab disconnects after 12 hours.</td>
+</tr>
+<tr>
+<td>Save intermediate <code>.parquet</code> files to Drive</td>
+<td>Files in <code>/content/</code> disappear when Colab
+disconnects.</td>
+</tr>
+<tr>
+<td>Share the notebook with teammates (Share button, top right)</td>
+<td>Editor access. Like Google Docs for code.</td>
+</tr>
+<tr>
+<td>Restart runtime if memory full</td>
+<td>Runtime &gt; Restart runtime.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="class-1-data-cleaning">Class 1 — Data Cleaning</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Tom drops a 10-million-row CSV on
+your desk. You cannot load it all. Some columns are HTML. Some date
+columns are stored as text. Your job today: sample, clean, and prepare
+the basic table.</p>
+</blockquote>
+<h2 id="your-goal">Your goal</h2>
+<p>Sample the data. Fix the HTML in the body column. Convert dates.
+Decide what to keep.</p>
+<h2 id="inputs">Inputs</h2>
+<ul>
+<li>The raw CSV from Kaggle in <code>data/</code></li>
+</ul>
+<h2 id="outputs">Outputs</h2>
+<ul>
+<li><code>questions_step1.parquet</code> saved in your Drive folder</li>
+<li>3+ exploratory charts in your notebook</li>
+<li>1 explanatory chart for Tom</li>
+<li>Notes in markdown about every decision you made</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-15-minutes">Phase A — Explore the
+data first (15 minutes)</h2>
+<p>Before you clean anything, <strong>LOOK</strong> at the data.</p>
+<h3 id="exploratory-chart-1-how-many-questions-per-year">Exploratory
+chart 1 — How many questions per year?</h3>
+<ul>
+<li><strong>Question:</strong> “Is the dataset balanced across years? Or
+do we have mostly recent questions?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>First convert <code>creation_date</code> to datetime.</li>
+<li>Use <code>.dt.year</code> to get the year.</li>
+<li><code>value_counts()</code> then
+<code>.sort_index().plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Time distribution. Are old
+questions over-represented?</li>
+</ul>
+<h3 id="exploratory-chart-2-distribution-of-answer_count">Exploratory
+chart 2 — Distribution of <code>answer_count</code></h3>
+<ul>
+<li><strong>Question:</strong> “Most questions get 1 answer. Some get 0.
+A few get 50+. What is the shape?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Histogram with <code>bins=30</code>.</li>
+<li>Add <code>range=(0, 20)</code> to ignore the long tail.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The long tail. The 0-answer
+questions are the main problem.</li>
+</ul>
+<h3 id="exploratory-chart-3-top-20-most-common-tags">Exploratory chart 3
+— Top 20 most common tags</h3>
+<ul>
+<li><strong>Question:</strong> “Which programming languages are most
+popular?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>The <code>tags</code> column is a string like
+<code>&lt;python&gt;&lt;pandas&gt;&lt;dataframe&gt;</code>.</li>
+<li>Use a regex <code>re.findall(r'&lt;(.*?)&gt;', tags_string)</code>
+to extract.</li>
+<li>Flatten, count, top 20.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Python and JavaScript dominate.
+Other languages are smaller.</li>
+</ul>
+<hr />
+<h2 id="phase-b-clean-the-questions-table-45-minutes">Phase B — Clean
+the questions table (45 minutes)</h2>
+<h3 id="step-1-load-with-row-limit">Step 1 — Load with row limit</h3>
+<ul>
+<li><strong>WHAT:</strong> Load only 100,000 rows with
+<code>pd.read_csv()</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>nrows=100_000</code>.</li>
+<li>Set <code>low_memory=False</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> A DataFrame with about 100,000 rows × ~10
+columns.</li>
+</ul>
+<h3 id="step-2-look-at-the-dataframe">Step 2 — Look at the
+DataFrame</h3>
+<ul>
+<li><strong>WHAT:</strong> Run <code>.info()</code>,
+<code>.head()</code>, <code>.shape</code>, and
+<code>.dtypes</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Look at the <code>Dtype</code> column in <code>.info()</code>
+output. <strong>Is <code>creation_date</code> stored as
+<code>object</code> (text)?</strong></li>
+<li>Look at <code>body</code> — it has HTML tags like
+<code>&lt;p&gt;</code>, <code>&lt;code&gt;</code>,
+<code>&lt;pre&gt;</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> ~100,000 rows. Date columns are text.
+Body is full of HTML.</li>
+</ul>
+<h3 id="step-3-convert-dates">Step 3 — Convert dates</h3>
+<ul>
+<li><strong>WHAT:</strong> Convert <code>creation_date</code> and any
+other date column to datetime.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>pd.to_datetime()</code> with
+<code>errors='coerce'</code>.</li>
+<li><code>errors='coerce'</code> means: if a cell is bad, set it to
+<code>NaT</code> (Not a Time = missing).</li>
+</ul></li>
+<li><strong>WHY:</strong> If dates are strings, you cannot compute “how
+many days ago?”.</li>
+<li><strong>EXPECTED:</strong> <code>df['creation_date'].dtype</code> is
+<code>datetime64[ns]</code>.</li>
+</ul>
+<h3 id="step-4-strip-html-from-body">Step 4 — Strip HTML from
+<code>body</code></h3>
+<ul>
+<li><strong>WHAT:</strong> The <code>body</code> column has
+<code>&lt;p&gt;...&lt;/p&gt;</code>,
+<code>&lt;code&gt;...&lt;/code&gt;</code>,
+<code>&lt;a href="..."&gt;...&lt;/a&gt;</code> tags.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use BeautifulSoup: <code>from bs4 import BeautifulSoup</code>.</li>
+<li>Make a function:
+<code>def strip_html(text): return BeautifulSoup(text, 'html.parser').get_text()</code>.</li>
+<li>Apply to body:
+<code>df['body_clean'] = df['body'].apply(strip_html)</code>.</li>
+<li>WARNING: BeautifulSoup is slow. For 100k rows, it takes ~30 seconds.
+That is OK.</li>
+</ul></li>
+<li><strong>WHY:</strong> TF-IDF in M7 should see real WORDS, not HTML
+tags.</li>
+</ul>
+<h3 id="step-5-count-code-blocks-before-stripping-html">Step 5 — Count
+code blocks BEFORE stripping HTML</h3>
+<p>Code blocks are a STRONG signal of quality. Save the count before you
+strip.</p>
+<ul>
+<li><strong>WHAT:</strong> Count <code>&lt;pre&gt;&lt;code&gt;</code>
+tags per row.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>df['body'].str.count('&lt;pre&gt;')</code>. Or
+<code>&lt;code&gt;</code>. Both work.</li>
+<li>Save as <code>n_code_blocks</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Questions with code are more likely to be
+answered.</li>
+</ul>
+<h3 id="step-6-find-missing-values">Step 6 — Find missing values</h3>
+<ul>
+<li><strong>WHAT:</strong> Run <code>df.isna().sum()</code>.</li>
+<li><strong>EXPECTED:</strong> Some rows have empty <code>body</code> or
+empty <code>tags</code>. Decide what to do.</li>
+</ul>
+<h3 id="step-7-drop-rows-with-empty-body-or-empty-tags">Step 7 — Drop
+rows with empty body or empty tags</h3>
+<ul>
+<li><strong>WHAT:</strong> Use
+<code>.dropna(subset=['body', 'tags'])</code>.</li>
+<li><strong>WHY:</strong> We cannot work with no content.</li>
+</ul>
+<h3 id="step-8-write-down-what-you-did">Step 8 — Write down what you
+did</h3>
+<p>In a markdown cell, write: - Starting rows: ~100,000. - Rows after
+dropping empty body / tags: ~_____. - WHY you removed each group.</p>
+<h3 id="step-9-save-to-drive">Step 9 — Save to Drive</h3>
+<ul>
+<li><strong>WHAT:</strong> Save the cleaned DataFrame as parquet.</li>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/stackoverflow_lab/questions_step1.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-tom-15-minutes">Phase C — Make ONE
+chart for Tom (15 minutes)</h2>
+<p>He does not have time to read your code. He wants ONE picture.</p>
+<h3 id="toms-chart-the-silent-question-problem">Tom’s chart — “The
+silent question problem”</h3>
+<p>Make a bar chart showing two bars: - Questions with at least 1 answer
+- Questions with 0 answers</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>is_answered = (df['answer_count'] &gt; 0)</code>.</li>
+<li><code>is_answered.value_counts().plot.bar()</code>.</li>
+<li>Add the title:
+<code>"30% of questions get NO answer. That is our problem."</code>.</li>
+</ul></li>
+<li><strong>Takeaway for Tom:</strong> “We must catch the silent ones
+BEFORE they are posted.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-1">Common mistakes in Class 1</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Load all 10 million rows</td>
+<td>Colab runs out of memory and crashes.</td>
+</tr>
+<tr>
+<td>Forget <code>errors='coerce'</code> on <code>to_datetime</code></td>
+<td>One bad date crashes the code.</td>
+</tr>
+<tr>
+<td>Strip HTML with simple regex</td>
+<td>Misses nested tags. Use BeautifulSoup.</td>
+</tr>
+<tr>
+<td>Save to <code>/content/</code> instead of Drive</td>
+<td>File disappears when Colab disconnects.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-2">Self-check before Class 2</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />You sampled 100,000
+rows.</label></li>
+<li><label><input type="checkbox" />Date columns have dtype
+<code>datetime64</code>.</label></li>
+<li><label><input type="checkbox" />You have a <code>body_clean</code>
+column with no HTML.</label></li>
+<li><label><input type="checkbox" />You counted
+<code>n_code_blocks</code> BEFORE stripping HTML.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory charts in
+your notebook.</label></li>
+<li><label><input type="checkbox" />1 polished chart for
+Tom.</label></li>
+<li><label><input type="checkbox" />You saved
+<code>questions_step1.parquet</code> to your Drive folder.</label></li>
+</ul>
+<hr />
+<h1 id="class-2-encoding-and-scaling">Class 2 — Encoding and
+Scaling</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Tom is happy with your cleaning.
+But he asks: “the <code>tags</code> column is one big string like
+<code>&lt;python&gt;&lt;pandas&gt;</code>. The <code>view_count</code>
+ranges from 1 to 1,000,000. The model is a math model. Make these
+usable.”</p>
+</blockquote>
+<h2 id="your-goal-1">Your goal</h2>
+<p>Turn the multi-value tags into proper columns. Make all numeric
+columns about the same size.</p>
+<h2 id="inputs-1">Inputs</h2>
+<ul>
+<li><code>questions_step1.parquet</code> from Class 1</li>
+</ul>
+<h2 id="outputs-1">Outputs</h2>
+<ul>
+<li><code>questions_step2.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Tom</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-distribution-of-view_count">Exploratory
+chart 1 — Distribution of <code>view_count</code></h3>
+<ul>
+<li><strong>Question:</strong> “Most questions get 100 views. A few get
+1 million. Is the distribution skewed?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use a histogram (<code>plt.hist()</code>).</li>
+<li>Use <code>bins=50</code> to see the shape.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Very long tail. We will use
+log-transform.</li>
+</ul>
+<h3
+id="exploratory-chart-2-distribution-of-view_count-after-np.log1p">Exploratory
+chart 2 — Distribution of <code>view_count</code> AFTER
+<code>np.log1p</code></h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Make <code>view_count_log = np.log1p(df['view_count'])</code>.</li>
+<li>Histogram it.</li>
+<li>Compare to chart 1.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Log makes the long tail
+manageable.</li>
+</ul>
+<h3 id="exploratory-chart-3-top-20-most-common-tags-1">Exploratory chart
+3 — Top 20 most common tags</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Already done in Class 1 — repeat here for completeness.</li>
+<li><code>value_counts().head(20).plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Python, JavaScript, Java, C#
+dominate. Smaller languages are rare.</li>
+</ul>
+<h3 id="exploratory-chart-4-n_code_blocks-vs-is_answered">Exploratory
+chart 4 — <code>n_code_blocks</code> vs <code>is_answered</code></h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Group by <code>is_answered</code>. Take mean of
+<code>n_code_blocks</code>.</li>
+<li>Bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Answered questions have MORE code
+blocks on average.</li>
+</ul>
+<hr />
+<h2 id="phase-b-encode-and-scale">Phase B — Encode and scale</h2>
+<h3 id="step-1-parse-the-tags-column">Step 1 — Parse the tags
+column</h3>
+<ul>
+<li><strong>WHAT:</strong> The <code>tags</code> column is text:
+<code>&lt;python&gt;&lt;pandas&gt;&lt;dataframe&gt;</code>. Convert to a
+list.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>re.findall(r'&lt;(.*?)&gt;', tag_string)</code>.</li>
+<li>Apply to each row:
+<code>df['tag_list'] = df['tags'].apply(lambda x: re.findall(r'&lt;(.*?)&gt;', x))</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> A new column <code>tag_list</code> with
+Python lists like <code>['python', 'pandas', 'dataframe']</code>.</li>
+</ul>
+<h3 id="step-2-count-tags-per-row">Step 2 — Count tags per row</h3>
+<ul>
+<li><strong>WHAT:</strong> Add a column <code>n_tags</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['n_tags'] = df['tag_list'].apply(len)</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Values 1 to 5 (Stack Overflow limits to
+5).</li>
+</ul>
+<h3 id="step-3-extract-the-primary-tag">Step 3 — Extract the primary
+tag</h3>
+<ul>
+<li><strong>WHAT:</strong> The FIRST tag is usually the most important
+(the language).</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['primary_tag'] = df['tag_list'].apply(lambda x: x[0] if len(x) &gt; 0 else 'unknown')</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-4-one-hot-encode-the-top-20-tags">Step 4 — One-hot encode
+the top 20 tags</h3>
+<ul>
+<li><strong>WHAT:</strong> Make 20 new 0/1 columns for the most common
+tags.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Find the top 20 tags from the exploration.</li>
+<li>For each tag, add a column:
+<code>df[f'has_{tag}'] = df['tag_list'].apply(lambda x: 1 if tag in x else 0)</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> A question tagged <code>python</code> has a
+different answer pattern than one tagged <code>c++</code>.</li>
+</ul>
+<h3 id="step-5-log-transform-view_count-score-comment_count">Step 5 —
+Log-transform <code>view_count</code>, <code>score</code>,
+<code>comment_count</code></h3>
+<ul>
+<li><strong>WHAT:</strong> All three have long tails.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['view_count_log'] = np.log1p(df['view_count'])</code>.</li>
+<li>Same for <code>score</code> and <code>comment_count</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Long tails confuse models. Log fixes
+this.</li>
+</ul>
+<h3 id="step-6-date-derived-features">Step 6 — Date-derived
+features</h3>
+<p>Make these from <code>creation_date</code>:</p>
+<table>
+<thead>
+<tr>
+<th>New column</th>
+<th>How to make it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>creation_year</code></td>
+<td><code>df['creation_date'].dt.year</code></td>
+</tr>
+<tr>
+<td><code>creation_month</code></td>
+<td><code>.dt.month</code></td>
+</tr>
+<tr>
+<td><code>creation_dayofweek</code></td>
+<td><code>.dt.dayofweek</code> (0=Monday)</td>
+</tr>
+<tr>
+<td><code>creation_hour</code></td>
+<td><code>.dt.hour</code></td>
+</tr>
+<tr>
+<td><code>is_weekend</code></td>
+<td><code>(creation_dayofweek &gt;= 5).astype(int)</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-7-save">Step 7 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/stackoverflow_lab/questions_step2.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-tom">Phase C — Make ONE chart for
+Tom</h2>
+<h3 id="toms-chart-hour-of-day-vs-answer-rate">Tom’s chart — “Hour of
+day vs answer rate”</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>GroupBy <code>creation_hour</code>. Take the mean of
+<code>is_answered</code> (after Class 3 you will have this column; for
+now use <code>(answer_count &gt; 0)</code>).</li>
+<li>Line plot.</li>
+</ul></li>
+<li><strong>Title:</strong> “When you ask the question matters —
+questions posted at 3am rarely get answers.”</li>
+<li><strong>Takeaway for Tom:</strong> “Maybe show a warning to users
+posting at unusual hours.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-2">Common mistakes in Class 2</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>One-hot encode ALL tags</td>
+<td>Some tags appear once. Adding 50,000 columns crashes the model.</td>
+</tr>
+<tr>
+<td>Scale BEFORE the train/test split</td>
+<td>Leakage.</td>
+</tr>
+<tr>
+<td>Forget <code>np.log1p</code> and use <code>np.log</code> on
+zeros</td>
+<td><code>np.log(0) = -inf</code>. Crash.</td>
+</tr>
+<tr>
+<td>Confuse the <code>tags</code> string with a Python list</td>
+<td>The raw column is text. Must parse first.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-3">Self-check before Class 3</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>tag_list</code> exists (Python
+list per row).</label></li>
+<li><label><input type="checkbox" /><code>primary_tag</code>
+exists.</label></li>
+<li><label><input type="checkbox" />Top-20 tags are one-hot
+encoded.</label></li>
+<li><label><input type="checkbox" /><code>view_count</code>,
+<code>score</code>, <code>comment_count</code> are
+log-transformed.</label></li>
+<li><label><input type="checkbox" />Date features
+extracted.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Tom.</label></li>
+<li><label><input type="checkbox" /><code>questions_step2.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-3-feature-engineering">Class 3 — Feature Engineering</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Tom says: “Now make me the SMART
+columns. Length of the title. Length of the body. Does the body have an
+error message? Does it look like a ‘do my homework’ question? These are
+the signals.”</p>
+</blockquote>
+<h2 id="your-goal-2">Your goal</h2>
+<p>Engineer signals from the title and body. These predict whether a
+question will be answered.</p>
+<h2 id="inputs-2">Inputs</h2>
+<ul>
+<li><code>questions_step2.parquet</code></li>
+</ul>
+<h2 id="outputs-2">Outputs</h2>
+<ul>
+<li><code>questions_step3.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Tom</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-1">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-is_answered-distribution">Exploratory chart
+1 — <code>is_answered</code> distribution</h3>
+<ul>
+<li>First make the <code>is_answered</code> column (Step 1 below).</li>
+<li><strong>HINTS:</strong>
+<code>df['is_answered'].value_counts(normalize=True).plot.bar()</code>.</li>
+<li><strong>What you learn:</strong> Confirm it is around 70% Yes, 30%
+No.</li>
+</ul>
+<h3 id="exploratory-chart-2-title-length-vs-answered-rate">Exploratory
+chart 2 — Title length vs answered rate</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Bin <code>title_length</code> into 10 bins with
+<code>pd.cut()</code>.</li>
+<li>GroupBy bin, take mean of <code>is_answered</code>.</li>
+<li>Bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Very short titles (1-3 words) and
+very long titles (&gt;20 words) tend to NOT get answers.</li>
+</ul>
+<h3 id="exploratory-chart-3-body-length-vs-answered">Exploratory chart 3
+— Body length vs answered</h3>
+<ul>
+<li><strong>HINTS:</strong> Same as above but for
+<code>body_length</code>.</li>
+<li><strong>What you learn:</strong> Very short bodies (no detail)
+rarely get answers.</li>
+</ul>
+<h3 id="exploratory-chart-4-n_code_blocks-vs-answered">Exploratory chart
+4 — <code>n_code_blocks</code> vs answered</h3>
+<ul>
+<li><strong>HINTS:</strong> Bar chart of mean <code>is_answered</code>
+per <code>n_code_blocks</code> value (0, 1, 2, 3+).</li>
+<li><strong>What you learn:</strong> 0 code blocks = often no
+answer.</li>
+</ul>
+<hr />
+<h2 id="phase-b-engineer-the-features">Phase B — Engineer the
+features</h2>
+<h3 id="step-1-create-the-target-column-is_answered">Step 1 — Create the
+target column <code>is_answered</code></h3>
+<ul>
+<li><strong>WHAT:</strong> <code>is_answered = 1</code> if
+<code>answer_count &gt; 0</code>, else 0.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compare: <code>df['answer_count'] &gt; 0</code>.</li>
+<li>Convert to int with <code>.astype(int)</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> About 70% of rows have
+<code>is_answered = 1</code>.</li>
+</ul>
+<h3 id="step-2-title-and-body-lengths">Step 2 — Title and body
+lengths</h3>
+<ul>
+<li><strong>WHAT:</strong> Length in characters AND length in
+words.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>New column</th>
+<th>How to make it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>title_length</code></td>
+<td><code>df['title'].str.len()</code></td>
+</tr>
+<tr>
+<td><code>title_n_words</code></td>
+<td><code>df['title'].str.split().apply(len)</code></td>
+</tr>
+<tr>
+<td><code>body_length</code></td>
+<td><code>df['body_clean'].str.len()</code></td>
+</tr>
+<tr>
+<td><code>body_n_words</code></td>
+<td><code>df['body_clean'].str.split().apply(len)</code></td>
+</tr>
+<tr>
+<td><code>n_paragraphs</code></td>
+<td><code>df['body_clean'].str.count('\n\n') + 1</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-3-html-feature-signals-already-extracted-in-class-1">Step 3
+— HTML feature signals (already extracted in Class 1)</h3>
+<p>Confirm you have: - <code>n_code_blocks</code> — count of
+<code>&lt;pre&gt;&lt;code&gt;</code> blocks - <code>n_links</code> —
+count of <code>&lt;a</code> tags in body (extract before HTML stripping
+if needed) - <code>n_images_in_body</code> — count of
+<code>&lt;img</code> tags</p>
+<h3 id="step-4-text-quality-signals">Step 4 — Text quality signals</h3>
+<p>Make these from <code>title</code> and <code>body_clean</code>:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+<th>Hint</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>title_n_caps_words</code></td>
+<td>Count of ALL-CAPS words in title</td>
+<td><code>re.findall(r'\b[A-Z]{2,}\b', title)</code></td>
+</tr>
+<tr>
+<td><code>title_has_question_mark</code></td>
+<td>1 if title ends with <code>?</code></td>
+<td><code>.endswith('?')</code></td>
+</tr>
+<tr>
+<td><code>body_has_error_message</code></td>
+<td>1 if body contains words like “Error:”, “Traceback”,
+“Exception”</td>
+<td><code>.str.contains('Error:|Traceback|Exception', regex=True)</code></td>
+</tr>
+<tr>
+<td><code>has_minimal_reproducible_example_phrase</code></td>
+<td>1 if body says “what I have tried” or “I tried” or “here is my
+code”</td>
+<td>regex search</td>
+</tr>
+<tr>
+<td><code>body_has_url</code></td>
+<td>1 if body has a URL</td>
+<td>regex <code>http\S+</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>WHY:</strong> These are quality signals. Questions with
+error messages get more answers (the asker is specific).</li>
+</ul>
+<h3 id="step-5-save">Step 5 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/stackoverflow_lab/questions_step3.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-tom-1">Phase C — Make ONE chart for
+Tom</h2>
+<h3 id="toms-chart-code-blocks-predict-answers">Tom’s chart — “Code
+blocks predict answers”</h3>
+<p>A bar chart showing answer rate for: 0 code blocks, 1, 2, 3+.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df.groupby('n_code_blocks')['is_answered'].mean().plot.bar()</code>.</li>
+<li>Cap at <code>n_code_blocks=3+</code> (group 3, 4, 5, …
+together).</li>
+</ul></li>
+<li><strong>Title:</strong> “Questions with 2+ code blocks are 40% more
+likely to be answered.”</li>
+<li><strong>Takeaway for Tom:</strong> “Our pop-up should say: ‘Add a
+code example to improve your chances.’”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-3">Common mistakes in Class 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Use <code>answer_count</code> as a feature</td>
+<td>Leakage. <code>answer_count &gt; 0</code> =
+<code>is_answered</code>.</td>
+</tr>
+<tr>
+<td>Forget to remove HTML before counting words</td>
+<td>Counts <code>&lt;p&gt;</code> and <code>&lt;a&gt;</code> as
+words.</td>
+</tr>
+<tr>
+<td>Use simple <code>.split()</code> for word count on HTML</td>
+<td>Each tag becomes a “word”.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-4">Self-check before Class 4</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>is_answered</code> exists.
+Mean ~70%.</label></li>
+<li><label><input type="checkbox" />Title and body lengths
+computed.</label></li>
+<li><label><input type="checkbox" />HTML signals
+(<code>n_code_blocks</code>, <code>n_links</code>,
+<code>n_images_in_body</code>) exist.</label></li>
+<li><label><input type="checkbox" />Text quality signals
+(<code>has_error_message</code>, etc.) exist.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Tom.</label></li>
+<li><label><input type="checkbox" /><code>questions_step3.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-4-feature-selection">Class 4 — Feature Selection</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Now you have ~30 columns. Tom
+says: “Too many. Some are duplicates. Some are useless. I want 12-15
+GOOD columns. Pick them.”</p>
+</blockquote>
+<h2 id="your-goal-3">Your goal</h2>
+<p>Pick the best 12-15 columns. Drop the rest. Justify every choice.</p>
+<h2 id="inputs-3">Inputs</h2>
+<ul>
+<li><code>questions_step3.parquet</code></li>
+</ul>
+<h2 id="outputs-3">Outputs</h2>
+<ul>
+<li><code>questions_step4.parquet</code> in Drive (only the selected
+columns + <code>is_answered</code>)</li>
+<li>3+ exploratory charts</li>
+<li>A short markdown report explaining your choices</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-2">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-correlation-heatmap">Exploratory chart 1 —
+Correlation heatmap</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df[numeric_cols].corr()</code>.</li>
+<li><code>sns.heatmap(..., annot=True, fmt='.2f', cmap='coolwarm')</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Pairs with |corr| &gt; 0.9 are
+redundant.</li>
+</ul>
+<h3 id="exploratory-chart-2-mutual-information-bars">Exploratory chart 2
+— Mutual information bars</h3>
+<ul>
+<li>After Step 4 below, plot the result.</li>
+<li><strong>What you learn:</strong> Which features predict
+<code>is_answered</code> strongest.</li>
+</ul>
+<h3 id="exploratory-chart-3-random-forest-importance-bars">Exploratory
+chart 3 — Random Forest importance bars</h3>
+<ul>
+<li>After Step 5 below, plot the result.</li>
+<li><strong>What you learn:</strong> A second opinion on
+importance.</li>
+</ul>
+<hr />
+<h2 id="phase-b-select-features">Phase B — Select features</h2>
+<h3 id="step-1-split-into-train-and-test-first">Step 1 — Split into
+train and test FIRST</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>train_test_split</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.model_selection import train_test_split</code>.</li>
+<li><code>X = df.drop('is_answered', axis=1); y = df['is_answered']</code>.</li>
+<li>Pass: <code>test_size=0.2</code>, <code>random_state=42</code>,
+<code>stratify=y</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> All next steps use TRAIN ONLY. Otherwise
+leakage.</li>
+</ul>
+<h3 id="step-2-remove-low-variance-columns">Step 2 — Remove low-variance
+columns</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import VarianceThreshold</code>.</li>
+<li><code>VarianceThreshold(threshold=0.01)</code> then
+<code>.fit(X_train[numeric_cols])</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-3-remove-highly-correlated-columns">Step 3 — Remove highly
+correlated columns</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute correlation matrix.</li>
+<li>Get the upper triangle with <code>np.triu(...)</code>.</li>
+<li>For each column, if any of its upper-triangle correlations &gt; 0.9,
+mark for drop.</li>
+</ul></li>
+</ul>
+<h3 id="step-4-rank-by-mutual-information">Step 4 — Rank by mutual
+information</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import mutual_info_classif</code>.</li>
+<li><code>mi = mutual_info_classif(X_train[numeric_cols], y_train)</code>.</li>
+<li>Sort and inspect.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Top features: <code>n_code_blocks</code>,
+<code>body_length</code>, <code>creation_hour</code>,
+<code>view_count_log</code>.</li>
+</ul>
+<h3 id="step-5-random-forest-importance">Step 5 — Random Forest
+importance</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>RandomForestClassifier(n_estimators=50, max_depth=8, n_jobs=-1)</code>.</li>
+<li><code>.fit(X_train, y_train)</code>.</li>
+<li>Look at <code>.feature_importances_</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-6-pick-the-final-12-15-columns">Step 6 — Pick the final
+12-15 columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Combine the rankings. Pick columns that are:
+<ul>
+<li>High in mutual info, AND</li>
+<li>High in RF importance, AND</li>
+<li>Not dropped by variance/correlation pruning.</li>
+</ul></li>
+<li><strong>WRITE DOWN:</strong> In your notebook, list the columns.
+Explain WHY for each.</li>
+</ul>
+<h3 id="step-7-save-1">Step 7 — Save</h3>
+<ul>
+<li>Keep only selected columns + <code>is_answered</code>. Save as
+<code>questions_step4.parquet</code> to Drive.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-tom-2">Phase C — Make ONE chart for
+Tom</h2>
+<h3 id="toms-chart-top-10-predictors-of-an-unanswered-question">Tom’s
+chart — “Top 10 predictors of an unanswered question”</h3>
+<p>A horizontal bar chart of the top 10 features by RF importance.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>sort_values()</code> then <code>.head(10)</code> then
+<code>.plot.barh()</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Top 10 predictors of question
+quality.”</li>
+<li><strong>Takeaway for Tom:</strong> “Code blocks and body length are
+the strongest signals. Our pop-up should focus on these.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-4">Common mistakes in Class 4</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compute mutual info on FULL data</td>
+<td>Leakage.</td>
+</tr>
+<tr>
+<td>Drop columns without writing why</td>
+<td>Module 4 students will not understand.</td>
+</tr>
+<tr>
+<td>Keep too many columns (40+)</td>
+<td>Slow training. Overfitting risk.</td>
+</tr>
+<tr>
+<td>Drop a high-mutual-info column</td>
+<td>Big mistake. Check why before dropping.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-5">Self-check before Class 5</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Train/test split done
+FIRST.</label></li>
+<li><label><input type="checkbox" />12-15 columns remain +
+<code>is_answered</code>.</label></li>
+<li><label><input type="checkbox" />You wrote down WHY for each kept
+column.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Tom.</label></li>
+<li><label><input type="checkbox" /><code>questions_step4.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-5-pipelines">Class 5 — Pipelines</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Tom says: “Your cleaning code is
+in 4 different notebooks. Tomorrow when a user types a draft question on
+our website, will you copy 4 notebooks to the server? No. We need ONE
+object that does everything.”</p>
+</blockquote>
+<h2 id="your-goal-4">Your goal</h2>
+<p>Put EVERY cleaning step inside ONE Pipeline object. Production-ready
+code.</p>
+<h2 id="inputs-4">Inputs</h2>
+<ul>
+<li><code>questions_step4.parquet</code></li>
+</ul>
+<h2 id="outputs-4">Outputs</h2>
+<ul>
+<li><code>stackoverflow_pipeline.joblib</code> saved in Drive</li>
+<li>1 confusion-matrix + 1 ROC curve chart</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-3">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-confusion-matrix">Exploratory chart 1 —
+Confusion matrix</h3>
+<ul>
+<li>After training, build a confusion matrix.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay</code>.</li>
+<li><code>ConfusionMatrixDisplay(cm, display_labels=['No answer', 'Answered']).plot()</code>.</li>
+</ul></li>
+</ul>
+<h3 id="exploratory-chart-2-roc-curve">Exploratory chart 2 — ROC
+curve</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.metrics import RocCurveDisplay</code>.</li>
+<li><code>RocCurveDisplay.from_estimator(pipeline, X_test, y_test)</code>.</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="phase-b-build-the-pipeline">Phase B — Build the pipeline</h2>
+<h3
+id="step-1-decide-which-columns-are-numeric-and-which-are-categorical">Step
+1 — Decide which columns are numeric and which are categorical</h3>
+<ul>
+<li><strong>HINTS:</strong> Make two lists.</li>
+<li><strong>EXAMPLE:</strong>
+<ul>
+<li>numeric: <code>view_count_log</code>, <code>score_log</code>,
+<code>comment_count_log</code>, <code>body_length</code>,
+<code>title_length</code>, <code>n_code_blocks</code>,
+<code>n_links</code>, <code>n_tags</code>,
+<code>creation_hour</code>.</li>
+<li>categorical: <code>primary_tag</code>,
+<code>creation_dayofweek</code> (treat as categorical).</li>
+</ul></li>
+</ul>
+<h3 id="step-2-build-the-numeric-mini-pipeline">Step 2 — Build the
+numeric mini-pipeline</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>numeric_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;scaler&#39;</span>,  StandardScaler()),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in: best strategy for numeric?
+(<code>'median'</code>)</p></li>
+</ul></li>
+</ul>
+<h3 id="step-3-build-the-categorical-mini-pipeline">Step 3 — Build the
+categorical mini-pipeline</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>categorical_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;onehot&#39;</span>,  OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">&#39;___&#39;</span>, sparse_output<span class="op">=</span>___)),</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in: <code>'most_frequent'</code>, <code>'ignore'</code>,
+<code>False</code>.</p></li>
+</ul></li>
+<li><strong>WHY <code>handle_unknown='ignore'</code>?</strong> A new
+programming language tag might appear in production. Do not crash.</li>
+</ul>
+<h3 id="step-4-combine-into-a-columntransformer">Step 4 — Combine into a
+ColumnTransformer</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.compose import ColumnTransformer</code>.</li>
+<li>It takes a list of tuples:
+<code>(name, transformer, list_of_columns)</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-5-add-the-model-on-top">Step 5 — Add the model on top</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>LogisticRegression(max_iter=1000, random_state=42)</code>.</li>
+<li>Class imbalance is mild (~70/30), but
+<code>class_weight='balanced'</code> is still safer.</li>
+</ul></li>
+<li><strong>WHY:</strong> Without <code>class_weight='balanced'</code>,
+the model is biased toward the majority class.</li>
+</ul>
+<h3 id="step-6-train-and-evaluate">Step 6 — Train and evaluate</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>full_pipeline.fit(X_train, y_train)</code>.</li>
+<li><code>y_pred = full_pipeline.predict(X_test)</code>.</li>
+<li><code>print(classification_report(y_test, y_pred))</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> F1 on the “No answer” class around
+0.40-0.55.</li>
+</ul>
+<h3 id="step-7-save-the-trained-pipeline">Step 7 — Save the trained
+pipeline</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>import joblib</code>.</li>
+<li><code>joblib.dump(full_pipeline, '/content/drive/MyDrive/stackoverflow_lab/stackoverflow_pipeline.joblib')</code>.</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-tom-3">Phase C — Make ONE chart for
+Tom</h2>
+<h3
+id="toms-chart-of-1000-unanswered-questions-our-baseline-catches-x">Tom’s
+chart — “Of 1,000 unanswered questions, our baseline catches X”</h3>
+<p>A simple confusion matrix with labels.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>seaborn.heatmap()</code> on the confusion matrix.</li>
+<li>Annotate with the actual counts.</li>
+</ul></li>
+<li><strong>Title:</strong> “Of 1,000 unanswered questions, we flag 550
+correctly.”</li>
+<li><strong>Takeaway for Tom:</strong> “Better than zero (which is what
+we have now). Module 4 will improve this.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-5">Common mistakes in Class 5</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Build pipeline AFTER manual scaling</td>
+<td>Pipeline scales twice. Wrong numbers.</td>
+</tr>
+<tr>
+<td>Forget <code>sparse_output=False</code></td>
+<td>Some downstream code breaks.</td>
+</tr>
+<tr>
+<td>Use <code>class_weight='balanced'</code> AND SMOTE</td>
+<td>Over-correction. Pick one.</td>
+</tr>
+<tr>
+<td>Forget <code>random_state</code></td>
+<td>Results change every run. Hard to debug.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-6">Self-check before Class 6</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Pipeline has preprocessor +
+model.</label></li>
+<li><label><input type="checkbox" />Preprocessor has numeric +
+categorical transformers.</label></li>
+<li><label><input type="checkbox" /><code>handle_unknown='ignore'</code>
+set.</label></li>
+<li><label><input type="checkbox" /><code>class_weight='balanced'</code>
+set.</label></li>
+<li><label><input type="checkbox" />Confusion matrix + ROC curve
+charts.</label></li>
+<li><label><input
+type="checkbox" /><code>stackoverflow_pipeline.joblib</code> saved to
+Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-6-end-to-end-lab-the-big-one">Class 6 — End-to-End Lab
+(THE BIG ONE)</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Tom is in the meeting room. He
+wants the FINAL clean dataset on his desk in 90 minutes. This is the
+lab.</p>
+</blockquote>
+<h2 id="your-goal-5">Your goal</h2>
+<p>Take the raw CSV. Produce ONE final <code>.parquet</code> file with
+the exact 21-column schema. Plus a 1-page findings report.</p>
+<h2 id="time">Time</h2>
+<p><strong>90 minutes</strong> of focused work.</p>
+<h2 id="inputs-5">Inputs</h2>
+<ul>
+<li>The raw Stack Overflow CSV in your Drive folder</li>
+</ul>
+<h2 id="outputs-5">Outputs</h2>
+<ul>
+<li><code>stackoverflow_questions_clean.parquet</code> (~100,000 rows ×
+21 columns) in Drive</li>
+<li><code>findings.md</code> (~1 page)</li>
+<li>Your full Colab notebook</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-10-minutes">Phase A — Explore the
+data first (10 minutes)</h2>
+<p>Reuse 3 of your best charts from Classes 1-5: 1.
+<code>is_answered</code> distribution 2. Code blocks vs answer rate 3.
+Top 10 most important features</p>
+<p>These tell Tom the whole story.</p>
+<hr />
+<h2 id="phase-b-build-the-final-dataset-70-minutes">Phase B — Build the
+final dataset (70 minutes)</h2>
+<h3 id="required-output-schema">Required output schema</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>Column</th>
+<th>Type</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>question_id</code></td>
+<td>int</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>creation_year</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>creation_month</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>creation_dayofweek</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>creation_hour</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>is_weekend</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>view_count_log</code></td>
+<td>float</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>score_log</code></td>
+<td>float</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>comment_count_log</code></td>
+<td>float</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>title_length</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>body_length</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>n_code_blocks</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>n_links</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>n_images_in_body</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>has_error_message</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>has_minimal_reproducible_example_phrase</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>n_tags</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>primary_tag</code></td>
+<td>string</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>n_paragraphs</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>is_answered</code></td>
+<td>int (0/1)</td>
+<td>TARGET (engineered)</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>body_clean</code></td>
+<td>string</td>
+<td>raw HTML-stripped (kept for Module 7)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lab-phases-timed">Lab phases (timed)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Time</th>
+<th>What you do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Load</td>
+<td>10 min</td>
+<td>Load CSV, sample 100k rows.</td>
+</tr>
+<tr>
+<td>2. Clean</td>
+<td>15 min</td>
+<td>Parse dates, strip HTML, drop empty body/tags.</td>
+</tr>
+<tr>
+<td>3. Encode</td>
+<td>15 min</td>
+<td>Parse tags, count tags, primary tag, log-transform numerics.</td>
+</tr>
+<tr>
+<td>4. Engineer</td>
+<td>20 min</td>
+<td>Title/body lengths, HTML signals, text quality signals, dates.</td>
+</tr>
+<tr>
+<td>5. Target</td>
+<td>5 min</td>
+<td>Make <code>is_answered</code>.</td>
+</tr>
+<tr>
+<td>6. Validate + save</td>
+<td>10 min</td>
+<td>Check 21 columns + dtypes. Save <code>.parquet</code>.</td>
+</tr>
+<tr>
+<td>7. Findings</td>
+<td>10 min</td>
+<td>Write <code>findings.md</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total: 90 minutes.</strong></p>
+<hr />
+<h2 id="phase-c-findings-report-for-tom-10-minutes">Phase C — Findings
+report for Tom (10 minutes)</h2>
+<p>Write <code>findings.md</code> with these sections:</p>
+<h3 id="final-numbers">Final numbers</h3>
+<ul>
+<li>Final row count: ____</li>
+<li><code>is_answered</code> rate: ____% (should be ~70%)</li>
+</ul>
+<h3 id="top-3-insights">Top 3 insights</h3>
+<ol type="1">
+<li><hr /></li>
+<li><hr /></li>
+<li><hr /></li>
+</ol>
+<h3 id="one-question-to-investigate-in-module-4">One question to
+investigate in Module 4</h3>
+<ul>
+<li><hr /></li>
+</ul>
+<h3 id="one-chart-that-summarizes-everything">One chart that summarizes
+everything</h3>
+<p>Embed your most important chart.</p>
+<hr />
+<h2 id="grading-rubric-100-points">Grading rubric (100 points)</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All 21 columns exist with the right names and dtypes</td>
+<td>25</td>
+</tr>
+<tr>
+<td>Cleaning decisions written in markdown</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Pipeline reproducible (one command from raw CSV to
+<code>.parquet</code>)</td>
+<td>15</td>
+</tr>
+<tr>
+<td>BeautifulSoup stripping works on all HTML</td>
+<td>10</td>
+</tr>
+<tr>
+<td><code>is_answered</code> rate is between 60% and 80%</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>At least 3 exploratory + 1 explanatory chart per
+class</strong></td>
+<td><strong>15</strong></td>
+</tr>
+<tr>
+<td><code>findings.md</code> has insights, not just numbers</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Code is clean (comments, sensible variable names)</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<h2 id="submit">Submit</h2>
+<p>Upload to
+<code>module-3/class_6/submissions/&lt;YourTeamName&gt;/</code>: -
+<code>stackoverflow_questions_clean.parquet</code> - Your Colab notebook
+(<code>File &gt; Download &gt; Download .ipynb</code>) -
+<code>findings.md</code></p>
+<hr />
+<h1 id="tips-for-the-whole-module">Tips for the whole module</h1>
+<ol type="1">
+<li><strong>Do NOT copy-paste code from this guide.</strong> Write the
+code yourself.</li>
+<li><strong>Save your notebook to Drive often.</strong> Colab
+disconnects after 12 hours.</li>
+<li><strong>Save intermediate <code>.parquet</code> files to
+Drive.</strong></li>
+<li><strong>Pair-program.</strong> One student types, one reads. Switch
+every 20 minutes.</li>
+<li><strong>Make a chart BEFORE you write cleaning code.</strong> You
+must SEE the problem before you can fix it.</li>
+<li><strong>Make a chart AFTER each step.</strong> Confirm your code did
+what you expected.</li>
+<li><strong>Ask the mentor early.</strong> If you are stuck for 20
+minutes, ask. Do not waste an afternoon.</li>
+</ol>
+<p>Good luck.</p>
+</main>
+
+<footer class="scenario-footer">
+  <p><a href="../../#/module/3/class/6">&larr; Back to all 15 scenarios</a></p>
+</footer>
+
+</body>
+</html>

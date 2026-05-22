@@ -1,0 +1,2484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>15_drug_reviews_m3_lab</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --text: #e6e8ec;
+    --text-dim: #9aa0aa;
+    --accent: #7aa2f7;
+    --accent-hover: #a5c0ff;
+    --border: #2a2f3a;
+    --code-bg: #11141a;
+    --table-header: #232732;
+    --quote-bar: #7aa2f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(26, 29, 36, 0.92);
+  }
+  .topbar-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .back-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .back-link:hover { color: var(--accent-hover); }
+  .pdf-link {
+    background: var(--accent);
+    color: #0f1115;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pdf-link:hover { background: var(--accent-hover); }
+  .pdf-link svg { width: 14px; height: 14px; }
+
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 56px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  p { margin-bottom: 16px; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+  strong { color: #fff; font-weight: 600; }
+  em { color: var(--text); font-style: italic; }
+
+  ul, ol { margin-bottom: 18px; padding-left: 28px; }
+  li { margin-bottom: 6px; }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 36px 0;
+  }
+
+  blockquote {
+    border-left: 4px solid var(--quote-bar);
+    background: var(--card);
+    padding: 14px 22px;
+    margin: 18px 0;
+    color: var(--text);
+    border-radius: 0 8px 8px 0;
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  blockquote strong { color: var(--accent); }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    font-size: 0.88em;
+    color: #f0a3b5;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 18px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text);
+    font-size: 1em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.94rem;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  thead { background: var(--table-header); }
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+
+  /* Checkboxes in self-check lists */
+  input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+
+  /* Anchored sections for nav */
+  h2[id], h3[id] { scroll-margin-top: 80px; }
+
+  footer.scenario-footer {
+    max-width: 920px;
+    margin: 60px auto 40px;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+  footer.scenario-footer a {
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    main { padding: 24px 16px 60px; }
+    h1 { font-size: 1.7rem; }
+    h2 { font-size: 1.35rem; }
+    h3 { font-size: 1.1rem; }
+    .topbar { padding: 10px 16px; }
+    pre { font-size: 0.8rem; padding: 12px 14px; }
+    table { font-size: 0.85rem; }
+    th, td { padding: 9px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="../../#/module/3/class/6">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <span style="display:inline-block;transform:translateY(-1px)">&larr;</span> Back to all scenarios
+    </a>
+    <a class="pdf-link" href="15_drug_reviews_m3_lab.pdf" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-4-4h3V4h2v8h3l-4 4zm-8 4v-2h16v2H4z"/></svg>
+      Download as PDF
+    </a>
+  </div>
+</div>
+
+<main>
+<h1 id="drug-reviews-module-3-lab-guide">Drug Reviews — Module 3 Lab
+Guide</h1>
+<p><strong>Scenario:</strong> UCI Drug Review Dataset (Drugs.com).
+Predict the patient rating (1 to 10) for a medication.
+<strong>Module:</strong> 3 (Data Preparation and Feature Engineering)
+<strong>Audience:</strong> Adult learners, A2 English. New to AI.
+<strong>Tools:</strong> Google Colab (no install needed).</p>
+<hr />
+<h1 id="the-scenario-your-mission">The Scenario — Your Mission</h1>
+<h2 id="where-you-work">Where you work</h2>
+<p>You and your team are new data analysts at
+<strong>PharmaSignal</strong>, a healthcare analytics company.
+PharmaSignal sells one product: reports about new medications. The
+customers are pharmaceutical companies, hospitals, and government health
+agencies.</p>
+<p>Every day: - <strong>5,000 new patient reviews</strong> appear on
+websites like Drugs.com. - Each review has a star rating from 1
+(terrible) to 10 (perfect). - Each review has free-text comments.
+Patients write about side effects, dose, doctor visits, and
+pregnancy.</p>
+<h2 id="the-problem">The problem</h2>
+<p>When a new medication is approved by the FDA, the FDA only sees data
+from <strong>clinical trials</strong>. A clinical trial has 500 to 5,000
+people. They are watched for 6 months.</p>
+<p>But <strong>real-world use is different</strong>: - 1 million people
+take the medication. - They use it for years, not months. - They mix it
+with other pills. - New side effects appear.</p>
+<p>These real-world side effects show up in <strong>patient
+reviews</strong> on websites. But nobody at the pharma company reads
+200,000 reviews. The information is lost.</p>
+<h2 id="your-managers-request">Your manager’s request</h2>
+<p>Your manager is <strong>Dr. Anya</strong>, Director of Patient
+Insights at PharmaSignal. She is a medical doctor. She also studied data
+science. She tells you:</p>
+<blockquote>
+<p>“When a new medication is approved, the FDA only sees clinical
+trials. Real-world side effects appear in patient reviews. I want a
+model that does two things.</p>
+<p>One: <strong>read patient reviews and predict the rating</strong> (1
+to 10). If the model is good, then the model UNDERSTANDS what makes a
+medication good or bad.</p>
+<p>Two: <strong>find words that signal side effects</strong>. Which
+words appear in 1-star reviews but not in 10-star reviews? Words like
+‘nausea’, ‘headache’, ‘dizziness’, ‘rash’.</p>
+<p>Pharmaceutical companies will pay millions to know side effects 6
+months earlier. Hospitals will pay to warn patients. Government agencies
+will pay to update safety labels.</p>
+<p>Build me this model. Start with clean data.”</p>
+</blockquote>
+<h2 id="your-teams-job-for-the-next-2-weeks-module-3">Your team’s job
+for the next 2 weeks (Module 3)</h2>
+<p>Dr. Anya cannot do this alone. The raw data is <strong>2 messy TSV
+files</strong> from the UCI Machine Learning Repository.</p>
+<p>Your job in Module 3: &gt; <strong>Turn 2 messy TSV files into ONE
+clean file. The clean file will be used to train the model in Module
+4.</strong></p>
+<p>The clean file is called <code>drug_reviews_clean.parquet</code>. It
+must have <strong>22 specific columns</strong> (we will see them in
+Class 6).</p>
+<h2 id="a-note-on-ethics-read-this-carefully">A note on ethics — read
+this carefully</h2>
+<p>This data comes from <strong>real patients</strong> who wrote about
+real medications. Even though the names are removed, this is still
+sensitive content.</p>
+<ul>
+<li><strong>Do NOT share raw patient text outside this
+lab.</strong></li>
+<li><strong>Do NOT post review text on social media</strong> or in
+public notebooks.</li>
+<li><strong>Do NOT use this model to give medical advice.</strong> Our
+model PREDICTS a rating. It does not tell anyone what to take.</li>
+<li>The dataset is published openly under the UCI license. That makes
+the data legal to use. But it does not make it polite. Treat each review
+as if it was written by your aunt.</li>
+</ul>
+<p>Dr. Anya will check that you respect this.</p>
+<h2 id="after-module-3">After Module 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Module</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Module 4</strong></td>
+<td>Train the prediction model. Dr. Anya finally gets her rating
+predictor.</td>
+</tr>
+<tr>
+<td><strong>Module 5</strong></td>
+<td>Find groups of patients (happy vs frustrated vs side-effect-driven).
+For research.</td>
+</tr>
+<tr>
+<td><strong>Module 7</strong></td>
+<td>Read the review text deeply. Find common side effect words. Find
+positive words.</td>
+</tr>
+</tbody>
+</table>
+<p>You use the <strong>same Drug Review dataset</strong> until the end
+of Module 7.</p>
+<hr />
+<h1 id="how-this-guide-works-read-this-first">How This Guide Works (Read
+This First!)</h1>
+<h2 id="we-do-not-give-you-the-full-code">We do NOT give you the full
+code</h2>
+<p>In this guide you will see two kinds of content:</p>
+<h3 id="what-why-expected-explained-in-words">1. WHAT / WHY / EXPECTED —
+explained in words</h3>
+<p>For every step you read: - <strong>WHAT</strong> you have to do (in
+normal language) - <strong>WHY</strong> you do it (the reason) -
+<strong>HINTS</strong> — the function names, the arguments to remember -
+<strong>EXPECTED</strong> — the result you should see if you did it
+right</p>
+<h3 id="sometimes-a-tiny-code-skeleton-with-blanks">2. Sometimes a tiny
+code skeleton with blanks</h3>
+<p>For the harder steps we give you a code skeleton with
+<code>___</code> blanks. <strong>You fill in the blanks.</strong></p>
+<h3 id="why-no-full-code">Why no full code?</h3>
+<p>Because you will NOT learn if you copy-paste. - In Module 4, the
+model only works if YOU understand each step. - In your future job,
+nobody will give you the code. - Writing the code yourself takes 10
+minutes more today, but saves 10 hours later.</p>
+<p><strong>Rule:</strong> If you finish a step in 30 seconds by
+copy-pasting from a teammate’s notebook, do it AGAIN by yourself.
+Different variable names, same logic.</p>
+<hr />
+<h1 id="visualizations-two-modes">Visualizations — Two Modes</h1>
+<p>In every class you will make charts. There are <strong>two
+reasons</strong> to make a chart:</p>
+<h2 id="exploratory-charts-for-you">1. Exploratory charts (for YOU)</h2>
+<p>Made BEFORE you clean the data. To understand what the data looks
+like. - Fast, ugly, no labels needed. - Examples:
+<code>df.hist()</code>,
+<code>df['column'].value_counts().plot.bar()</code>.</p>
+<blockquote>
+<p>Goal: <strong>“What does this data look like?”</strong></p>
+</blockquote>
+<h2 id="explanatory-charts-for-dr.-anya">2. Explanatory charts (for DR.
+ANYA)</h2>
+<p>Made AFTER you understand. To EXPLAIN something to your manager. -
+Clean, labeled, one clear message. - Must have: title, x-label, y-label,
+source, and a 1-sentence takeaway.</p>
+<blockquote>
+<p>Goal: <strong>“Dr. Anya, look at this. This is the medical
+signal.”</strong></p>
+</blockquote>
+<p>In every class you make BOTH kinds.</p>
+<h2 id="your-plotting-toolkit-you-learned-this-in-module-2-class-5">Your
+plotting toolkit (you learned this in Module 2 Class 5)</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Plot</th>
+<th>When to use it</th>
+<th>Function name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Histogram</td>
+<td>See the SHAPE of a numeric column</td>
+<td><code>plt.hist()</code> or <code>sns.histplot()</code></td>
+</tr>
+<tr>
+<td>Bar chart</td>
+<td>Count of each category</td>
+<td><code>df['col'].value_counts().plot.bar()</code></td>
+</tr>
+<tr>
+<td>Box plot</td>
+<td>See outliers in a numeric column</td>
+<td><code>sns.boxplot()</code></td>
+</tr>
+<tr>
+<td>Scatter plot</td>
+<td>See the relationship between 2 numbers</td>
+<td><code>plt.scatter()</code> or <code>sns.scatterplot()</code></td>
+</tr>
+<tr>
+<td>Heatmap</td>
+<td>See correlation between many columns</td>
+<td><code>sns.heatmap(df.corr())</code></td>
+</tr>
+<tr>
+<td>Line plot</td>
+<td>See change over time</td>
+<td><code>plt.plot()</code></td>
+</tr>
+</tbody>
+</table>
+<p>Before you start: <code>import matplotlib.pyplot as plt</code> and
+<code>import seaborn as sns</code>.</p>
+<hr />
+<h1 id="before-you-start-google-colab-setup">Before You Start — Google
+Colab Setup</h1>
+<p>You will work in <strong>Google Colab</strong>. That means: - You do
+NOT install Python. - You do NOT install pandas, scikit-learn, or
+anything. - You just open a notebook in your web browser.</p>
+<h2 id="step-1-open-a-new-colab-notebook">Step 1 — Open a new Colab
+notebook</h2>
+<ol type="1">
+<li>Go to https://colab.research.google.com</li>
+<li>Sign in with your Google account.</li>
+<li>Click <strong>“New notebook”</strong> (top left).</li>
+<li>Name it <code>drug_reviews_module_3.ipynb</code>.</li>
+</ol>
+<h2 id="step-2-connect-to-google-drive">Step 2 — Connect to Google
+Drive</h2>
+<p>Colab files <strong>disappear</strong> when you close the browser. So
+you must save your work to <strong>Google Drive</strong>.</p>
+<p>In the first cell:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> drive</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>drive.mount(<span class="st">&#39;/content/drive&#39;</span>)</span></code></pre></div>
+<p>A pop-up asks for permission. Click “Allow”. After this, Drive is
+available at <code>/content/drive/MyDrive/</code>.</p>
+<h2 id="step-3-create-a-project-folder">Step 3 — Create a project
+folder</h2>
+<p>In a new cell:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&#39;/content/drive/MyDrive/drug_reviews_lab&#39;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>cd <span class="op">/</span>content<span class="op">/</span>drive<span class="op">/</span>MyDrive<span class="op">/</span>drug_reviews_lab</span></code></pre></div>
+<p>Your team will save ALL files in this folder.</p>
+<h2 id="step-4-get-the-data">Step 4 — Get the data</h2>
+<p><strong>Option A — Direct download from UCI
+(recommended):</strong></p>
+<p>The UCI Machine Learning Repository hosts the data. There are TWO
+files: a train file and a test file. Both are TSV (tab-separated, NOT
+comma-separated).</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>wget <span class="op">-</span>q https:<span class="op">//</span>archive.ics.uci.edu<span class="op">/</span>static<span class="op">/</span>public<span class="op">/</span><span class="dv">462</span><span class="op">/</span>drug<span class="op">+</span>review<span class="op">+</span>dataset<span class="op">+</span>drugs<span class="op">+</span>com.<span class="bu">zip</span> <span class="op">-</span>O drug_reviews.<span class="bu">zip</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>unzip <span class="op">-</span>q <span class="op">-</span>o drug_reviews.<span class="bu">zip</span> <span class="op">-</span>d data</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ls data<span class="op">/</span></span></code></pre></div>
+<p>You should see two files: - <code>drugsComTrain_raw.tsv</code> (about
+161,000 rows) - <code>drugsComTest_raw.tsv</code> (about 54,000
+rows)</p>
+<p><strong>Important:</strong> This is <strong>TSV</strong>, not CSV.
+The separator is a TAB, not a comma. If you load it as CSV by mistake,
+everything will be in ONE column.</p>
+<p><strong>Option B — Upload by hand:</strong></p>
+<ol type="1">
+<li>Go to
+https://archive.ics.uci.edu/dataset/462/drug+review+dataset+drugs+com on
+your laptop.</li>
+<li>Click “Download”.</li>
+<li>Unzip on your laptop.</li>
+<li>In Colab’s file panel (left sidebar), upload the two TSV files.</li>
+</ol>
+<h2 id="step-5-test-it">Step 5 — Test it</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>train <span class="op">=</span> pd.read_csv(<span class="st">&#39;data/drugsComTrain_raw.tsv&#39;</span>, sep<span class="op">=</span><span class="st">&#39;</span><span class="ch">\t</span><span class="st">&#39;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(train.shape)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(train.columns.tolist())</span></code></pre></div>
+<p>Should print: - Shape: about <code>(161297, 7)</code>. - Columns:
+<code>['uniqueID', 'drugName', 'condition', 'review', 'rating', 'date', 'usefulCount']</code>.</p>
+<p>If you see only 1 column, you forgot <code>sep='\t'</code>. Try
+again.</p>
+<p>You are ready.</p>
+<h2 id="colab-tips">Colab tips</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Save your notebook to Drive often</td>
+<td>Colab disconnects after 12 hours.</td>
+</tr>
+<tr>
+<td>Save intermediate <code>.parquet</code> files to Drive</td>
+<td>Files in <code>/content/</code> disappear when Colab
+disconnects.</td>
+</tr>
+<tr>
+<td>Share the notebook with teammates (Share button, top right)</td>
+<td>Editor access. Like Google Docs for code.</td>
+</tr>
+<tr>
+<td>Restart runtime if memory full</td>
+<td>Runtime &gt; Restart runtime.</td>
+</tr>
+<tr>
+<td>Do NOT print full review text in screenshots</td>
+<td>Privacy.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="class-1-data-cleaning">Class 1 — Data Cleaning</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Dr. Anya drops 2 messy TSV files
+on your desk. The file extension is <code>.tsv</code>. The date column
+is a string like “May 20, 2012”. Some condition fields are missing. Your
+job today: load both files, fix the dates, combine them, and find
+missing values.</p>
+</blockquote>
+<h2 id="your-goal">Your goal</h2>
+<p>Make the 2 TSV files USABLE. Load them with the right separator. Fix
+the date column. Combine train + test. Find missing values. Decide what
+to keep.</p>
+<h2 id="inputs">Inputs</h2>
+<ul>
+<li>The 2 TSV files in <code>data/</code></li>
+</ul>
+<h2 id="outputs">Outputs</h2>
+<ul>
+<li><code>reviews_step1.parquet</code> saved in your Drive folder</li>
+<li>3+ exploratory charts in your notebook</li>
+<li>1 explanatory chart for Dr. Anya</li>
+<li>Notes in markdown about every decision you made</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-15-minutes">Phase A — Explore the
+data first (15 minutes)</h2>
+<p>Before you clean anything, <strong>LOOK</strong> at the data.</p>
+<h3 id="exploratory-chart-1-how-are-ratings-distributed">Exploratory
+chart 1 — How are ratings distributed?</h3>
+<ul>
+<li><strong>Question:</strong> “Of 215,000 reviews, how many give 1
+star? How many give 10? Is it balanced?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>df['rating'].value_counts().sort_index()</code>.</li>
+<li>Then <code>.plot.bar()</code> on the result.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The data is <strong>heavily skewed
+toward 10 stars</strong>. Many patients only write a review when very
+happy or very unhappy.</li>
+</ul>
+<h3 id="exploratory-chart-2-how-long-is-a-review">Exploratory chart 2 —
+How long is a review?</h3>
+<ul>
+<li><strong>Question:</strong> “Are reviews short (1 sentence) or long
+(1 page)?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Make a column
+<code>review_length = df['review'].str.len()</code>.</li>
+<li>Histogram with <code>bins=50</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Most reviews are 100 to 500
+characters. A few are over 2000.</li>
+</ul>
+<h3 id="exploratory-chart-3-missing-values-per-column">Exploratory chart
+3 — Missing values per column</h3>
+<ul>
+<li><strong>Question:</strong> “Which columns have the most missing
+data?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>df.isna().sum().sort_values(ascending=False)</code>.</li>
+<li>Plot it as a bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The <code>condition</code> column
+has missing values. The review column itself should not.</li>
+</ul>
+<hr />
+<h2 id="phase-b-clean-the-two-tsv-files-45-minutes">Phase B — Clean the
+two TSV files (45 minutes)</h2>
+<h3 id="step-1-load-both-tsv-files">Step 1 — Load both TSV files</h3>
+<ul>
+<li><strong>WHAT:</strong> Load <code>drugsComTrain_raw.tsv</code> and
+<code>drugsComTest_raw.tsv</code>. They are tab-separated.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>pd.read_csv('data/drugsComTrain_raw.tsv', sep='\t')</code>.</li>
+<li>Use
+<code>pd.read_csv('data/drugsComTest_raw.tsv', sep='\t')</code>.</li>
+<li><strong>The separator is <code>\t</code> (tab), NOT
+comma.</strong></li>
+<li>Give them short names: <code>train</code> and
+<code>test</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong>
+<ul>
+<li><code>train.shape</code> is about <code>(161297, 7)</code>.</li>
+<li><code>test.shape</code> is about <code>(53766, 7)</code>.</li>
+</ul></li>
+<li><strong>WHY load both?</strong> UCI split the data for an old
+experiment. We do not care. We need ALL the reviews. We will split again
+later, our own way.</li>
+</ul>
+<h3 id="step-2-look-at-each-dataframe">Step 2 — Look at each
+DataFrame</h3>
+<ul>
+<li><strong>WHAT:</strong> For each, check <code>.shape</code>,
+<code>.info()</code>, and <code>.head()</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Loop over <code>[train, test]</code>. Or just call them one by
+one.</li>
+<li>Look at the <code>Dtype</code> column in <code>.info()</code>
+output. <strong>Is the date stored as <code>object</code>
+(text)?</strong></li>
+</ul></li>
+<li><strong>EXPECTED:</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>DataFrame</th>
+<th>Approx rows</th>
+<th>Columns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>train</td>
+<td>161,297</td>
+<td>7</td>
+</tr>
+<tr>
+<td>test</td>
+<td>53,766</td>
+<td>7</td>
+</tr>
+</tbody>
+</table>
+<p>The 7 columns are: <code>uniqueID</code>, <code>drugName</code>,
+<code>condition</code>, <code>review</code>, <code>rating</code>,
+<code>date</code>, <code>usefulCount</code>.</p>
+<h3 id="step-3-combine-train-and-test">Step 3 — Combine train and
+test</h3>
+<ul>
+<li><strong>WHAT:</strong> Stack the two DataFrames on top of each other
+into ONE DataFrame called <code>df</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>pd.concat([train, test], ignore_index=True)</code>.</li>
+<li><code>ignore_index=True</code> makes the row index go 0, 1, 2, …
+without duplicates.</li>
+</ul></li>
+<li><strong>WHY:</strong> We have one project, one model. The old UCI
+split is not useful for us.</li>
+<li><strong>EXPECTED:</strong> <code>df.shape</code> is about
+<code>(215063, 7)</code>.</li>
+</ul>
+<h3 id="step-4-rename-uniqueid-to-review_id">Step 4 — Rename
+<code>uniqueID</code> to <code>review_id</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Rename the column to a clearer name.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df = df.rename(columns={'uniqueID': 'review_id'})</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Our schema in Class 6 uses
+<code>review_id</code>. Match it early.</li>
+</ul>
+<h3 id="step-5-fix-the-date-column">Step 5 — Fix the date column</h3>
+<ul>
+<li><strong>WHAT:</strong> The <code>date</code> column is text like
+<code>"May 20, 2012"</code>. Convert it to a real datetime.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>The function is <code>pd.to_datetime()</code>.</li>
+<li>Add the argument <code>errors='coerce'</code>. If a cell is bad, it
+becomes <code>NaT</code> (Not a Time = missing). The code does not
+crash.</li>
+<li>Example:
+<code>df['date'] = pd.to_datetime(df['date'], errors='coerce')</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> If dates are strings, you cannot subtract
+them. “How old is this review?” is impossible without datetime.</li>
+<li><strong>EXPECTED:</strong> After your code,
+<code>df['date'].dtype</code> is <code>datetime64[ns]</code>.</li>
+</ul>
+<h3 id="step-6-find-missing-values">Step 6 — Find missing values</h3>
+<ul>
+<li><p><strong>WHAT:</strong> Count missing values per column.</p></li>
+<li><p><strong>HINTS:</strong> <code>.isna()</code> returns True/False
+per cell. <code>.sum()</code> counts the Trues per column.</p></li>
+<li><p><strong>EXPECTED:</strong> Something like:</p>
+<pre><code>condition       ~1,200
+review              0
+rating              0
+date                0
+drugName            0</code></pre></li>
+</ul>
+<h3 id="step-7-decide-what-to-do-with-missing-condition">Step 7 — Decide
+what to do with missing <code>condition</code></h3>
+<ul>
+<li><strong>WHAT:</strong> About 1,200 rows have no
+<code>condition</code>. Three choices:
+<ul>
+<li>A. Drop these rows.</li>
+<li>B. Fill with the string <code>"Unknown"</code>.</li>
+<li>C. Try to guess from the review text.</li>
+</ul></li>
+<li><strong>OUR CHOICE:</strong> B (Fill with <code>"Unknown"</code>).
+Reason: we do not want to throw away patient data. “Unknown” is a real
+category.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['condition'] = df['condition'].fillna('Unknown')</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-8-drop-duplicate-review-ids-just-in-case">Step 8 — Drop
+duplicate review IDs (just in case)</h3>
+<ul>
+<li><strong>WHAT:</strong> Keep only one row per
+<code>review_id</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df = df.drop_duplicates(subset='review_id')</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Sometimes the same review appears in both
+train and test files. We do not want it twice.</li>
+</ul>
+<h3 id="step-9-sanity-check-the-rating-column">Step 9 — Sanity check the
+rating column</h3>
+<ul>
+<li><strong>WHAT:</strong> Confirm <code>rating</code> is between 1 and
+10 with no weird values.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['rating'].describe()</code>. Min should be 1, max should be
+10.</li>
+<li><code>df['rating'].value_counts().sort_index()</code> — there should
+be no 0 or 11.</li>
+</ul></li>
+</ul>
+<h3 id="step-10-write-down-what-you-did">Step 10 — Write down what you
+did</h3>
+<p>In a markdown cell, write: - Train rows loaded: ~161,297 - Test rows
+loaded: ~53,766 - After combine: ~215,063 - After drop duplicates:
+~215,000 - Missing <code>condition</code>: ~1,200 (filled with
+“Unknown”) - WHY you made each decision.</p>
+<h3 id="step-11-save-to-drive">Step 11 — Save to Drive</h3>
+<ul>
+<li><strong>WHAT:</strong> Save the cleaned DataFrame as parquet, inside
+your Drive folder.</li>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/drug_reviews_lab/reviews_step1.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-dr.-anya-15-minutes">Phase C — Make
+ONE chart for Dr. Anya (15 minutes)</h2>
+<p>She does not have time to read your code. She wants ONE picture.</p>
+<h3
+id="dr.-anyas-chart-patients-only-review-when-very-happy-or-very-angry">Dr. Anya’s
+chart — “Patients only review when very happy or very angry”</h3>
+<p>A bar chart showing the count of reviews for each rating, from 1 to
+10.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['rating'].value_counts().sort_index().plot.bar()</code>.</li>
+<li>Add the title:
+<code>"Rating distribution — patients write at the extremes"</code>.</li>
+<li>X-label: <code>"Rating (1=worst, 10=best)"</code>.</li>
+<li>Y-label: <code>"Number of reviews"</code>.</li>
+<li>Color the bars: maybe red for 1-3, gray for 4-7, green for
+8-10.</li>
+</ul></li>
+<li><strong>Takeaway for Dr. Anya:</strong> “About 60% of reviews are
+8-10 stars. About 25% are 1-3 stars. Almost nobody writes a 5-star
+review. This is a U-shape, not a bell shape. Our model must handle
+this.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-1">Common mistakes in Class 1</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Use <code>pd.read_csv</code> without <code>sep='\t'</code></td>
+<td>All 7 columns load as 1 column.</td>
+</tr>
+<tr>
+<td>Forget <code>errors='coerce'</code> on <code>to_datetime</code></td>
+<td>Code crashes on one bad date.</td>
+</tr>
+<tr>
+<td>Drop rows with missing <code>condition</code> without a reason</td>
+<td>You lose ~1,200 real reviews.</td>
+</tr>
+<tr>
+<td>Save to <code>/content/</code> instead of Drive</td>
+<td>File disappears when Colab disconnects.</td>
+</tr>
+<tr>
+<td>Print full review text to share</td>
+<td>Privacy violation.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-2">Self-check before Class 2</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Train and test TSV loaded with
+<code>sep='\t'</code>.</label></li>
+<li><label><input type="checkbox" />Combined into one DataFrame, about
+215,000 rows.</label></li>
+<li><label><input type="checkbox" /><code>date</code> column has dtype
+<code>datetime64</code>.</label></li>
+<li><label><input type="checkbox" /><code>condition</code> has no NaN
+(filled with “Unknown”).</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory charts in
+your notebook.</label></li>
+<li><label><input type="checkbox" />1 polished chart for
+Dr. Anya.</label></li>
+<li><label><input type="checkbox" />You saved
+<code>reviews_step1.parquet</code> to your Drive folder.</label></li>
+<li><label><input type="checkbox" />You wrote down (in markdown) what
+you did and WHY.</label></li>
+</ul>
+<hr />
+<h1 id="class-2-encoding-and-scaling">Class 2 — Encoding and
+Scaling</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Dr. Anya looks at your cleaned
+data. She is happy. But she says: “the model is a math model. It does
+not understand the word ‘Depression’ or the drug name ‘Sertraline’. Turn
+the words into numbers. Also, <code>usefulCount</code> has a long tail —
+fix it.”</p>
+</blockquote>
+<h2 id="your-goal-1">Your goal</h2>
+<p>Turn TEXT columns into numbers. Make all numeric columns about the
+same size. Keep the raw review text — we need it in Module 7.</p>
+<h2 id="inputs-1">Inputs</h2>
+<ul>
+<li><code>reviews_step1.parquet</code> from Class 1</li>
+</ul>
+<h2 id="outputs-1">Outputs</h2>
+<ul>
+<li><code>reviews_step2.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Dr. Anya</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-distribution-of-usefulcount">Exploratory
+chart 1 — Distribution of <code>usefulCount</code></h3>
+<ul>
+<li><strong>Question:</strong> “Most reviews get 5 upvotes. A few get
+1000+. Is the distribution skewed?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use a histogram (<code>plt.hist()</code>).</li>
+<li>Use <code>bins=50</code> to see the shape.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The <code>usefulCount</code> column
+has a “long tail”. This is why we will use log-transform.</li>
+</ul>
+<h3
+id="exploratory-chart-2-distribution-of-usefulcount-after-np.log1p">Exploratory
+chart 2 — Distribution of <code>usefulCount</code> AFTER
+<code>np.log1p</code></h3>
+<ul>
+<li><strong>Question:</strong> “Does log-transform make the shape more
+normal?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Make a NEW column:
+<code>log_useful = np.log1p(df['usefulCount'])</code>.</li>
+<li>Histogram it.</li>
+<li>Compare to chart 1.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Log makes the long tail manageable
+for the model.</li>
+</ul>
+<h3 id="exploratory-chart-3-top-20-conditions">Exploratory chart 3 — Top
+20 conditions</h3>
+<ul>
+<li><strong>Question:</strong> “Which medical conditions appear most
+often?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['condition'].value_counts().head(20).plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Birth Control, Depression, Pain,
+Anxiety, Acne, and Diabetes are the most common. The “long tail” of
+conditions has hundreds of rare diseases.</li>
+</ul>
+<h3 id="exploratory-chart-4-top-20-drug-names">Exploratory chart 4 — Top
+20 drug names</h3>
+<ul>
+<li><strong>Question:</strong> “How many unique drugs are in the data?
+Which are most reviewed?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['drugName'].nunique()</code> — how many unique values.</li>
+<li><code>df['drugName'].value_counts().head(20).plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> About 3,500 unique drugs. Top 20
+are common antidepressants and birth control pills. Long tail
+again.</li>
+</ul>
+<hr />
+<h2 id="phase-b-encode-and-scale">Phase B — Encode and scale</h2>
+<h3 id="step-1-bucket-condition-into-top-10-other">Step 1 — Bucket
+<code>condition</code> into top 10 + “Other”</h3>
+<ul>
+<li><strong>WHAT:</strong> <code>condition</code> has about 900 unique
+values. Too many. We will group them.</li>
+<li><strong>STRATEGY:</strong>
+<ul>
+<li>Keep the top 10 most frequent conditions as their own buckets.</li>
+<li>But also create <strong>named clinical groups</strong> so they make
+medical sense.</li>
+</ul></li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>First look at the top 10 with
+<code>df['condition'].value_counts().head(10)</code>.</p></li>
+<li><p>Likely top 10 (your data may differ): <code>Birth Control</code>,
+<code>Depression</code>, <code>Pain</code>, <code>Anxiety</code>,
+<code>Acne</code>, <code>Bipolar Disorde</code>, <code>Insomnia</code>,
+<code>Weight Loss</code>, <code>Obesity</code>,
+<code>ADHD</code>.</p></li>
+<li><p>Use Python dictionaries to map. Skeleton:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>condition_buckets <span class="op">=</span> {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Birth Control&#39;</span>:     <span class="st">&#39;Reproductive&#39;</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Depression&#39;</span>:        <span class="st">&#39;Mental Health&#39;</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Anxiety&#39;</span>:           <span class="st">&#39;Mental Health&#39;</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Bipolar Disorde&#39;</span>:   <span class="st">&#39;Mental Health&#39;</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Pain&#39;</span>:              <span class="st">&#39;Pain&#39;</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Insomnia&#39;</span>:          <span class="st">&#39;Sleep&#39;</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Acne&#39;</span>:              <span class="st">&#39;Skin&#39;</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Weight Loss&#39;</span>:       <span class="st">&#39;Weight&#39;</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Obesity&#39;</span>:           <span class="st">&#39;Weight&#39;</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;ADHD&#39;</span>:              <span class="st">&#39;Mental Health&#39;</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;condition_top10_bucket&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;condition&#39;</span>].<span class="bu">map</span>(condition_buckets).fillna(<span class="st">&#39;___&#39;</span>)</span></code></pre></div></li>
+<li><p>Fill in the blank: anything not in the dictionary becomes
+<code>'Other'</code>.</p></li>
+</ul></li>
+<li><strong>WHY this design?</strong> Dr. Anya is a doctor. She wants
+groups that make medical sense. “Mental Health” tells a story. 900
+separate conditions do not.</li>
+<li><strong>EXPECTED:</strong> About 6 to 8 named buckets +
+<code>"Other"</code>.</li>
+</ul>
+<h3 id="step-2-target-encode-drugname">Step 2 — Target encode
+<code>drugName</code></h3>
+<ul>
+<li><strong>WHAT:</strong> ~3,500 unique drugs. One-hot would create
+3,500 columns. Too many. Use <strong>target encoding</strong>: replace
+the drug name with the average rating for that drug.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Group by <code>drugName</code>. Take the mean of
+<code>rating</code>.</li>
+<li>Make a Series <code>drug_avg</code>.</li>
+<li>Map back:
+<code>df['drugName_target_encoded'] = df['drugName'].map(drug_avg)</code>.</li>
+</ul></li>
+<li><strong>BIG WARNING:</strong> This is <strong>leakage</strong> if
+you compute on the full data. Right now, we are still in cleaning. In
+Class 4 you will do this on TRAIN ONLY. For now, mark it as “preview
+only” in a comment.</li>
+<li><strong>WHY target encode and not one-hot?</strong> Memory. Also,
+the model can use one number (“this drug averages 7.2 stars”) instead of
+3,500 zero columns.</li>
+</ul>
+<h3 id="step-3-log-transform-usefulcount">Step 3 — Log-transform
+<code>usefulCount</code></h3>
+<ul>
+<li><strong>WHAT:</strong> <code>usefulCount</code> has a very long
+tail. Apply <code>np.log1p()</code>.</li>
+<li><strong>HINTS:</strong>
+<code>df['usefulCount_log'] = np.log1p(df['usefulCount'])</code>.</li>
+<li><strong>WHY <code>log1p</code> and not <code>log</code>?</strong>
+<code>log(0)</code> is <code>-inf</code>.
+<code>log1p(x) = log(x + 1)</code> is safe for zeros. Many reviews have
+<code>usefulCount = 0</code>.</li>
+</ul>
+<h3 id="step-4-one-hot-encode-condition_top10_bucket">Step 4 — One-hot
+encode <code>condition_top10_bucket</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Turn the 6-8 buckets into 6-8 new 0/1
+columns.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>pd.get_dummies(df, columns=['condition_top10_bucket'], prefix='cond')</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> New columns:
+<code>cond_Mental Health</code>, <code>cond_Pain</code>,
+<code>cond_Other</code>, etc.</li>
+<li><strong>NOTE:</strong> We will keep the
+<code>condition_top10_bucket</code> text column AS WELL for the final
+schema. Make a copy before the one-hot if you need both.</li>
+</ul>
+<h3 id="step-5-scale-numeric-columns-preview-only">Step 5 — Scale
+numeric columns (preview only)</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>StandardScaler</code> to make every
+numeric column have mean = 0, std = 1.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.preprocessing import StandardScaler</code>.</li>
+<li><code>scaler = StandardScaler()</code>.</li>
+<li><code>scaler.fit_transform(df[numeric_cols])</code>.</li>
+</ul></li>
+<li><strong>WARNING:</strong> This is for inspection only. In Class 5,
+scaling goes INSIDE the Pipeline. Do NOT save the scaled version as your
+final file.</li>
+</ul>
+<h3 id="step-6-save">Step 6 — Save</h3>
+<ul>
+<li><strong>WHAT:</strong> Save to Drive.
+<code>df.to_parquet('/content/drive/MyDrive/drug_reviews_lab/reviews_step2.parquet')</code>.</li>
+<li><strong>Save the UNSCALED version.</strong> Scaling will happen
+inside the Pipeline later.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-dr.-anya">Phase C — Make ONE chart
+for Dr. Anya</h2>
+<h3 id="dr.-anyas-chart-rating-depends-on-the-condition">Dr. Anya’s
+chart — “Rating depends on the condition”</h3>
+<p>A grouped bar chart of average rating per
+<code>condition_top10_bucket</code>.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df.groupby('condition_top10_bucket')['rating'].mean().sort_values()</code>.</li>
+<li>Then <code>.plot.barh()</code>.</li>
+</ul></li>
+<li><strong>Title:</strong>
+<code>"Average rating by medical area — pain meds rate lowest, contraceptives rate highest"</code>.</li>
+<li><strong>X-label:</strong> <code>"Average rating (1-10)"</code>.</li>
+<li><strong>Y-label:</strong> <code>"Medical area"</code>.</li>
+<li><strong>Takeaway:</strong> “Depression and pain medications get the
+lowest scores. Birth control gets the highest. The condition is a strong
+signal. Our model must use it.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-2">Common mistakes in Class 2</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scale BEFORE train/test split</td>
+<td><strong>Leakage.</strong> Scaler sees test data.</td>
+</tr>
+<tr>
+<td>One-hot encode <code>drugName</code> (3,500 unique)</td>
+<td>Table explodes. Memory crash.</td>
+</tr>
+<tr>
+<td>Forget <code>np.log1p</code> and use <code>np.log</code> on
+zeros</td>
+<td><code>np.log(0) = -inf</code>. Crash.</td>
+</tr>
+<tr>
+<td>Target encode using FULL data</td>
+<td>Leakage (fix in Class 4).</td>
+</tr>
+<tr>
+<td>Save the scaled version</td>
+<td>Class 5 will scale again inside the pipeline. Double scaling = wrong
+numbers.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-3">Self-check before Class 3</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>condition_top10_bucket</code>
+exists with about 7 named groups.</label></li>
+<li><label><input type="checkbox" /><code>drugName_target_encoded</code>
+exists (preview).</label></li>
+<li><label><input type="checkbox" /><code>usefulCount_log</code>
+exists.</label></li>
+<li><label><input type="checkbox" />One-hot columns for the condition
+bucket exist.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory
+charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Dr. Anya.</label></li>
+<li><label><input type="checkbox" /><code>reviews_step2.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-3-feature-engineering">Class 3 — Feature Engineering</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Dr. Anya says: “The raw columns
+are not enough. The signal is INSIDE the review text. Words like
+‘nausea’ and ‘dizziness’ predict 1-star ratings. Words like ‘helped’
+predict 10-star ratings. Build me features that COUNT these words.”</p>
+</blockquote>
+<h2 id="your-goal-2">Your goal</h2>
+<p>Make NEW columns from the existing ones. The biggest new columns will
+come from the <strong>review text</strong>. We will use simple keyword
+counts (rule-based features), NOT machine learning yet. ML on text comes
+in Module 7.</p>
+<h2 id="inputs-2">Inputs</h2>
+<ul>
+<li><code>reviews_step2.parquet</code></li>
+</ul>
+<h2 id="outputs-2">Outputs</h2>
+<ul>
+<li><code>reviews_step3.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Dr. Anya</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-1">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-is_effective-distribution">Exploratory chart
+1 — <code>is_effective</code> distribution</h3>
+<ul>
+<li>First make the <code>is_effective</code> column (see Step 1
+below).</li>
+<li><strong>Question:</strong> “What % of reviews are ‘effective’
+(rating &gt;= 7)?”</li>
+<li><strong>HINTS:</strong>
+<code>df['is_effective'].value_counts(normalize=True).plot.bar()</code>.</li>
+<li><strong>What you learn:</strong> Around 65-70% of reviews are
+“effective”. The classes are not balanced (we will handle this in Class
+5).</li>
+</ul>
+<h3 id="exploratory-chart-2-review-length-vs-rating">Exploratory chart 2
+— Review length vs rating</h3>
+<ul>
+<li><strong>Question:</strong> “Do angry patients write longer reviews
+than happy patients?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Make <code>review_length</code> (Step 3 below).</li>
+<li>Use <code>df.groupby('rating')['review_length'].mean()</code>.</li>
+<li>Plot as a bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Often, the most extreme reviews (1
+and 10 stars) are the longest. People with strong feelings write
+more.</li>
+</ul>
+<h3 id="exploratory-chart-3-side-effect-keywords-frequency">Exploratory
+chart 3 — Side-effect keywords frequency</h3>
+<ul>
+<li>After you compute <code>n_side_effect_keywords</code> (Step 5), look
+at its distribution.</li>
+<li><strong>HINTS:</strong> Histogram with <code>bins=20</code>.</li>
+<li><strong>What you learn:</strong> Most reviews have 0 side-effect
+keywords. A few reviews mention 5+ different symptoms. These are the
+gold mine.</li>
+</ul>
+<h3 id="exploratory-chart-4-side-effect-count-vs-rating">Exploratory
+chart 4 — Side-effect count vs rating</h3>
+<ul>
+<li><strong>Question:</strong> “Are reviews with many side-effect words
+rated lower?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Group <code>n_side_effect_keywords</code> (or <code>pd.cut()</code>
+it into 5 bins).</li>
+<li>Compute mean <code>rating</code> per bin.</li>
+<li>Bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> <strong>This is the most important
+chart.</strong> Side-effect words strongly predict low ratings.</li>
+</ul>
+<hr />
+<h2 id="phase-b-engineer-the-features">Phase B — Engineer the
+features</h2>
+<h3 id="step-1-create-the-engineered-binary-target-is_effective">Step 1
+— Create the engineered binary target <code>is_effective</code></h3>
+<ul>
+<li><strong>WHAT:</strong> <code>is_effective = 1</code> if rating &gt;=
+7, else 0.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compare: <code>df['rating'] &gt;= 7</code>.</li>
+<li>The result is True/False. Convert to int with
+<code>.astype(int)</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> About 65-70% of rows have
+<code>is_effective = 1</code>. Confirm with
+<code>df['is_effective'].mean()</code>.</li>
+<li><strong>WHY both <code>rating</code> AND
+<code>is_effective</code>?</strong> In Module 4, you will try BOTH
+problems: regression (predict the exact number) AND classification
+(predict effective yes/no). Keep both columns.</li>
+</ul>
+<h3 id="step-2-date-derived-features">Step 2 — Date-derived
+features</h3>
+<p>Make these new columns from the <code>date</code> column:</p>
+<table>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>review_year</code></td>
+<td>The year (2008-2017)</td>
+</tr>
+<tr>
+<td><code>review_month</code></td>
+<td>The month (1-12)</td>
+</tr>
+<tr>
+<td><code>review_age_years</code></td>
+<td>Years from review date to today (2026)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Use the <code>.dt</code> accessor on a datetime column.</p></li>
+<li><p><code>df['date'].dt.year</code>, <code>.dt.month</code>.</p></li>
+<li><p>For <code>review_age_years</code>:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>today <span class="op">=</span> pd.Timestamp(<span class="st">&#39;2026-05-21&#39;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;review_age_years&#39;</span>] <span class="op">=</span> (today <span class="op">-</span> df[<span class="st">&#39;date&#39;</span>]).dt.days <span class="op">/</span> <span class="fl">365.25</span></span></code></pre></div></li>
+</ul></li>
+<li><strong>WHY:</strong> A model can learn “old reviews are less
+reliable” only if you give it the age.</li>
+</ul>
+<h3 id="step-3-text-shape-features">Step 3 — Text-shape features</h3>
+<p>Simple counts ABOUT the review (not the meaning). These work in any
+language.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+<th>How to compute</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>review_length</code></td>
+<td>Number of characters</td>
+<td><code>df['review'].str.len()</code></td>
+</tr>
+<tr>
+<td><code>n_sentences</code></td>
+<td>Number of sentences</td>
+<td>Split by <code>.</code>, <code>!</code>, <code>?</code> and
+count</td>
+</tr>
+<tr>
+<td><code>n_caps_words</code></td>
+<td>Number of UPPERCASE words</td>
+<td>Count words that are all caps</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS for <code>n_sentences</code>:</strong>
+<ul>
+<li>Use <code>df['review'].str.count(r'[.!?]')</code>.</li>
+<li>Sentences end with <code>.</code>, <code>!</code>, or
+<code>?</code>.</li>
+</ul></li>
+<li><strong>HINTS for <code>n_caps_words</code>:</strong>
+<ul>
+<li><p>You need to split the review into words.</p></li>
+<li><p>Then count how many words are all uppercase AND have at least 2
+letters (to avoid counting “I” or “A”).</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> count_caps(text):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> <span class="bu">isinstance</span>(text, <span class="bu">str</span>):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    words <span class="op">=</span> text.split()</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    caps <span class="op">=</span> [w <span class="cf">for</span> w <span class="kw">in</span> words <span class="cf">if</span> w.isupper() <span class="kw">and</span> <span class="bu">len</span>(w) <span class="op">&gt;=</span> ___]</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">len</span>(caps)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;n_caps_words&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;review&#39;</span>].<span class="bu">apply</span>(___)</span></code></pre></div></li>
+<li><p>Fill in the blanks.</p></li>
+</ul></li>
+<li><strong>WHY caps?</strong> “TERRIBLE”, “AWFUL”, “NEVER AGAIN” —
+angry patients SHOUT in text.</li>
+</ul>
+<h3 id="step-4-define-your-keyword-dictionaries">Step 4 — Define your
+keyword dictionaries</h3>
+<p>You will make THREE word lists. Then count appearances per
+review.</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>side_effect_words <span class="op">=</span> [</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;nausea&#39;</span>, <span class="st">&#39;headache&#39;</span>, <span class="st">&#39;dizziness&#39;</span>, <span class="st">&#39;dizzy&#39;</span>, <span class="st">&#39;vomit&#39;</span>, <span class="st">&#39;vomiting&#39;</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;rash&#39;</span>, <span class="st">&#39;itching&#39;</span>, <span class="st">&#39;drowsy&#39;</span>, <span class="st">&#39;drowsiness&#39;</span>, <span class="st">&#39;fatigue&#39;</span>, <span class="st">&#39;tired&#39;</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;insomnia&#39;</span>, <span class="st">&#39;anxiety&#39;</span>, <span class="st">&#39;depression&#39;</span>, <span class="st">&#39;weight gain&#39;</span>, <span class="st">&#39;weight loss&#39;</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;diarrhea&#39;</span>, <span class="st">&#39;constipation&#39;</span>, <span class="st">&#39;dry mouth&#39;</span>, <span class="st">&#39;sweating&#39;</span>, <span class="st">&#39;tremor&#39;</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;pain&#39;</span>, <span class="st">&#39;cramps&#39;</span>, <span class="st">&#39;bleeding&#39;</span>, <span class="st">&#39;swelling&#39;</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>positive_words <span class="op">=</span> [</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;helped&#39;</span>, <span class="st">&#39;great&#39;</span>, <span class="st">&#39;amazing&#39;</span>, <span class="st">&#39;love&#39;</span>, <span class="st">&#39;wonderful&#39;</span>, <span class="st">&#39;excellent&#39;</span>,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;works&#39;</span>, <span class="st">&#39;effective&#39;</span>, <span class="st">&#39;recommend&#39;</span>, <span class="st">&#39;happy&#39;</span>, <span class="st">&#39;relief&#39;</span>, <span class="st">&#39;better&#39;</span>,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;saved&#39;</span>, <span class="st">&#39;lifesaver&#39;</span>, <span class="st">&#39;perfect&#39;</span>,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>negative_words <span class="op">=</span> [</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;terrible&#39;</span>, <span class="st">&#39;useless&#39;</span>, <span class="st">&#39;awful&#39;</span>, <span class="st">&#39;horrible&#39;</span>, <span class="st">&#39;worst&#39;</span>, <span class="st">&#39;waste&#39;</span>,</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;never again&#39;</span>, <span class="st">&#39;do not&#39;</span>, <span class="st">&#39;stopped&#39;</span>, <span class="st">&#39;quit&#39;</span>, <span class="st">&#39;switched&#39;</span>,</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;allergic&#39;</span>, <span class="st">&#39;reaction&#39;</span>, <span class="st">&#39;emergency&#39;</span>, <span class="st">&#39;hospital&#39;</span>,</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div>
+<p>You can extend these lists. Write your own. Show Dr. Anya the list
+and let her add medical terms.</p>
+<h3 id="step-5-count-keywords-per-review">Step 5 — Count keywords per
+review</h3>
+<ul>
+<li><strong>WHAT:</strong> For each review, count how many keywords from
+each list appear.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Lowercase the review first.</p></li>
+<li><p>Then for each word in the list, count appearances.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> count_keywords(text, words):</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> <span class="bu">isinstance</span>(text, <span class="bu">str</span>):</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    text_lower <span class="op">=</span> text.___()</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    total <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> w <span class="kw">in</span> words:</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        total <span class="op">+=</span> text_lower.count(___)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> total</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;n_side_effect_keywords&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;review&#39;</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> t: count_keywords(t, ___))</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;n_positive_keywords&#39;</span>]    <span class="op">=</span> df[<span class="st">&#39;review&#39;</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> t: count_keywords(t, ___))</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;n_negative_keywords&#39;</span>]    <span class="op">=</span> df[<span class="st">&#39;review&#39;</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> t: count_keywords(t, ___))</span></code></pre></div></li>
+<li><p>Fill in the blanks.</p></li>
+</ul></li>
+<li><strong>WHY count by hand instead of ML?</strong> This is a SIMPLE,
+transparent feature. Dr. Anya can EXPLAIN it to the FDA. “Our model
+counted the word ‘nausea’.” That is trustable. ML black boxes are
+not.</li>
+</ul>
+<h3 id="step-6-three-more-rule-based-flags">Step 6 — Three more
+rule-based flags</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>has_specific_dose</code></td>
+<td>1 if the review mentions a number+unit like “20 mg”</td>
+<td>Regex</td>
+</tr>
+<tr>
+<td><code>mentions_doctor</code></td>
+<td>1 if “doctor”, “dr.”, “physician”, “GP” appears</td>
+<td>Word check</td>
+</tr>
+<tr>
+<td><code>mentions_pregnancy</code></td>
+<td>1 if “pregnant”, “pregnancy”, “trying to conceive” appears</td>
+<td>Word check</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS for <code>has_specific_dose</code>:</strong>
+<ul>
+<li>Use a regex: <code>r'\d+\s*(mg|ml|mcg|g|iu)'</code>.</li>
+<li><code>df['has_specific_dose'] = df['review'].str.lower().str.contains(r'\d+\s*(mg|ml|mcg|g|iu)', regex=True, na=False).astype(int)</code>.</li>
+</ul></li>
+<li><strong>HINTS for the other two:</strong>
+<ul>
+<li>Use
+<code>.str.lower().str.contains('doctor|physician|gp', regex=True, na=False).astype(int)</code>.</li>
+</ul></li>
+<li><strong>WHY these features?</strong>
+<ul>
+<li><code>has_specific_dose</code>: shows the review is detailed and
+credible.</li>
+<li><code>mentions_doctor</code>: shows the patient followed medical
+guidance.</li>
+<li><code>mentions_pregnancy</code>: critical for safety analysis.
+Pharma companies care a LOT about pregnancy-related reviews.</li>
+</ul></li>
+</ul>
+<h3 id="step-7-save">Step 7 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/drug_reviews_lab/reviews_step3.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-dr.-anya-1">Phase C — Make ONE chart
+for Dr. Anya</h2>
+<h3
+id="dr.-anyas-chart-side-effect-keywords-predict-low-ratings">Dr. Anya’s
+chart — “Side-effect keywords predict low ratings”</h3>
+<p>A bar chart showing: bin <code>n_side_effect_keywords</code> into 5
+buckets, show the <strong>mean rating</strong> in each bucket.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>pd.cut(df['n_side_effect_keywords'], bins=[-0.1, 0, 1, 3, 5, 50])</code>.</li>
+<li>GroupBy that, take the mean of <code>rating</code>.</li>
+<li>Bar chart.</li>
+</ul></li>
+<li><strong>Title:</strong>
+<code>"Average rating drops as side-effect words appear"</code>.</li>
+<li><strong>X-label:</strong>
+<code>"Number of side-effect keywords in the review"</code>.</li>
+<li><strong>Y-label:</strong> <code>"Average rating (1-10)"</code>.</li>
+<li><strong>Takeaway for Dr. Anya:</strong> “Reviews with zero
+side-effect words average 8 stars. Reviews with 5+ side-effect words
+average 3 stars. Counting these words alone tells us a lot. If a new
+drug shows a sudden spike in side-effect word counts, that is an early
+warning.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-3">Common mistakes in Class 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Forget to lowercase before keyword count</td>
+<td>“Nausea” is counted but “NAUSEA” is not.</td>
+</tr>
+<tr>
+<td>Use <code>delivery_days</code>-style “future” features</td>
+<td>(Not applicable here, but never use a column that depends on the
+rating itself.)</td>
+</tr>
+<tr>
+<td>Forget <code>na=False</code> on <code>str.contains</code></td>
+<td>NaN values become True. Wrong counts.</td>
+</tr>
+<tr>
+<td>Use the count of one word (“pain”) that is ALSO a condition</td>
+<td>“Pain” is both a side effect AND a condition name. Be careful.</td>
+</tr>
+<tr>
+<td>Make the keyword list too small</td>
+<td>If your list has only 3 words, the feature is weak.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-4">Self-check before Class 4</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>is_effective</code> exists.
+Mean ~65-70%.</label></li>
+<li><label><input type="checkbox" /><code>review_year</code>,
+<code>review_month</code>, <code>review_age_years</code>
+exist.</label></li>
+<li><label><input type="checkbox" /><code>review_length</code>,
+<code>n_sentences</code>, <code>n_caps_words</code> exist.</label></li>
+<li><label><input type="checkbox" /><code>n_side_effect_keywords</code>,
+<code>n_positive_keywords</code>, <code>n_negative_keywords</code>
+exist.</label></li>
+<li><label><input type="checkbox" /><code>has_specific_dose</code>,
+<code>mentions_doctor</code>, <code>mentions_pregnancy</code>
+exist.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 explanatory chart.</label></li>
+<li><label><input type="checkbox" /><code>reviews_step3.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-4-feature-selection">Class 4 — Feature Selection</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Now you have ~22 columns.
+Dr. Anya says: “Too many. Some are duplicates. Some are useless. Pick
+the ones the model actually needs. And remember: I want a model I can
+EXPLAIN to the FDA.”</p>
+</blockquote>
+<h2 id="your-goal-3">Your goal</h2>
+<p>Pick the best columns. Drop the useless ones. Justify every choice.
+Remember: in Module 4 you might do regression (predict
+<code>rating</code>) OR classification (predict
+<code>is_effective</code>). Your selection should work for both.</p>
+<h2 id="inputs-3">Inputs</h2>
+<ul>
+<li><code>reviews_step3.parquet</code></li>
+</ul>
+<h2 id="outputs-3">Outputs</h2>
+<ul>
+<li><code>reviews_step4.parquet</code> in Drive (only the selected
+columns + <code>rating</code> + <code>is_effective</code>)</li>
+<li>3+ exploratory charts (correlation heatmap, mutual info bars,
+importance bars)</li>
+<li>A short markdown report explaining your choices</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-2">Phase A — Explore the data
+first</h2>
+<h3
+id="exploratory-chart-1-correlation-heatmap-of-numeric-columns">Exploratory
+chart 1 — Correlation heatmap of numeric columns</h3>
+<ul>
+<li><strong>Question:</strong> “Which columns say the same thing as each
+other?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute <code>df[numeric_cols].corr()</code>.</li>
+<li>Plot with <code>sns.heatmap()</code>.</li>
+<li>Use <code>annot=True</code> and <code>fmt='.2f'</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Pairs of columns with |corr| &gt;
+0.9 are redundant. For example, <code>review_length</code> and
+<code>n_sentences</code> are probably highly correlated.</li>
+</ul>
+<h3 id="exploratory-chart-2-mutual-information-bar-chart">Exploratory
+chart 2 — Mutual information bar chart</h3>
+<ul>
+<li>After you compute mutual info (Step 4 below), plot it.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Sort the values, then bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Which columns predict
+<code>rating</code> (or <code>is_effective</code>) strongest.</li>
+</ul>
+<h3
+id="exploratory-chart-3-random-forest-feature-importance">Exploratory
+chart 3 — Random Forest feature importance</h3>
+<ul>
+<li>After you train the RF (Step 5 below), plot the importances.</li>
+<li><strong>HINTS:</strong>
+<code>pd.Series(rf.feature_importances_, index=...).sort_values().plot.barh()</code>.</li>
+<li><strong>What you learn:</strong> A second opinion on feature
+importance.</li>
+</ul>
+<hr />
+<h2 id="phase-b-select-features">Phase B — Select features</h2>
+<h3 id="step-1-split-into-train-and-test-first">Step 1 — Split into
+train and test FIRST</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>train_test_split</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.model_selection import train_test_split</code>.</li>
+<li><code>X = df.drop(['rating', 'is_effective', 'review'], axis=1)</code>.</li>
+<li><code>y = df['is_effective']</code>.</li>
+<li>Pass: <code>test_size=0.2</code>, <code>random_state=42</code>,
+<code>stratify=y</code>.</li>
+</ul></li>
+<li><strong>WHY drop <code>review</code> from X?</strong> It is text. We
+will use it in Module 7, not now. But we save it in the final file.</li>
+<li><strong>WHY split FIRST?</strong> All next steps (target encoding,
+mutual info) must use TRAIN ONLY. Otherwise leakage.</li>
+</ul>
+<h3 id="step-2-recompute-target-encoding-on-train-only">Step 2 —
+Recompute target encoding on TRAIN ONLY</h3>
+<ul>
+<li><strong>WHAT:</strong> In Class 2 you did
+<code>drugName_target_encoded</code> with the full data. That was
+leakage. Fix it now.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>drug_avg_train = X_train.groupby('drugName')['rating'].mean()</code>
+— wait, <code>rating</code> is not in X. So use <code>y_train</code>
+indirectly. Skeleton:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>train_temp <span class="op">=</span> X_train.copy()</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>train_temp[<span class="st">&#39;rating&#39;</span>] <span class="op">=</span> df.loc[X_train.index, <span class="st">&#39;rating&#39;</span>]</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>drug_avg_train <span class="op">=</span> train_temp.groupby(<span class="st">&#39;___&#39;</span>)[<span class="st">&#39;___&#39;</span>].mean()</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>X_train[<span class="st">&#39;drugName_target_encoded&#39;</span>] <span class="op">=</span> X_train[<span class="st">&#39;drugName&#39;</span>].<span class="bu">map</span>(drug_avg_train)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>X_test[<span class="st">&#39;drugName_target_encoded&#39;</span>]  <span class="op">=</span> X_test[<span class="st">&#39;drugName&#39;</span>].<span class="bu">map</span>(drug_avg_train)  <span class="co"># use TRAIN map!</span></span></code></pre></div></li>
+<li><p>Fill in the blanks.</p></li>
+<li><p>For drugs in test that were not in train, the result will be NaN.
+Fill with the global train mean.</p></li>
+</ul></li>
+<li><strong>WHY:</strong> This is the core idea of preventing data
+leakage. The test set must look like “new data” to the model.</li>
+</ul>
+<h3 id="step-3-remove-low-variance-columns">Step 3 — Remove low-variance
+columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop columns where almost all values are the
+same.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import VarianceThreshold</code>.</li>
+<li><code>VarianceThreshold(threshold=0.01)</code> then
+<code>.fit_transform(X_train[numeric_cols])</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-4-remove-highly-correlated-columns">Step 4 — Remove highly
+correlated columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop one of each pair where |corr| &gt;
+0.9.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute correlation matrix.</li>
+<li>Get the upper triangle with <code>np.triu(...)</code>.</li>
+<li>For each column, if any of its upper-triangle correlations is &gt;
+0.9, mark it for dropping.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Likely <code>review_length</code> and
+<code>n_sentences</code> are too similar. Keep one.</li>
+</ul>
+<h3 id="step-5-rank-by-mutual-information">Step 5 — Rank by mutual
+information</h3>
+<ul>
+<li><strong>WHAT:</strong> Score each column by how much it tells you
+about <code>is_effective</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import mutual_info_classif</code>.</li>
+<li><code>mi = mutual_info_classif(X_train_numeric, y_train)</code>.</li>
+<li>Put in a Series, sort.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> <code>n_side_effect_keywords</code>,
+<code>n_negative_keywords</code>, <code>n_positive_keywords</code>,
+<code>drugName_target_encoded</code>,
+<code>condition_top10_bucket</code> should be at the top.</li>
+</ul>
+<h3 id="step-6-random-forest-importance-second-opinion">Step 6 — Random
+Forest importance (second opinion)</h3>
+<ul>
+<li><strong>WHAT:</strong> Train a small RF, look at
+<code>feature_importances_</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.ensemble import RandomForestClassifier</code>.</li>
+<li><code>RandomForestClassifier(n_estimators=50, max_depth=8, n_jobs=-1, random_state=42)</code>.</li>
+<li><code>.fit(X_train, y_train)</code>.</li>
+<li>Look at <code>.feature_importances_</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-7-pick-the-final-columns">Step 7 — Pick the final
+columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Combine the rankings. Pick columns that:
+<ul>
+<li>Are high in mutual info, AND</li>
+<li>Are high in RF importance, AND</li>
+<li>Were not dropped by variance/correlation pruning.</li>
+</ul></li>
+<li><strong>WRITE DOWN:</strong> In your notebook, list the columns.
+Explain in 1 sentence why each one is in.</li>
+</ul>
+<h3 id="step-8-save">Step 8 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong> Keep only the selected columns +
+<code>rating</code> + <code>is_effective</code> + <code>review</code>
+(for Module 7). Save as <code>reviews_step4.parquet</code> to
+Drive.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-dr.-anya-2">Phase C — Make ONE chart
+for Dr. Anya</h2>
+<h3
+id="dr.-anyas-chart-these-are-the-words-that-predict-effectiveness">Dr. Anya’s
+chart — “These are the words that predict effectiveness”</h3>
+<p>A horizontal bar chart of your top 10 features and their importance
+score.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use the RF importance.</li>
+<li><code>sort_values()</code> then <code>.head(10)</code> then
+<code>.plot.barh()</code>.</li>
+</ul></li>
+<li><strong>Title:</strong>
+<code>"Top 10 predictors of effective rating"</code>.</li>
+<li><strong>Y-axis:</strong> column names.</li>
+<li><strong>X-axis:</strong> Random Forest importance.</li>
+<li><strong>Takeaway:</strong> “Side-effect word count and the drug’s
+average historical rating predict 60% of the signal. Everything else is
+small. We can build a transparent, simple model.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-4">Common mistakes in Class 4</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compute mutual info on the FULL data</td>
+<td>Leakage.</td>
+</tr>
+<tr>
+<td>Compute target encoding on the FULL data</td>
+<td>Leakage.</td>
+</tr>
+<tr>
+<td>Drop columns without writing why</td>
+<td>Module 4 students will not understand.</td>
+</tr>
+<tr>
+<td>Keep <code>review</code> as a numeric feature</td>
+<td>Crash. It is text. Keep it in the file but NOT in the model input
+for now.</td>
+</tr>
+<tr>
+<td>Drop <code>n_side_effect_keywords</code> because it correlates with
+rating</td>
+<td>This is NOT leakage. The feature is computed from the TEXT, not the
+rating itself. Keep it.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-5">Self-check before Class 5</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Train/test split done
+FIRST.</label></li>
+<li><label><input type="checkbox" />Target encoding computed on TRAIN
+ONLY.</label></li>
+<li><label><input type="checkbox" />Final ~15 columns +
+<code>rating</code> + <code>is_effective</code> +
+<code>review</code>.</label></li>
+<li><label><input type="checkbox" />You wrote down WHY for each kept
+column.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Dr. Anya.</label></li>
+<li><label><input type="checkbox" /><code>reviews_step4.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-5-pipelines">Class 5 — Pipelines</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Dr. Anya says: “Your cleaning
+code is in 4 different notebooks. When a new review arrives tomorrow,
+you cannot copy 4 notebooks to the server. We need ONE object that does
+everything.”</p>
+</blockquote>
+<h2 id="your-goal-4">Your goal</h2>
+<p>Put EVERY cleaning step inside ONE Pipeline object. Production-ready
+code. Try both REGRESSION (predict <code>rating</code>) and
+CLASSIFICATION (predict <code>is_effective</code>).</p>
+<h2 id="inputs-4">Inputs</h2>
+<ul>
+<li><code>reviews_step4.parquet</code> (selected columns)</li>
+</ul>
+<h2 id="outputs-4">Outputs</h2>
+<ul>
+<li><code>drug_reviews_pipeline.joblib</code> saved in Drive</li>
+<li>1 confusion-matrix chart + 1 ROC curve chart (classification)</li>
+<li>1 scatter plot of predicted-vs-actual ratings (regression)</li>
+<li>A pipeline that takes RAW input and produces predictions</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-3">Phase A — Explore the data
+first</h2>
+<h3
+id="exploratory-chart-1-confusion-matrix-after-classification-training">Exploratory
+chart 1 — Confusion matrix (after classification training)</h3>
+<ul>
+<li>After you train the classifier, build a confusion matrix.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay</code>.</li>
+<li><code>cm = confusion_matrix(y_test, y_pred)</code>.</li>
+<li><code>ConfusionMatrixDisplay(cm, display_labels=['Not effective', 'Effective']).plot()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> How many “effective” did we CATCH?
+How many did we MISS?</li>
+</ul>
+<h3 id="exploratory-chart-2-roc-curve">Exploratory chart 2 — ROC
+curve</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.metrics import RocCurveDisplay</code>.</li>
+<li><code>RocCurveDisplay.from_estimator(pipeline, X_test, y_test)</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The trade-off between recall and
+false alarms. The AUC number.</li>
+</ul>
+<h3
+id="exploratory-chart-3-predicted-vs-actual-rating-regression">Exploratory
+chart 3 — Predicted vs actual rating (regression)</h3>
+<ul>
+<li>After you train a regression model:</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Scatter plot: x-axis = true rating, y-axis = predicted rating.</li>
+<li>Draw a diagonal line for reference.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Where the model is correct, where
+it makes mistakes.</li>
+</ul>
+<hr />
+<h2 id="phase-b-build-the-pipeline">Phase B — Build the pipeline</h2>
+<h3
+id="step-1-decide-which-columns-are-numeric-and-which-are-categorical">Step
+1 — Decide which columns are numeric and which are categorical</h3>
+<ul>
+<li><strong>HINTS:</strong> Make two lists.</li>
+<li><strong>EXAMPLE:</strong>
+<ul>
+<li>numeric: <code>usefulCount_log</code>, <code>review_year</code>,
+<code>review_month</code>, <code>review_age_years</code>,
+<code>review_length</code>, <code>n_sentences</code>,
+<code>n_caps_words</code>, <code>n_side_effect_keywords</code>,
+<code>n_positive_keywords</code>, <code>n_negative_keywords</code>,
+<code>has_specific_dose</code>, <code>mentions_doctor</code>,
+<code>mentions_pregnancy</code>,
+<code>drugName_target_encoded</code>.</li>
+<li>categorical: <code>condition_top10_bucket</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-2-build-the-numeric-mini-pipeline">Step 2 — Build the
+numeric mini-pipeline</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer (fill missing) +
+scaler.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.pipeline import Pipeline</code>.</p></li>
+<li><p><code>from sklearn.impute import SimpleImputer</code>.</p></li>
+<li><p><code>from sklearn.preprocessing import StandardScaler</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>numeric_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;scaler&#39;</span>,  StandardScaler()),</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in the blank: best strategy for numeric?
+(<code>'median'</code>)</p></li>
+</ul></li>
+</ul>
+<h3 id="step-3-build-the-categorical-mini-pipeline">Step 3 — Build the
+categorical mini-pipeline</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer + one-hot encoder.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.preprocessing import OneHotEncoder</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>categorical_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;onehot&#39;</span>,  OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">&#39;___&#39;</span>, sparse_output<span class="op">=</span>___)),</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in blanks. (Strategy <code>'most_frequent'</code>,
+handle_unknown <code>'ignore'</code>, sparse_output
+<code>False</code>.)</p></li>
+</ul></li>
+<li><strong>WHY <code>handle_unknown='ignore'</code>?</strong> In
+production, a new condition bucket may appear. We do not want the code
+to crash.</li>
+</ul>
+<h3 id="step-4-combine-into-a-columntransformer">Step 4 — Combine into a
+ColumnTransformer</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.compose import ColumnTransformer</code>.</li>
+<li>It takes a list of tuples:
+<code>(name, transformer, list_of_columns)</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-5a-add-the-classifier-on-top-is_effective">Step 5a — Add
+the CLASSIFIER on top (<code>is_effective</code>)</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.linear_model import LogisticRegression</code>.</li>
+<li><code>LogisticRegression(class_weight='balanced', max_iter=1000, random_state=42)</code>.</li>
+<li>Put it in a Pipeline with the preprocessor.</li>
+</ul></li>
+<li><strong>WHY <code>class_weight='balanced'</code>?</strong> About
+65-70% of reviews are “effective”. Without <code>balanced</code>, the
+model just predicts “effective” for everyone and gets 65% accuracy (but
+useless).</li>
+</ul>
+<h3 id="step-5b-add-the-regressor-on-top-rating">Step 5b — Add the
+REGRESSOR on top (<code>rating</code>)</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.linear_model import Ridge</code>.</li>
+<li><code>Ridge(alpha=1.0, random_state=42)</code>.</li>
+<li>Put it in a SECOND Pipeline with the same preprocessor.</li>
+</ul></li>
+<li><strong>WHY Ridge instead of LinearRegression?</strong> Ridge
+handles correlated features better. We have several “count”
+features.</li>
+</ul>
+<h3 id="step-6-train-and-evaluate-both">Step 6 — Train and evaluate
+BOTH</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Classifier:
+<ul>
+<li><code>classifier_pipeline.fit(X_train, y_train_eff)</code>.</li>
+<li><code>y_pred = classifier_pipeline.predict(X_test)</code>.</li>
+<li><code>from sklearn.metrics import classification_report</code>.</li>
+</ul></li>
+<li>Regressor:
+<ul>
+<li><code>regressor_pipeline.fit(X_train, y_train_rating)</code>.</li>
+<li><code>y_pred_rating = regressor_pipeline.predict(X_test)</code>.</li>
+<li><code>from sklearn.metrics import mean_absolute_error, r2_score</code>.</li>
+</ul></li>
+</ul></li>
+<li><strong>EXPECTED:</strong>
+<ul>
+<li>Classifier: F1 around 0.65-0.75.</li>
+<li>Regressor: MAE around 2-2.5 (rating is 1-10 scale).</li>
+<li>Both are baselines. Module 4 will improve.</li>
+</ul></li>
+</ul>
+<h3 id="step-7-save-the-trained-pipelines">Step 7 — Save the trained
+pipelines</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>import joblib</code>.</li>
+<li><code>joblib.dump(classifier_pipeline, '/content/drive/MyDrive/drug_reviews_lab/drug_reviews_classifier.joblib')</code>.</li>
+<li><code>joblib.dump(regressor_pipeline, '/content/drive/MyDrive/drug_reviews_lab/drug_reviews_regressor.joblib')</code>.</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-dr.-anya-3">Phase C — Make ONE chart
+for Dr. Anya</h2>
+<h3
+id="dr.-anyas-chart-where-the-model-is-right-and-where-it-is-wrong">Dr. Anya’s
+chart — “Where the model is right and where it is wrong”</h3>
+<p>Show the confusion matrix as a labeled table or heatmap. Add the
+numbers.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Predicted not effective</th>
+<th>Predicted effective</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Actually not effective</strong></td>
+<td>true negatives</td>
+<td>false alarms</td>
+</tr>
+<tr>
+<td><strong>Actually effective</strong></td>
+<td>missed effective</td>
+<td>caught effective</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong> Use <code>seaborn.heatmap()</code> on the
+confusion matrix with <code>annot=True, fmt='d'</code>.</li>
+<li><strong>Title:</strong>
+<code>"Of 10,000 'not effective' reviews, our baseline catches ~6,800"</code>.</li>
+<li><strong>Takeaway for Dr. Anya:</strong> “We catch about 70% of
+negative reviews. We sometimes flag a happy review as negative. Module 4
+will tune this. Also: most errors are on borderline cases (rating 6-7),
+which are hard for any human too.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-5">Common mistakes in Class 5</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Build the pipeline AFTER you scaled the data manually</td>
+<td>Pipeline scales it twice. Numbers wrong.</td>
+</tr>
+<tr>
+<td>Forget <code>sparse_output=False</code> in OneHotEncoder</td>
+<td>Some downstream code breaks.</td>
+</tr>
+<tr>
+<td>Use <code>class_weight='balanced'</code> AND SMOTE</td>
+<td>Over-correction. Pick one.</td>
+</tr>
+<tr>
+<td>Forget <code>random_state</code></td>
+<td>Results change every run. Hard to debug.</td>
+</tr>
+<tr>
+<td>Use <code>LinearRegression</code> and get negative predictions</td>
+<td><code>Ridge</code> with simple post-processing (clip to 1-10) is
+safer.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-6">Self-check before Class 6</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Pipeline has preprocessor +
+model.</label></li>
+<li><label><input type="checkbox" />Preprocessor has numeric +
+categorical transformers.</label></li>
+<li><label><input type="checkbox" /><code>handle_unknown='ignore'</code>
+set.</label></li>
+<li><label><input type="checkbox" /><code>class_weight='balanced'</code>
+set (classifier).</label></li>
+<li><label><input type="checkbox" />Confusion matrix + ROC curve +
+scatter (regression) charts.</label></li>
+<li><label><input type="checkbox" />Both pipelines saved to
+Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-6-end-to-end-lab-the-big-one">Class 6 — End-to-End Lab
+(THE BIG ONE)</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Dr. Anya is in the meeting room.
+She wants the FINAL clean dataset on her desk in 90 minutes. This is the
+lab.</p>
+</blockquote>
+<h2 id="your-goal-5">Your goal</h2>
+<p>Take 2 raw TSV files. Produce ONE final <code>.parquet</code> file
+with the exact 22-column schema. Plus a 1-page findings report.</p>
+<h2 id="time">Time</h2>
+<p><strong>90 minutes</strong> of focused work.</p>
+<h2 id="inputs-5">Inputs</h2>
+<ul>
+<li>The 2 raw TSV files in your Drive folder</li>
+</ul>
+<h2 id="outputs-5">Outputs</h2>
+<ul>
+<li><code>drug_reviews_clean.parquet</code> (~215,000 rows × 22 columns)
+in Drive</li>
+<li><code>findings.md</code> (~1 page)</li>
+<li>Your full Colab notebook</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-10-minutes">Phase A — Explore the
+data first (10 minutes)</h2>
+<p>You will reuse charts from Classes 1-5. Pick 3 of them. Put them all
+on ONE PAGE of your notebook with markdown headers: 1. Rating
+distribution (the U-shape) 2. Side-effect keyword count vs rating (your
+most important chart) 3. Top 10 most important features</p>
+<p>These 3 charts tell Dr. Anya the whole story.</p>
+<hr />
+<h2 id="phase-b-build-the-final-dataset-70-minutes">Phase B — Build the
+final dataset (70 minutes)</h2>
+<h3 id="required-output-schema">Required output schema</h3>
+<p>Your <code>drug_reviews_clean.parquet</code> MUST have these 22
+columns, with these names and types:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>Column</th>
+<th>Type</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>review_id</code></td>
+<td>int</td>
+<td>renamed from uniqueID</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>drugName</code></td>
+<td>string</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>drugName_target_encoded</code></td>
+<td>float</td>
+<td>engineered (TRAIN-only mean)</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>condition</code></td>
+<td>string</td>
+<td>raw, NaN filled with “Unknown”</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>condition_top10_bucket</code></td>
+<td>string</td>
+<td>engineered (Mental Health, Pain, etc. + Other)</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>usefulCount</code></td>
+<td>int</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>usefulCount_log</code></td>
+<td>float</td>
+<td>engineered (np.log1p)</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>review_year</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>review_month</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>review_age_years</code></td>
+<td>float</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>review_length</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>n_sentences</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>n_caps_words</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>n_side_effect_keywords</code></td>
+<td>int</td>
+<td>engineered (rule-based count)</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>n_positive_keywords</code></td>
+<td>int</td>
+<td>engineered (rule-based count)</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>n_negative_keywords</code></td>
+<td>int</td>
+<td>engineered (rule-based count)</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>has_specific_dose</code></td>
+<td>int (0/1)</td>
+<td>engineered (regex)</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>mentions_doctor</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>mentions_pregnancy</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>is_effective</code></td>
+<td>int (0/1)</td>
+<td>engineered (rating &gt;= 7)</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>rating</code></td>
+<td>int 1-10</td>
+<td>TARGET (raw)</td>
+</tr>
+<tr>
+<td>22</td>
+<td><code>review</code></td>
+<td>string</td>
+<td>raw, kept for Module 7</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lab-phases-timed">Lab phases (timed)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Time</th>
+<th>What you do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Load</td>
+<td>10 min</td>
+<td>Load both TSVs with <code>sep='\t'</code>. Confirm shapes.</td>
+</tr>
+<tr>
+<td>2. Combine + clean</td>
+<td>15 min</td>
+<td><code>pd.concat</code>, rename, parse date, fill missing
+<code>condition</code>.</td>
+</tr>
+<tr>
+<td>3. Bucket conditions + encode</td>
+<td>10 min</td>
+<td>Map top 10 to named groups. Add <code>"Other"</code>.</td>
+</tr>
+<tr>
+<td>4. Train/test split BEFORE encoding</td>
+<td>5 min</td>
+<td>So target encoding uses train only.</td>
+</tr>
+<tr>
+<td>5. Engineered features</td>
+<td>25 min</td>
+<td>usefulCount_log, date parts, text-shape, keyword counts, regex
+flags, <code>is_effective</code>.</td>
+</tr>
+<tr>
+<td>6. Validate schema + save</td>
+<td>10 min</td>
+<td>Check all 22 columns. Save <code>.parquet</code>.</td>
+</tr>
+<tr>
+<td>7. Findings</td>
+<td>15 min</td>
+<td>Write <code>findings.md</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total: 90 minutes.</strong></p>
+<h3 id="validation-checklist-run-before-saving">Validation checklist
+(run before saving)</h3>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>expected_cols <span class="op">=</span> [</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;review_id&#39;</span>, <span class="st">&#39;drugName&#39;</span>, <span class="st">&#39;drugName_target_encoded&#39;</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;condition&#39;</span>, <span class="st">&#39;condition_top10_bucket&#39;</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;usefulCount&#39;</span>, <span class="st">&#39;usefulCount_log&#39;</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;review_year&#39;</span>, <span class="st">&#39;review_month&#39;</span>, <span class="st">&#39;review_age_years&#39;</span>,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;review_length&#39;</span>, <span class="st">&#39;n_sentences&#39;</span>, <span class="st">&#39;n_caps_words&#39;</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;n_side_effect_keywords&#39;</span>, <span class="st">&#39;n_positive_keywords&#39;</span>, <span class="st">&#39;n_negative_keywords&#39;</span>,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;has_specific_dose&#39;</span>, <span class="st">&#39;mentions_doctor&#39;</span>, <span class="st">&#39;mentions_pregnancy&#39;</span>,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;is_effective&#39;</span>, <span class="st">&#39;rating&#39;</span>, <span class="st">&#39;review&#39;</span>,</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">sorted</span>(df.columns.tolist()) <span class="op">==</span> <span class="bu">sorted</span>(expected_cols), <span class="st">&quot;Schema mismatch!&quot;</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> df.shape[<span class="dv">0</span>] <span class="op">&gt;</span> <span class="dv">200_000</span>, <span class="st">&quot;Too few rows!&quot;</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> df[<span class="st">&#39;rating&#39;</span>].between(<span class="dv">1</span>, <span class="dv">10</span>).<span class="bu">all</span>(), <span class="st">&quot;Rating out of range!&quot;</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> df[<span class="st">&#39;is_effective&#39;</span>].isin([<span class="dv">0</span>, <span class="dv">1</span>]).<span class="bu">all</span>(), <span class="st">&quot;is_effective not binary!&quot;</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Schema OK. Rows:&quot;</span>, df.shape[<span class="dv">0</span>])</span></code></pre></div>
+<hr />
+<h2 id="phase-c-findings-report-for-dr.-anya-15-minutes">Phase C —
+Findings report for Dr. Anya (15 minutes)</h2>
+<p>Write <code>findings.md</code> with these sections:</p>
+<h3 id="final-numbers">Final numbers</h3>
+<ul>
+<li>Final row count: ____</li>
+<li><code>is_effective</code> rate: ____% (should be 65-75%)</li>
+<li>Number of unique drugs: ____</li>
+<li>Number of named condition buckets: ____</li>
+</ul>
+<h3 id="top-3-insights">Top 3 insights</h3>
+<ol type="1">
+<li><hr /></li>
+<li><hr /></li>
+<li><hr /></li>
+</ol>
+<p>(Example insight: “Reviews with 5+ side-effect words have an average
+rating of 3.2, vs 8.1 for reviews with zero side-effect words.”)</p>
+<h3 id="one-question-to-investigate-in-module-4">One question to
+investigate in Module 4</h3>
+<ul>
+<li><hr /></li>
+</ul>
+<h3 id="one-ethical-concern">One ethical concern</h3>
+<ul>
+<li>_____ (Example: “Some reviews mention pregnancy and specific doses.
+We must NEVER use the model to make medical decisions. The model is for
+research only.”)</li>
+</ul>
+<h3 id="one-chart-that-summarizes-everything">One chart that summarizes
+everything</h3>
+<p>Embed your most important chart (the side-effect keywords vs rating
+one).</p>
+<hr />
+<h2 id="grading-rubric-100-points">Grading rubric (100 points)</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All 22 columns exist with the right names and dtypes</td>
+<td>25</td>
+</tr>
+<tr>
+<td>Cleaning decisions written in markdown</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Pipeline is reproducible (re-run from 2 TSVs in ONE command)</td>
+<td>15</td>
+</tr>
+<tr>
+<td>TSV loaded with <code>sep='\t'</code> (no single-column bug)</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Target encoding uses TRAIN ONLY (no leakage)</td>
+<td>5</td>
+</tr>
+<tr>
+<td><code>is_effective</code> rate is between 65-75%</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>At least 3 exploratory + 1 explanatory chart per
+class</strong></td>
+<td><strong>15</strong></td>
+</tr>
+<tr>
+<td><code>findings.md</code> has insights AND an ethical note</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Code is clean (comments, sensible variable names)</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<h2 id="submit">Submit</h2>
+<p>Upload to
+<code>module-3/class_6/submissions/&lt;YourTeamName&gt;/</code>: -
+<code>drug_reviews_clean.parquet</code> - Your Colab notebook
+(<code>File &gt; Download &gt; Download .ipynb</code>) -
+<code>findings.md</code></p>
+<hr />
+<h1 id="tips-for-the-whole-module">Tips for the whole module</h1>
+<ol type="1">
+<li><strong>Do NOT copy-paste code from this guide.</strong> This guide
+gives you HINTS only. Write the code yourself. You will learn much
+faster.</li>
+<li><strong>Save your notebook to Drive often.</strong> Colab
+disconnects after 12 hours.</li>
+<li><strong>Save intermediate <code>.parquet</code> files to
+Drive</strong> (reviews_step1, reviews_step2, etc.). If something
+breaks, you do not redo everything.</li>
+<li><strong>Pair-program.</strong> One student types, one reads. Switch
+every 20 minutes.</li>
+<li><strong>Make a chart BEFORE you write cleaning code.</strong> You
+must SEE the problem before you can fix it.</li>
+<li><strong>Make a chart AFTER each step.</strong> Confirm your code did
+what you expected.</li>
+<li><strong>Ask the mentor early.</strong> If you are stuck for 20
+minutes, ask. Do not waste an afternoon.</li>
+<li><strong>Respect the patient data.</strong> Do not screenshot full
+reviews. Do not paste reviews into chat apps. Treat them as private even
+though they are technically public.</li>
+<li><strong>Remember the medical context.</strong> This is not
+e-commerce. Wrong answers here could affect health. Always include an
+ethical note in your findings.</li>
+</ol>
+<p>Good luck.</p>
+</main>
+
+<footer class="scenario-footer">
+  <p><a href="../../#/module/3/class/6">&larr; Back to all 15 scenarios</a></p>
+</footer>
+
+</body>
+</html>

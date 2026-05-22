@@ -1,0 +1,2276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>09_bbc_news_m3_lab</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --text: #e6e8ec;
+    --text-dim: #9aa0aa;
+    --accent: #7aa2f7;
+    --accent-hover: #a5c0ff;
+    --border: #2a2f3a;
+    --code-bg: #11141a;
+    --table-header: #232732;
+    --quote-bar: #7aa2f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(26, 29, 36, 0.92);
+  }
+  .topbar-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .back-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .back-link:hover { color: var(--accent-hover); }
+  .pdf-link {
+    background: var(--accent);
+    color: #0f1115;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pdf-link:hover { background: var(--accent-hover); }
+  .pdf-link svg { width: 14px; height: 14px; }
+
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 56px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  p { margin-bottom: 16px; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+  strong { color: #fff; font-weight: 600; }
+  em { color: var(--text); font-style: italic; }
+
+  ul, ol { margin-bottom: 18px; padding-left: 28px; }
+  li { margin-bottom: 6px; }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 36px 0;
+  }
+
+  blockquote {
+    border-left: 4px solid var(--quote-bar);
+    background: var(--card);
+    padding: 14px 22px;
+    margin: 18px 0;
+    color: var(--text);
+    border-radius: 0 8px 8px 0;
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  blockquote strong { color: var(--accent); }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    font-size: 0.88em;
+    color: #f0a3b5;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 18px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text);
+    font-size: 1em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.94rem;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  thead { background: var(--table-header); }
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+
+  /* Checkboxes in self-check lists */
+  input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+
+  /* Anchored sections for nav */
+  h2[id], h3[id] { scroll-margin-top: 80px; }
+
+  footer.scenario-footer {
+    max-width: 920px;
+    margin: 60px auto 40px;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+  footer.scenario-footer a {
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    main { padding: 24px 16px 60px; }
+    h1 { font-size: 1.7rem; }
+    h2 { font-size: 1.35rem; }
+    h3 { font-size: 1.1rem; }
+    .topbar { padding: 10px 16px; }
+    pre { font-size: 0.8rem; padding: 12px 14px; }
+    table { font-size: 0.85rem; }
+    th, td { padding: 9px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="../../#/module/3/class/6">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <span style="display:inline-block;transform:translateY(-1px)">&larr;</span> Back to all scenarios
+    </a>
+    <a class="pdf-link" href="09_bbc_news_m3_lab.pdf" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-4-4h3V4h2v8h3l-4 4zm-8 4v-2h16v2H4z"/></svg>
+      Download as PDF
+    </a>
+  </div>
+</div>
+
+<main>
+<h1 id="bbc-news-module-3-lab-guide">BBC News — Module 3 Lab Guide</h1>
+<p><strong>Scenario:</strong> BBC newsroom. Auto-classify articles into
+the right desk (Business, Entertainment, Politics, Sport, Tech).
+<strong>Module:</strong> 3 (Data Preparation and Feature Engineering)
+<strong>Audience:</strong> Adult learners, A2 English. New to AI.
+<strong>Tools:</strong> Google Colab (no install needed).</p>
+<hr />
+<h1 id="the-scenario-your-mission">The Scenario — Your Mission</h1>
+<h2 id="where-you-work">Where you work</h2>
+<p>You and your team are new data analysts at the <strong>BBC</strong>
+(British Broadcasting Corporation). The BBC is the biggest news
+organisation in the United Kingdom. Millions of people read BBC News
+every day.</p>
+<p>Every day: - <strong>10,000 articles</strong> arrive from wire
+services (Reuters, AP, AFP). - Each article must go to the right desk:
+Business, Entertainment, Politics, Sport, or Tech. - An editor reads
+each title and sends the article to the correct desk.</p>
+<h2 id="the-problem">The problem</h2>
+<p>A human editor reads the title, then routes the article. This is
+slow. Also, when the editor is tired (at 3 a.m.), mistakes happen. A
+sports story goes to the Politics desk. A tech story goes to
+Entertainment.</p>
+<p>Bad routing means: - Slow publishing. The competition is faster. -
+Confused readers (a football story on the Business homepage). - Tired
+editors doing boring work instead of real journalism.</p>
+<p>The Head of Editorial Workflow Tech is worried. She calls your team
+into a meeting on Monday morning.</p>
+<h2 id="your-managers-request">Your manager’s request</h2>
+<p>Your manager, <strong>Olivia</strong> (Head of Editorial Workflow
+Tech at BBC), tells you:</p>
+<blockquote>
+<p>“Every day we get 10,000 articles from wire services. Each one needs
+to go to the right desk. Right now a human reads each title and routes
+it. It costs us money. It makes mistakes when they are tired.</p>
+<p>Build me a model that reads an article and routes it in <strong>0.1
+seconds</strong>.</p>
+<p>Then we will do TWO things: 1. The article goes straight to the right
+desk. The editor only checks the difficult ones. 2. Our editors spend
+their time on real journalism, not on clicking ‘send to Sport’.</p>
+<p>If the model is right 95% of the time, we save thousands of hours of
+editor work every year.”</p>
+</blockquote>
+<h2 id="your-teams-job-for-the-next-2-weeks-module-3">Your team’s job
+for the next 2 weeks (Module 3)</h2>
+<p>Olivia cannot do this alone. Her data is <strong>2,225 articles in
+folders</strong> (one folder per category). It is NOT a CSV. It is a ZIP
+of folders with <code>.txt</code> files inside.</p>
+<p>Your job in Module 3: &gt; <strong>Turn 2,225 messy text files into
+ONE clean file. The clean file will be used to train the model in Module
+4.</strong></p>
+<p>The clean file is called <code>bbc_news_clean.parquet</code>. It must
+have <strong>17 specific columns</strong> (we will see them in Class
+6).</p>
+<h2 id="after-module-3">After Module 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Module</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Module 4</strong></td>
+<td>Train the classification model. Olivia finally gets her
+auto-router.</td>
+</tr>
+<tr>
+<td><strong>Module 5</strong></td>
+<td>Find groups of articles (long-form vs short news). For homepage
+design.</td>
+</tr>
+<tr>
+<td><strong>Module 7</strong></td>
+<td>Read the full article text. Find what topics appear inside each
+category.</td>
+</tr>
+</tbody>
+</table>
+<p>You use the <strong>same BBC News dataset</strong> until the end of
+Module 7.</p>
+<h2 id="why-this-scenario-is-special">Why this scenario is special</h2>
+<p>This is the <strong>smallest</strong> dataset in the course. Only
+<strong>2,225 rows</strong>. Most students will think “great, easy!” —
+and they are partly right. The data is small. The categories are nearly
+balanced (~445 articles each).</p>
+<p><strong>BUT</strong> — and this is important — the data is
+<strong>TEXT</strong>. There are almost no numeric columns. You must
+<strong>CREATE the numeric columns from the text yourself.</strong></p>
+<p>This is your first <strong>NLP</strong> (Natural Language Processing)
+project. You will learn how to count words, find names of people, find
+names of countries, and turn a paragraph into numbers a model can
+use.</p>
+<p>No GPU needed. No deep learning. Just smart feature engineering.</p>
+<hr />
+<h1 id="how-this-guide-works-read-this-first">How This Guide Works (Read
+This First!)</h1>
+<h2 id="we-do-not-give-you-the-full-code">We do NOT give you the full
+code</h2>
+<p>In this guide you will see two kinds of content:</p>
+<h3 id="what-why-expected-explained-in-words">1. WHAT / WHY / EXPECTED —
+explained in words</h3>
+<p>For every step you read: - <strong>WHAT</strong> you have to do (in
+normal language) - <strong>WHY</strong> you do it (the reason) -
+<strong>HINTS</strong> — the function names, the arguments to remember -
+<strong>EXPECTED</strong> — the result you should see if you did it
+right</p>
+<h3 id="sometimes-a-tiny-code-skeleton-with-blanks">2. Sometimes a tiny
+code skeleton with blanks</h3>
+<p>For the harder steps we give you a code skeleton with
+<code>___</code> blanks. <strong>You fill in the blanks.</strong></p>
+<h3 id="why-no-full-code">Why no full code?</h3>
+<p>Because you will NOT learn if you copy-paste. - In Module 4, the
+model only works if YOU understand each step. - In your future job,
+nobody will give you the code. - Writing the code yourself takes 10
+minutes more today, but saves 10 hours later.</p>
+<p><strong>Rule:</strong> If you finish a step in 30 seconds by
+copy-pasting from a teammate’s notebook, do it AGAIN by yourself.
+Different variable names, same logic.</p>
+<h2 id="encouraging-words-for-nervous-teams">Encouraging words for
+nervous teams</h2>
+<p>This is text data. You may have never worked with text before.
+<strong>That is normal.</strong></p>
+<p>The good news: - The dataset is <strong>small</strong> (2,225 rows).
+Loading is fast. Everything runs in seconds. - The categories are
+<strong>clean</strong> (5 clear labels). - The categories are
+<strong>balanced</strong> (about 445 articles each). - You do NOT need a
+GPU. You do NOT need to install heavy libraries. - You only need pandas,
+scikit-learn, and one new library: <code>spaCy</code> (for finding names
+in text).</p>
+<p>If you finish early, help your teammates. Text data is new for
+everyone in the room.</p>
+<hr />
+<h1 id="visualizations-two-modes">Visualizations — Two Modes</h1>
+<p>In every class you will make charts. There are <strong>two
+reasons</strong> to make a chart:</p>
+<h2 id="exploratory-charts-for-you">1. Exploratory charts (for YOU)</h2>
+<p>Made BEFORE you clean the data. To understand what the data looks
+like. - Fast, ugly, no labels needed. - Examples:
+<code>df.hist()</code>,
+<code>df['column'].value_counts().plot.bar()</code>.</p>
+<blockquote>
+<p>Goal: <strong>“What does this data look like?”</strong></p>
+</blockquote>
+<h2 id="explanatory-charts-for-olivia">2. Explanatory charts (for
+OLIVIA)</h2>
+<p>Made AFTER you understand. To EXPLAIN something to your manager. -
+Clean, labeled, one clear message. - Must have: title, x-label, y-label,
+source, and a 1-sentence takeaway.</p>
+<blockquote>
+<p>Goal: <strong>“Olivia, look at this. This is the
+pattern.”</strong></p>
+</blockquote>
+<p>In every class you make BOTH kinds.</p>
+<h2 id="your-plotting-toolkit-you-learned-this-in-module-2-class-5">Your
+plotting toolkit (you learned this in Module 2 Class 5)</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Plot</th>
+<th>When to use it</th>
+<th>Function name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Histogram</td>
+<td>See the SHAPE of a numeric column</td>
+<td><code>plt.hist()</code> or <code>sns.histplot()</code></td>
+</tr>
+<tr>
+<td>Bar chart</td>
+<td>Count of each category</td>
+<td><code>df['col'].value_counts().plot.bar()</code></td>
+</tr>
+<tr>
+<td>Box plot</td>
+<td>See outliers in a numeric column</td>
+<td><code>sns.boxplot()</code></td>
+</tr>
+<tr>
+<td>Scatter plot</td>
+<td>See the relationship between 2 numbers</td>
+<td><code>plt.scatter()</code> or <code>sns.scatterplot()</code></td>
+</tr>
+<tr>
+<td>Heatmap</td>
+<td>See correlation between many columns</td>
+<td><code>sns.heatmap(df.corr())</code></td>
+</tr>
+<tr>
+<td>Word cloud</td>
+<td>See most common words in a text column</td>
+<td><code>WordCloud().generate(text)</code></td>
+</tr>
+</tbody>
+</table>
+<p>Before you start: <code>import matplotlib.pyplot as plt</code> and
+<code>import seaborn as sns</code>.</p>
+<hr />
+<h1 id="before-you-start-google-colab-setup">Before You Start — Google
+Colab Setup</h1>
+<p>You will work in <strong>Google Colab</strong>. That means: - You do
+NOT install Python. - You do NOT install pandas, scikit-learn, or
+anything (almost). - You just open a notebook in your web browser.</p>
+<h2 id="step-1-open-a-new-colab-notebook">Step 1 — Open a new Colab
+notebook</h2>
+<ol type="1">
+<li>Go to https://colab.research.google.com</li>
+<li>Sign in with your Google account.</li>
+<li>Click <strong>“New notebook”</strong> (top left).</li>
+<li>Name it <code>bbc_news_module_3.ipynb</code>.</li>
+</ol>
+<h2 id="step-2-connect-to-google-drive">Step 2 — Connect to Google
+Drive</h2>
+<p>Colab files <strong>disappear</strong> when you close the browser. So
+you must save your work to <strong>Google Drive</strong>.</p>
+<p>In the first cell:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> drive</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>drive.mount(<span class="st">&#39;/content/drive&#39;</span>)</span></code></pre></div>
+<p>A pop-up asks for permission. Click “Allow”. After this, Drive is
+available at <code>/content/drive/MyDrive/</code>.</p>
+<h2 id="step-3-create-a-project-folder">Step 3 — Create a project
+folder</h2>
+<p>In a new cell:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&#39;/content/drive/MyDrive/bbc_news_lab&#39;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>cd <span class="op">/</span>content<span class="op">/</span>drive<span class="op">/</span>MyDrive<span class="op">/</span>bbc_news_lab</span></code></pre></div>
+<p>Your team will save ALL files in this folder.</p>
+<h2 id="step-4-get-the-data">Step 4 — Get the data</h2>
+<p>The data is at: http://mlg.ucd.ie/datasets/bbc.html (the original
+source) or on Kaggle as “BBC News Classification”.</p>
+<p><strong>Option A — Direct download (recommended):</strong></p>
+<p>In Colab:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>wget http:<span class="op">//</span>mlg.ucd.ie<span class="op">/</span>files<span class="op">/</span>datasets<span class="op">/</span>bbc<span class="op">-</span>fulltext.<span class="bu">zip</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>unzip <span class="op">-</span>q bbc<span class="op">-</span>fulltext.<span class="bu">zip</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ls bbc<span class="op">/</span></span></code></pre></div>
+<p>You should see <strong>5 folders</strong>: <code>business</code>,
+<code>entertainment</code>, <code>politics</code>, <code>sport</code>,
+<code>tech</code>. Each folder has many <code>.txt</code> files.</p>
+<p><strong>Option B — From Kaggle:</strong></p>
+<ol type="1">
+<li>Make a free Kaggle account.</li>
+<li>Go to kaggle.com/settings/account, scroll to “API”, click “Create
+New Token”. Save the <code>kaggle.json</code> file.</li>
+<li>In Colab:</li>
+</ol>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> files</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>files.upload()    <span class="co"># pick kaggle.json</span></span></code></pre></div>
+<ol start="4" type="1">
+<li>Then:</li>
+</ol>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>mkdir <span class="op">-</span>p <span class="op">~/</span>.kaggle <span class="op">&amp;&amp;</span> mv kaggle.json <span class="op">~/</span>.kaggle<span class="op">/</span> <span class="op">&amp;&amp;</span> chmod <span class="dv">600</span> <span class="op">~/</span>.kaggle<span class="op">/</span>kaggle.json</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install kaggle <span class="op">-</span>q</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kaggle datasets download <span class="op">-</span>d pariza<span class="op">/</span>bbc<span class="op">-</span>news<span class="op">-</span>summary</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>unzip <span class="op">-</span>q bbc<span class="op">-</span>news<span class="op">-</span>summary.<span class="bu">zip</span></span></code></pre></div>
+<h2 id="step-5-install-spacy-and-download-the-english-model">Step 5 —
+Install spaCy and download the English model</h2>
+<p>We need one new library: <strong>spaCy</strong>. It finds names of
+people, places, and companies in text.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install spacy <span class="op">-</span>q</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>python <span class="op">-</span>m spacy download en_core_web_sm</span></code></pre></div>
+<p>This takes about 30 seconds.</p>
+<h2 id="step-6-test-it">Step 6 — Test it</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>folders <span class="op">=</span> os.listdir(<span class="st">&#39;bbc/&#39;</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(folders)</span></code></pre></div>
+<p>Should print something like
+<code>['business', 'entertainment', 'politics', 'sport', 'tech']</code>.
+You are ready.</p>
+<h2 id="colab-tips">Colab tips</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Save your notebook to Drive often</td>
+<td>Colab disconnects after 12 hours.</td>
+</tr>
+<tr>
+<td>Save intermediate <code>.parquet</code> files to Drive</td>
+<td>Files in <code>/content/</code> disappear when Colab
+disconnects.</td>
+</tr>
+<tr>
+<td>Share the notebook with teammates (Share button, top right)</td>
+<td>Editor access. Like Google Docs for code.</td>
+</tr>
+<tr>
+<td>Restart runtime if memory full</td>
+<td>Runtime &gt; Restart runtime.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="class-1-data-cleaning">Class 1 — Data Cleaning</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Olivia gives you a ZIP file with
+5 folders inside. Each folder has about 445 <code>.txt</code> files. The
+folder name is the category. The file content is the article. Your job
+today: load all 2,225 files into ONE DataFrame and clean the text.</p>
+</blockquote>
+<h2 id="your-goal">Your goal</h2>
+<p>Read 2,225 <code>.txt</code> files into one DataFrame. Make 4
+columns: <code>article_id</code>, <code>category</code>,
+<code>headline</code>, <code>text</code>. Clean strange characters.</p>
+<h2 id="inputs">Inputs</h2>
+<ul>
+<li>The 5 folders in <code>bbc/</code></li>
+</ul>
+<h2 id="outputs">Outputs</h2>
+<ul>
+<li><code>articles_step1.parquet</code> saved in your Drive folder</li>
+<li>3+ exploratory charts in your notebook</li>
+<li>1 explanatory chart for Olivia</li>
+<li>Notes in markdown about every decision you made</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-15-minutes">Phase A — Explore the
+data first (15 minutes)</h2>
+<p>Before you load anything, <strong>LOOK</strong> at one file by
+hand.</p>
+<h3 id="exploratory-chart-1-how-many-files-per-category">Exploratory
+chart 1 — How many files per category?</h3>
+<ul>
+<li><strong>Question:</strong> “Are the 5 categories balanced? Or is one
+much bigger?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>os.listdir('bbc/&lt;folder&gt;/')</code> for each of the 5
+folders.</li>
+<li>Use <code>len(...)</code> on the result.</li>
+<li>Plot the 5 counts as a bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The categories should be roughly
+equal (around 400-510 articles each).</li>
+</ul>
+<h3 id="exploratory-chart-2-open-one-file-by-hand">Exploratory chart 2 —
+Open ONE file by hand</h3>
+<ul>
+<li><strong>Question:</strong> “What does an article look like? What is
+the headline? Where does the body start?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Pick any file. Example: <code>bbc/sport/001.txt</code>.</li>
+<li>Open with
+<code>open(path, 'r', encoding='latin-1').read()</code>.</li>
+<li>Print the first 500 characters.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The first line is the HEADLINE.
+Then a blank line. Then the body.</li>
+</ul>
+<h3
+id="exploratory-chart-3-article-length-distribution-rough-estimate">Exploratory
+chart 3 — Article length distribution (rough estimate)</h3>
+<ul>
+<li><strong>Question:</strong> “How long is a typical BBC article?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Pick 100 random files. Count characters of each.</li>
+<li>Histogram the lengths.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Articles range from ~500 to ~5000
+characters. Most are around 2000.</li>
+</ul>
+<hr />
+<h2 id="phase-b-load-and-clean-all-articles-45-minutes">Phase B — Load
+and clean all articles (45 minutes)</h2>
+<h3 id="step-1-walk-through-all-5-folders">Step 1 — Walk through all 5
+folders</h3>
+<ul>
+<li><strong>WHAT:</strong> Visit each of the 5 folders. List the files.
+Read each file. Build a list of dictionaries.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>os.listdir('bbc/&lt;category&gt;/')</code> to get all
+filenames.</li>
+<li>Loop over the 5 categories.</li>
+<li>For each file, build a dict:
+<code>{'article_id': ..., 'category': ..., 'raw_text': ...}</code>.</li>
+<li>Append to a list.</li>
+</ul></li>
+<li><strong>WARNING about encoding:</strong> Some files have non-ASCII
+characters (special quotes, accents). Use
+<code>encoding='latin-1'</code> when opening, not <code>'utf-8'</code>.
+Some files crash with utf-8.</li>
+<li><strong>EXPECTED:</strong> A list of 2,225 dicts.</li>
+</ul>
+<h3 id="step-2-convert-the-list-to-a-dataframe">Step 2 — Convert the
+list to a DataFrame</h3>
+<ul>
+<li><strong>WHAT:</strong> Turn the list of dicts into a pandas
+DataFrame.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df = pd.DataFrame(your_list)</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> A DataFrame with 2,225 rows and 3
+columns: <code>article_id</code>, <code>category</code>,
+<code>raw_text</code>.</li>
+</ul>
+<h3 id="step-3-split-each-article-into-headline-body">Step 3 — Split
+each article into headline + body</h3>
+<ul>
+<li><strong>WHAT:</strong> The first line of each article is the
+HEADLINE. The rest is the body.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>.str.split('\n', n=1)</code> on the <code>raw_text</code>
+column. The argument <code>n=1</code> means “split only once”.</li>
+<li>The result is a list of 2 strings:
+<code>[headline, body]</code>.</li>
+<li>Save them as 2 new columns: <code>headline</code>,
+<code>body</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> The headline is very useful for prediction. A
+title like “Manchester United beat Arsenal” is obviously SPORT. The
+first 3 words alone often give the answer.</li>
+<li><strong>EXPECTED:</strong> Two new columns. Print 5 random headlines
+to confirm.</li>
+</ul>
+<h3
+id="step-4-strip-whitespace-and-remove-empty-lines-from-the-body">Step 4
+— Strip whitespace and remove empty lines from the body</h3>
+<ul>
+<li><strong>WHAT:</strong> The body has many <code>\n\n</code> (double
+newlines, between paragraphs). Some have leading or trailing spaces.
+Clean them up.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>.str.strip()</code> to remove leading/trailing
+spaces.</li>
+<li>To keep paragraph breaks but remove extra blank lines: split by
+<code>'\n\n'</code>, filter empty strings, join with
+<code>'\n\n'</code>. You can do this in a small function and
+<code>.apply()</code> it.</li>
+</ul></li>
+<li><strong>WHY:</strong> Clean text gives better word counts.</li>
+</ul>
+<h3 id="step-5-find-missing-or-empty-articles">Step 5 — Find missing or
+empty articles</h3>
+<ul>
+<li><strong>WHAT:</strong> Count rows where <code>body</code> is empty
+or very short (&lt; 100 characters).</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>(df['body'].str.len() &lt; 100).sum()</code> counts them.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Probably 0 or very few. If &gt; 0,
+decide: drop or keep.</li>
+</ul>
+<h3 id="step-6-check-encoding-problems-strange-characters">Step 6 —
+Check encoding problems (strange characters)</h3>
+<ul>
+<li><strong>WHAT:</strong> Look for weird characters like
+<code>Â£</code> (this is a broken <code>£</code> sign) or other broken
+non-ASCII.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Print a few articles. Search for <code>Â</code>, <code>â€</code>,
+<code>Ã</code>.</li>
+<li>If found, you can use <code>str.replace()</code> to fix them. Common
+fixes:
+<ul>
+<li><code>Â£</code> –&gt; <code>£</code></li>
+<li><code>â€™</code> –&gt; <code>'</code> (a smart quote)</li>
+<li><code>â€œ</code> –&gt; <code>"</code> (an opening smart quote)</li>
+</ul></li>
+</ul></li>
+<li><strong>WHY:</strong> Broken characters confuse the word counter and
+the named-entity recogniser.</li>
+</ul>
+<h3 id="step-7-write-down-what-you-did">Step 7 — Write down what you
+did</h3>
+<p>In a markdown cell, write: - Starting articles: 2,225 - After
+dropping empty: ____ - Encoding fixes applied: ____ - WHY for each
+decision.</p>
+<h3 id="step-8-save-to-drive">Step 8 — Save to Drive</h3>
+<ul>
+<li><strong>WHAT:</strong> Save the cleaned DataFrame as parquet, inside
+your Drive folder.</li>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/bbc_news_lab/articles_step1.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-olivia-15-minutes">Phase C — Make ONE
+chart for Olivia (15 minutes)</h2>
+<p>She does not have time to read your code. She wants ONE picture.</p>
+<h3 id="olivias-chart-are-the-5-categories-balanced">Olivia’s chart —
+“Are the 5 categories balanced?”</h3>
+<p>Make a bar chart showing the count of articles per category.</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Business</td>
+<td>~510</td>
+</tr>
+<tr>
+<td>Entertainment</td>
+<td>~386</td>
+</tr>
+<tr>
+<td>Politics</td>
+<td>~417</td>
+</tr>
+<tr>
+<td>Sport</td>
+<td>~511</td>
+</tr>
+<tr>
+<td>Tech</td>
+<td>~401</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>df['category'].value_counts().plot.bar()</code>.</li>
+<li>Add the title:
+<code>"BBC News dataset — 2,225 articles in 5 nearly-balanced categories"</code>.</li>
+<li>X-label: category name.</li>
+<li>Y-label: number of articles.</li>
+<li>Put the number on top of each bar.</li>
+</ul></li>
+<li><strong>Takeaway for Olivia:</strong> “The 5 categories are almost
+equal. The model will not be biased toward one class.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-1">Common mistakes in Class 1</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Use <code>encoding='utf-8'</code> when reading files</td>
+<td>Crash on some files with non-ASCII characters.</td>
+</tr>
+<tr>
+<td>Forget to keep <code>category</code> (the folder name)</td>
+<td>You lose the target column.</td>
+</tr>
+<tr>
+<td>Split headline / body with <code>n=2</code> instead of
+<code>n=1</code></td>
+<td>You lose part of the body.</td>
+</tr>
+<tr>
+<td>Save text columns as CSV</td>
+<td>Quotes and newlines break the CSV. Use parquet.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-2">Self-check before Class 2</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />You have a DataFrame with 2,225
+rows.</label></li>
+<li><label><input type="checkbox" />Four columns:
+<code>article_id</code>, <code>category</code>, <code>headline</code>,
+<code>body</code>.</label></li>
+<li><label><input type="checkbox" />No empty bodies.</label></li>
+<li><label><input type="checkbox" />No obvious broken
+characters.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory charts in
+your notebook.</label></li>
+<li><label><input type="checkbox" />1 polished chart for
+Olivia.</label></li>
+<li><label><input type="checkbox" />You saved
+<code>articles_step1.parquet</code> to your Drive folder.</label></li>
+<li><label><input type="checkbox" />You wrote down (in markdown) what
+you did and WHY.</label></li>
+</ul>
+<hr />
+<h1 id="class-2-encoding-and-scaling">Class 2 — Encoding and
+Scaling</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Olivia looks at your DataFrame.
+She is happy. But she says: “the model is a math model. It does not
+understand the word ‘Politics’. It does not understand the article text
+either. Turn it all into numbers.”</p>
+</blockquote>
+<h2 id="your-goal-1">Your goal</h2>
+<p>Turn the TEXT into numbers. Turn the CATEGORY label into numbers.
+Make the first basic numeric features.</p>
+<h2 id="inputs-1">Inputs</h2>
+<ul>
+<li><code>articles_step1.parquet</code> from Class 1</li>
+</ul>
+<h2 id="outputs-1">Outputs</h2>
+<ul>
+<li><code>articles_step2.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Olivia</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-article-length-per-category">Exploratory
+chart 1 — Article length per category</h3>
+<ul>
+<li><strong>Question:</strong> “Are Sport articles shorter than Business
+articles? Or longer?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>First make a column
+<code>article_length = df['body'].str.len()</code>.</li>
+<li>Use
+<code>sns.boxplot(x='category', y='article_length', data=df)</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Tech and Business articles tend to
+be longer. Sport is shorter.</li>
+</ul>
+<h3 id="exploratory-chart-2-headline-length-distribution">Exploratory
+chart 2 — Headline length distribution</h3>
+<ul>
+<li><strong>Question:</strong> “Are headlines short (5 words) or long
+(15 words)?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>headline_word_count = df['headline'].str.split().str.len()</code>.</li>
+<li>Histogram with <code>bins=20</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> BBC headlines are usually 5-10
+words.</li>
+</ul>
+<h3
+id="exploratory-chart-3-most-common-words-in-each-category-word-cloud">Exploratory
+chart 3 — Most common words in each category (word cloud)</h3>
+<ul>
+<li><strong>Question:</strong> “What words appear most in Sport vs
+Tech?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>!pip install wordcloud -q</code>.</li>
+<li><code>from wordcloud import WordCloud</code>.</li>
+<li>For each category, join all articles into one big string.</li>
+<li><code>WordCloud().generate(big_text).to_image()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Sport = “team, game, won”. Tech =
+“computer, software, internet”. This is your gut check that the
+categories are real.</li>
+</ul>
+<h3
+id="exploratory-chart-4-average-article-length-per-category">Exploratory
+chart 4 — Average article length per category</h3>
+<ul>
+<li><strong>Question:</strong> Bar chart showing mean character length
+per category.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df.groupby('category')['article_length'].mean().plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Confirms what the boxplot
+showed.</li>
+</ul>
+<hr />
+<h2 id="phase-b-encode-the-label-and-start-the-numeric-features">Phase B
+— Encode the label and start the numeric features</h2>
+<h3 id="step-1-encode-the-category-column-to-numbers">Step 1 — Encode
+the <code>category</code> column to numbers</h3>
+<ul>
+<li><strong>WHAT:</strong> Turn the 5 text labels into 5 numbers (0, 1,
+2, 3, 4).</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>from sklearn.preprocessing import LabelEncoder</code>.</li>
+<li><code>le = LabelEncoder()</code>.</li>
+<li><code>df['category_id'] = le.fit_transform(df['category'])</code>.</li>
+<li>Save the mapping. Print
+<code>dict(zip(le.classes_, range(5)))</code> to see which number means
+which category.</li>
+</ul></li>
+<li><strong>WHY:</strong> The model in Module 4 needs numbers, not
+words.</li>
+<li><strong>WARNING:</strong> Keep BOTH columns: <code>category</code>
+(text, for charts) and <code>category_id</code> (number, for the
+model).</li>
+</ul>
+<h3 id="step-2-compute-article_length-in-characters">Step 2 — Compute
+<code>article_length</code> (in characters)</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df['article_length'] = df['body'].str.len()</code>.</li>
+</ul>
+<h3 id="step-3-compute-n_words">Step 3 — Compute
+<code>n_words</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Number of words in the body.</li>
+<li><strong>HINTS:</strong>
+<code>df['n_words'] = df['body'].str.split().str.len()</code>.</li>
+</ul>
+<h3 id="step-4-compute-n_sentences">Step 4 — Compute
+<code>n_sentences</code></h3>
+<ul>
+<li><strong>WHAT:</strong> A sentence ends with <code>.</code>,
+<code>!</code>, or <code>?</code>. Count them.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Use a regex with <code>.str.count(...)</code>. Skeleton:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;n_sentences&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;body&#39;</span>].<span class="bu">str</span>.count(<span class="vs">r&#39;___&#39;</span>)   <span class="co"># YOU fill in: pattern for . ! or ?</span></span></code></pre></div></li>
+<li><p>The pattern is <code>r'[.!?]'</code>.</p></li>
+</ul></li>
+<li><strong>WARNING:</strong> This is not perfect (abbreviations like
+“Mr.” also have a dot). But for BBC news it works well enough.</li>
+</ul>
+<h3 id="step-5-compute-n_paragraphs">Step 5 — Compute
+<code>n_paragraphs</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Paragraphs are separated by <code>\n\n</code>
+(double newline).</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['n_paragraphs'] = df['body'].str.count(r'\n\n') + 1</code>.</li>
+</ul></li>
+<li><strong>WHY +1?</strong> N separators make N+1 paragraphs.</li>
+</ul>
+<h3 id="step-6-compute-avg_word_length">Step 6 — Compute
+<code>avg_word_length</code></h3>
+<ul>
+<li><strong>WHAT:</strong> The average length (in letters) of words in
+the article.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Define a small function: take a string, split into words, take
+<code>len()</code> of each, return mean.</li>
+<li>Apply it with <code>df['body'].apply(your_function)</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Tech articles use longer words
+(“infrastructure”, “encryption”). Sport uses shorter words (“won”,
+“goal”, “team”).</li>
+</ul>
+<h3 id="step-7-compute-n_unique_words-and-lexical_diversity">Step 7 —
+Compute <code>n_unique_words</code> and
+<code>lexical_diversity</code></h3>
+<ul>
+<li><strong>WHAT:</strong>
+<ul>
+<li><code>n_unique_words</code> = number of different words used.</li>
+<li><code>lexical_diversity</code> =
+<code>n_unique_words / n_words</code> (between 0 and 1).</li>
+</ul></li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>In a function: split, lower-case, put in <code>set()</code>, take
+<code>len()</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Politics articles repeat the same words
+(“government”, “minister”). Lexical diversity is LOWER.</li>
+</ul>
+<h3 id="step-8-scale-numeric-columns-preview-only">Step 8 — Scale
+numeric columns (preview only)</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>StandardScaler</code> to make every
+numeric column have mean = 0, std = 1.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.preprocessing import StandardScaler</code>.</li>
+<li><code>scaler = StandardScaler()</code>.</li>
+<li><code>scaler.fit_transform(df[numeric_cols])</code>.</li>
+</ul></li>
+<li><strong>WARNING:</strong> This is for inspection only. In Class 5,
+scaling goes INSIDE the Pipeline. Do NOT save the scaled version as your
+final file.</li>
+</ul>
+<h3 id="step-9-save">Step 9 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/bbc_news_lab/articles_step2.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-olivia">Phase C — Make ONE chart for
+Olivia</h2>
+<h3 id="olivias-chart-article-length-depends-on-the-desk">Olivia’s chart
+— “Article length depends on the desk”</h3>
+<p>A box plot of article length (in words) per category.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>sns.boxplot(x='category', y='n_words', data=df)</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Article length by category — Tech and
+Business write the longest, Sport writes the shortest”.</li>
+<li><strong>X-label:</strong> Category.</li>
+<li><strong>Y-label:</strong> Number of words per article.</li>
+<li><strong>Takeaway for Olivia:</strong> “Just the article length
+already tells us something about the category. The Sport desk produces
+shorter, faster news. Tech and Business need more space to
+explain.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-2">Common mistakes in Class 2</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scale BEFORE train/test split</td>
+<td><strong>Leakage.</strong> Scaler sees test data.</td>
+</tr>
+<tr>
+<td>Drop the <code>category</code> text column too early</td>
+<td>You cannot make pretty charts after that.</td>
+</tr>
+<tr>
+<td>Forget to save <code>LabelEncoder</code> mapping</td>
+<td>You cannot convert predictions back to category names later.</td>
+</tr>
+<tr>
+<td>Save the scaled version</td>
+<td>Class 5 will scale again inside the pipeline. Double scaling = wrong
+numbers.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-3">Self-check before Class 3</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>category_id</code> column
+exists (5 numbers).</label></li>
+<li><label><input type="checkbox" />You wrote down which number means
+which category.</label></li>
+<li><label><input type="checkbox" /><code>article_length</code>,
+<code>n_words</code>, <code>n_sentences</code>,
+<code>n_paragraphs</code> exist.</label></li>
+<li><label><input type="checkbox" /><code>avg_word_length</code>,
+<code>n_unique_words</code>, <code>lexical_diversity</code>
+exist.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory
+charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Olivia.</label></li>
+<li><label><input type="checkbox" /><code>articles_step2.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-3-feature-engineering">Class 3 — Feature Engineering</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Olivia says: “The simple counts
+you made yesterday are nice. But the TRULY useful columns are not there.
+For example: how many names of countries are in the article? How many
+companies? How many people? A Politics article is full of country names.
+A Sport article is full of player names. Find them.”</p>
+</blockquote>
+<h2 id="your-goal-2">Your goal</h2>
+<p>Make NEW columns that capture WHAT is in the article, not just HOW
+LONG it is. This is where the model gets its real power.
+<strong>Named-entity recognition (NER)</strong> is the key tool
+today.</p>
+<h2 id="inputs-2">Inputs</h2>
+<ul>
+<li><code>articles_step2.parquet</code></li>
+</ul>
+<h2 id="outputs-2">Outputs</h2>
+<ul>
+<li><code>articles_step3.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Olivia</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-1">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-run-spacy-on-one-article">Exploratory chart
+1 — Run spaCy on ONE article</h3>
+<ul>
+<li><strong>Question:</strong> “What does spaCy find in a Politics
+article? In a Sport article?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>import spacy</code>.</li>
+<li><code>nlp = spacy.load('en_core_web_sm')</code>.</li>
+<li>Pick one Politics article. Run <code>doc = nlp(text)</code>.</li>
+<li>Loop over <code>doc.ents</code>. Print
+<code>ent.text, ent.label_</code> for each.</li>
+</ul></li>
+<li><strong>What you learn:</strong> spaCy labels each name.
+<code>PERSON</code> (a human), <code>GPE</code> (a country or city),
+<code>ORG</code> (a company or party). You will count these.</li>
+</ul>
+<h3
+id="exploratory-chart-2-named-entity-types-across-categories">Exploratory
+chart 2 — Named-entity types across categories</h3>
+<ul>
+<li>After Step 2-4 below, you will have counts of PERSON, GPE, ORG per
+article.</li>
+<li><strong>Question:</strong> “Do Politics articles have more GPE
+(countries) than Sport?”</li>
+<li><strong>HINTS:</strong>
+<code>df.groupby('category')[['n_named_entities_persons', 'n_named_entities_locations', 'n_named_entities_organizations']].mean().plot.bar()</code>.</li>
+<li><strong>What you learn:</strong> Politics = lots of locations. Sport
+= lots of persons. Business = lots of organisations.</li>
+</ul>
+<h3
+id="exploratory-chart-3-number-of-caps-words-per-category">Exploratory
+chart 3 — Number of CAPS words per category</h3>
+<ul>
+<li><strong>Question:</strong> “Do Tech articles use more ALL-CAPS words
+(acronyms like IBM, NASA)?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>After Step 5, look at
+<code>df.groupby('category')['n_caps_words'].mean()</code>.</li>
+<li>Bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Tech and Business use more
+acronyms.</li>
+</ul>
+<h3 id="exploratory-chart-4-has_quote-rate-per-category">Exploratory
+chart 4 — <code>has_quote</code> rate per category</h3>
+<ul>
+<li><strong>Question:</strong> “Which desks quote people the most?”</li>
+<li><strong>HINTS:</strong>
+<code>df.groupby('category')['has_quote'].mean().plot.bar()</code>.</li>
+<li><strong>What you learn:</strong> Politics and Sport often quote
+people (politicians, players). Tech less so.</li>
+</ul>
+<hr />
+<h2 id="phase-b-engineer-the-features">Phase B — Engineer the
+features</h2>
+<h3 id="step-1-set-up-spacy-once-it-is-slow-to-load">Step 1 — Set up
+spaCy ONCE (it is slow to load)</h3>
+<ul>
+<li><strong>WHAT:</strong> Load the spaCy model once, save in a
+variable.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>import spacy</code>.</li>
+<li><code>nlp = spacy.load('en_core_web_sm')</code>.</li>
+</ul></li>
+<li><strong>WARNING:</strong> Do NOT load it inside a loop. It would
+take 20 minutes. Load once, reuse 2,225 times.</li>
+</ul>
+<h3 id="step-2-run-spacy-on-every-article">Step 2 — Run spaCy on every
+article</h3>
+<p>This is the <strong>biggest</strong> step. It will take 2-5 minutes
+for 2,225 articles. That is fine.</p>
+<ul>
+<li><strong>WHAT:</strong> For each article, run <code>nlp(text)</code>.
+Store the entities.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>For speed, use <code>nlp.pipe(df['body'], batch_size=50)</code> —
+this is FASTER than calling <code>nlp(text)</code> one by one.</li>
+<li>For each doc, collect the entities into a list of
+<code>(text, label)</code> tuples.</li>
+<li>Save the list in a new column <code>entities</code> (yes, a column
+of lists is allowed in pandas).</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Each row has a list like
+<code>[('Tony Blair', 'PERSON'), ('UK', 'GPE'), ('Labour Party', 'ORG'), ...]</code>.</li>
+</ul>
+<h3 id="step-3-count-named-entities-by-type">Step 3 — Count named
+entities by type</h3>
+<p>Make 3 new columns from the <code>entities</code> list:</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>n_named_entities_persons</code></td>
+<td>Count of entities where label = <code>PERSON</code></td>
+</tr>
+<tr>
+<td><code>n_named_entities_locations</code></td>
+<td>Count of entities where label = <code>GPE</code> or
+<code>LOC</code></td>
+</tr>
+<tr>
+<td><code>n_named_entities_organizations</code></td>
+<td>Count of entities where label = <code>ORG</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Write a small function that takes the list and a target label.
+Returns the count.</li>
+<li>Apply it with
+<code>df['entities'].apply(lambda lst: sum(1 for t, lab in lst if lab == 'PERSON'))</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-4-drop-the-raw-entities-column-or-keep-for-module-7">Step 4
+— Drop the raw <code>entities</code> column (or keep for Module 7)</h3>
+<ul>
+<li><strong>WHAT:</strong> The 3 count columns are what the model needs.
+The raw <code>entities</code> list is heavy.</li>
+<li><strong>OPTIONS:</strong>
+<ul>
+<li><strong>A:</strong> Drop it. Save space.</li>
+<li><strong>B:</strong> Keep it for Module 7. Heavier file but useful
+later.</li>
+</ul></li>
+<li><strong>RECOMMENDED:</strong> Keep it for now. Drop it in Class 6 if
+needed.</li>
+</ul>
+<h3 id="step-5-count-caps-words">Step 5 — Count CAPS words</h3>
+<ul>
+<li><strong>WHAT:</strong> Count words that are ALL UPPERCASE and have
+at least 2 letters (so we ignore “I” and “A”).</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>In a function: split, filter
+<code>w.isupper() and len(w) &gt;= 2</code>, count.</li>
+<li>Apply.</li>
+</ul></li>
+<li><strong>WHY:</strong> Acronyms (IBM, NASA, BBC, CEO) are common in
+Tech and Business.</li>
+</ul>
+<h3 id="step-6-has_quote-flag">Step 6 — <code>has_quote</code> flag</h3>
+<ul>
+<li><strong>WHAT:</strong> Does the article contain a <code>"</code>
+character? (Or smart quotes if you fixed them in Class 1.)</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['has_quote'] = df['body'].str.contains('"').astype(int)</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Quoting someone is a Politics / Sport
+pattern.</li>
+</ul>
+<h3 id="step-7-headline-features">Step 7 — Headline features</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>first_word_length</code></td>
+<td>Length (letters) of the first word in the HEADLINE</td>
+</tr>
+<tr>
+<td><code>headline_first_3_words</code></td>
+<td>The first 3 words of the headline, joined as one string</td>
+</tr>
+<tr>
+<td><code>headline_word_count</code></td>
+<td>How many words in the headline</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Split the headline. Take the first word. <code>len()</code> it.</li>
+<li>For <code>headline_first_3_words</code>:
+<code>' '.join(words[:3])</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> “Real Madrid beat Barcelona” –&gt;
+<code>headline_first_3_words = "Real Madrid beat"</code>. The model can
+learn that “Real Madrid” almost always means SPORT.</li>
+</ul>
+<h3 id="step-8-save">Step 8 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/bbc_news_lab/articles_step3.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-olivia-1">Phase C — Make ONE chart
+for Olivia</h2>
+<h3
+id="olivias-chart-named-entities-tell-the-story-of-the-desk">Olivia’s
+chart — “Named entities tell the story of the desk”</h3>
+<p>A grouped bar chart: for each category, show 3 bars: average PERSON
+count, average LOCATION count, average ORG count.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df.groupby('category')[['n_named_entities_persons', 'n_named_entities_locations', 'n_named_entities_organizations']].mean().plot.bar()</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Named entities by desk — Sport = persons,
+Politics = locations, Business = organisations”.</li>
+<li><strong>X-label:</strong> Category.</li>
+<li><strong>Y-label:</strong> Average count per article.</li>
+<li><strong>Takeaway for Olivia:</strong> “Even without reading a single
+word, we can tell the desk by counting names. Sport mentions players.
+Politics mentions countries. Business mentions companies. The model will
+love these features.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-3">Common mistakes in Class 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Load <code>spacy.load()</code> inside the loop</td>
+<td>20 minutes instead of 3. Load once.</td>
+</tr>
+<tr>
+<td>Process one article at a time instead of
+<code>nlp.pipe()</code></td>
+<td>4x slower.</td>
+</tr>
+<tr>
+<td>Forget to check spaCy label names (<code>PERSON</code> vs
+<code>Person</code>)</td>
+<td>Counts are all zero.</td>
+</tr>
+<tr>
+<td>Use <code>GPE</code> only, ignore <code>LOC</code></td>
+<td>Some locations get missed.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-4">Self-check before Class 4</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>entities</code> column made
+(or counts only).</label></li>
+<li><label><input
+type="checkbox" /><code>n_named_entities_persons</code>,
+<code>n_named_entities_locations</code>,
+<code>n_named_entities_organizations</code> exist.</label></li>
+<li><label><input type="checkbox" /><code>n_caps_words</code>
+exists.</label></li>
+<li><label><input type="checkbox" /><code>has_quote</code> exists (0 or
+1).</label></li>
+<li><label><input type="checkbox" /><code>first_word_length</code>,
+<code>headline_first_3_words</code> exist.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 explanatory chart.</label></li>
+<li><label><input type="checkbox" /><code>articles_step3.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-4-feature-selection">Class 4 — Feature Selection</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Now you have ~14 engineered
+columns. Olivia says: “Some of these say the same thing.
+<code>n_words</code> and <code>article_length</code> are basically
+twins. Pick the ones that really help. I want a small, clean set.”</p>
+</blockquote>
+<h2 id="your-goal-3">Your goal</h2>
+<p>Pick the best columns. Drop the rest. Justify every choice.</p>
+<h2 id="inputs-3">Inputs</h2>
+<ul>
+<li><code>articles_step3.parquet</code></li>
+</ul>
+<h2 id="outputs-3">Outputs</h2>
+<ul>
+<li><code>articles_step4.parquet</code> in Drive (only the selected
+columns + <code>category_id</code>)</li>
+<li>3+ exploratory charts (correlation heatmap, mutual info bars,
+importance bars)</li>
+<li>A short markdown report explaining your choices</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-2">Phase A — Explore the data
+first</h2>
+<h3
+id="exploratory-chart-1-correlation-heatmap-of-numeric-columns">Exploratory
+chart 1 — Correlation heatmap of numeric columns</h3>
+<ul>
+<li><strong>Question:</strong> “Which columns say the same thing as each
+other?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Pick only the numeric columns (skip <code>category</code>,
+<code>headline</code>, <code>body</code>, <code>entities</code>,
+<code>headline_first_3_words</code>).</li>
+<li>Compute <code>df[numeric_cols].corr()</code>.</li>
+<li>Plot with <code>sns.heatmap()</code>.</li>
+<li>Use <code>annot=True</code> and <code>fmt='.2f'</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> <code>n_words</code>,
+<code>article_length</code>, <code>n_sentences</code> are highly
+correlated. You only need ONE of them.</li>
+</ul>
+<h3 id="exploratory-chart-2-mutual-information-bar-chart">Exploratory
+chart 2 — Mutual information bar chart</h3>
+<ul>
+<li>After you compute mutual info (Step 4 below), plot it.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Sort the values, then bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Which columns predict
+<code>category_id</code> strongest.</li>
+</ul>
+<h3
+id="exploratory-chart-3-random-forest-feature-importance">Exploratory
+chart 3 — Random Forest feature importance</h3>
+<ul>
+<li>After you train the RF (Step 5 below), plot the importances.</li>
+<li><strong>HINTS:</strong>
+<code>pd.Series(rf.feature_importances_, index=...).sort_values().plot.barh()</code>.</li>
+<li><strong>What you learn:</strong> A second opinion on feature
+importance.</li>
+</ul>
+<hr />
+<h2 id="phase-b-select-features">Phase B — Select features</h2>
+<h3 id="step-1-split-into-train-and-test-first">Step 1 — Split into
+train and test FIRST</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>train_test_split</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.model_selection import train_test_split</code>.</li>
+<li><code>X = df.drop(['category', 'category_id', 'headline', 'body', 'entities', 'headline_first_3_words'], axis=1)</code>.</li>
+<li><code>y = df['category_id']</code>.</li>
+<li>Pass: <code>test_size=0.2</code>, <code>random_state=42</code>,
+<code>stratify=y</code>.</li>
+</ul></li>
+<li><strong>WHY <code>stratify=y</code>?</strong> The 5 categories are
+balanced. We want each split to also be balanced.</li>
+<li><strong>WHY:</strong> All next steps use TRAIN ONLY. Otherwise
+leakage.</li>
+</ul>
+<h3 id="step-2-remove-low-variance-columns">Step 2 — Remove low-variance
+columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop columns where almost all values are the
+same.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import VarianceThreshold</code>.</li>
+<li><code>VarianceThreshold(threshold=0.01).fit_transform(X_train)</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Probably none of yours will be dropped.
+Most have real variance.</li>
+</ul>
+<h3 id="step-3-remove-highly-correlated-columns">Step 3 — Remove highly
+correlated columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop one of each pair where |corr| &gt;
+0.9.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute correlation matrix.</li>
+<li>Get the upper triangle with <code>np.triu(...)</code>.</li>
+<li>For each column, if any of its upper-triangle correlations is &gt;
+0.9, mark it for dropping.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> <code>n_words</code> and
+<code>article_length</code> are very correlated. Keep one.</li>
+</ul>
+<h3 id="step-4-rank-by-mutual-information">Step 4 — Rank by mutual
+information</h3>
+<ul>
+<li><strong>WHAT:</strong> Score each column by how much it tells you
+about <code>category_id</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import mutual_info_classif</code>.</li>
+<li><code>mi = mutual_info_classif(X_train_numeric, y_train)</code>.</li>
+<li>Put in a Series, sort.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> <code>n_named_entities_persons</code>,
+<code>n_named_entities_locations</code>,
+<code>n_named_entities_organizations</code>,
+<code>avg_word_length</code>, <code>lexical_diversity</code> should be
+at the top.</li>
+</ul>
+<h3 id="step-5-random-forest-importance-second-opinion">Step 5 — Random
+Forest importance (second opinion)</h3>
+<ul>
+<li><strong>WHAT:</strong> Train a small RF, look at
+<code>feature_importances_</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.ensemble import RandomForestClassifier</code>.</li>
+<li><code>RandomForestClassifier(n_estimators=100, max_depth=8, n_jobs=-1, random_state=42)</code>.</li>
+<li><code>.fit(X_train, y_train)</code>.</li>
+<li>Look at <code>.feature_importances_</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-6-pick-the-final-columns">Step 6 — Pick the final
+columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Combine the rankings. Pick columns that:
+<ul>
+<li>Are high in mutual info, AND</li>
+<li>Are high in RF importance, AND</li>
+<li>Were not dropped by variance/correlation pruning.</li>
+</ul></li>
+<li><strong>WRITE DOWN:</strong> In your notebook, list the columns.
+Explain in 1 sentence why each one is in.</li>
+</ul>
+<h3 id="step-7-save">Step 7 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong> Keep the selected columns +
+<code>category_id</code> + <code>category</code> (for charts) +
+<code>body</code> (for Module 7) + <code>headline</code>. Save as
+<code>articles_step4.parquet</code> to Drive.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-olivia-2">Phase C — Make ONE chart
+for Olivia</h2>
+<h3 id="olivias-chart-these-are-the-most-important-features">Olivia’s
+chart — “These are the most important features”</h3>
+<p>A horizontal bar chart of your top features and their importance
+score.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use the RF importance.</li>
+<li><code>sort_values()</code> then <code>.plot.barh()</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Top features for routing articles”.</li>
+<li><strong>Y-axis:</strong> column names.</li>
+<li><strong>X-axis:</strong> Random Forest importance.</li>
+<li><strong>Takeaway:</strong> “Three named-entity counts and the
+average word length predict most of the routing. The rest are small
+helpers.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-4">Common mistakes in Class 4</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compute mutual info on the FULL data</td>
+<td>Leakage.</td>
+</tr>
+<tr>
+<td>Drop the <code>body</code> and <code>headline</code> columns
+now</td>
+<td>You need them for Module 7. Keep them.</td>
+</tr>
+<tr>
+<td>Keep too many columns (20+) for a 2,225-row dataset</td>
+<td>Overfitting risk.</td>
+</tr>
+<tr>
+<td>Drop a high-mutual-info column</td>
+<td>Big mistake. Check why it is high before dropping.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-5">Self-check before Class 5</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Train/test split done
+FIRST.</label></li>
+<li><label><input type="checkbox" />Final feature set chosen (we
+recommend 8-12 columns).</label></li>
+<li><label><input type="checkbox" /><code>body</code> and
+<code>headline</code> kept (for Module 7).</label></li>
+<li><label><input type="checkbox" />You wrote down WHY for each kept
+column.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Olivia.</label></li>
+<li><label><input type="checkbox" /><code>articles_step4.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-5-pipelines">Class 5 — Pipelines</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Olivia says: “Your cleaning code
+is in 4 different notebooks. When a new article arrives tomorrow morning
+at 6 a.m., you cannot run 4 notebooks. We need ONE object that does
+everything.”</p>
+</blockquote>
+<h2 id="your-goal-4">Your goal</h2>
+<p>Put EVERY cleaning step inside ONE Pipeline object. Production-ready
+code.</p>
+<h2 id="inputs-4">Inputs</h2>
+<ul>
+<li><code>articles_step4.parquet</code> (selected columns)</li>
+</ul>
+<h2 id="outputs-4">Outputs</h2>
+<ul>
+<li><code>bbc_pipeline.joblib</code> saved in Drive</li>
+<li>1 confusion-matrix chart + 1 classification report</li>
+<li>A pipeline that takes engineered features and produces
+predictions</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-3">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-confusion-matrix-after-training">Exploratory
+chart 1 — Confusion matrix (after training)</h3>
+<ul>
+<li>After Step 6, build a confusion matrix.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay</code>.</li>
+<li><code>cm = confusion_matrix(y_test, y_pred)</code>.</li>
+<li><code>ConfusionMatrixDisplay(cm, display_labels=['business', 'entertainment', 'politics', 'sport', 'tech']).plot()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> How many articles per category did
+we get right? Where are the mistakes? (Common mistake: Politics –&gt;
+Business.)</li>
+</ul>
+<h3 id="exploratory-chart-2-classification-report-table">Exploratory
+chart 2 — Classification report (table)</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.metrics import classification_report</code>.</li>
+<li><code>print(classification_report(y_test, y_pred, target_names=['business', ...]))</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Precision and recall PER category.
+Which desk is the hardest to predict?</li>
+</ul>
+<hr />
+<h2 id="phase-b-build-the-pipeline">Phase B — Build the pipeline</h2>
+<h3
+id="step-1-decide-which-columns-are-numeric-and-which-are-categorical">Step
+1 — Decide which columns are numeric and which are categorical</h3>
+<ul>
+<li><strong>HINTS:</strong> Make two lists.</li>
+<li><strong>EXAMPLE:</strong>
+<ul>
+<li>numeric: <code>article_length</code>, <code>n_words</code>,
+<code>n_sentences</code>, <code>n_paragraphs</code>,
+<code>avg_word_length</code>, <code>lexical_diversity</code>,
+<code>n_named_entities_persons</code>,
+<code>n_named_entities_locations</code>,
+<code>n_named_entities_organizations</code>, <code>n_caps_words</code>,
+<code>first_word_length</code>, <code>headline_word_count</code>.</li>
+<li>categorical: <code>has_quote</code> (already 0/1, so optional).</li>
+</ul></li>
+</ul>
+<h3 id="step-2-build-the-numeric-mini-pipeline">Step 2 — Build the
+numeric mini-pipeline</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer (fill missing) +
+scaler.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.pipeline import Pipeline</code>.</p></li>
+<li><p><code>from sklearn.impute import SimpleImputer</code>.</p></li>
+<li><p><code>from sklearn.preprocessing import StandardScaler</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>numeric_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;scaler&#39;</span>,  StandardScaler()),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in the blank: best strategy for numeric?
+(<code>'median'</code>)</p></li>
+</ul></li>
+</ul>
+<h3
+id="step-3-build-the-categorical-mini-pipeline-only-if-you-have-any">Step
+3 — Build the categorical mini-pipeline (only if you have any)</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer + one-hot encoder.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.preprocessing import OneHotEncoder</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>categorical_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;onehot&#39;</span>,  OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">&#39;___&#39;</span>, sparse_output<span class="op">=</span>___)),</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in blanks. (Strategy <code>'most_frequent'</code>,
+handle_unknown <code>'ignore'</code>, sparse_output
+<code>False</code>.)</p></li>
+</ul></li>
+<li><strong>WHY <code>handle_unknown='ignore'</code>?</strong> In
+production, a new unseen value may appear. We do not want the code to
+crash.</li>
+</ul>
+<h3 id="step-4-combine-into-a-columntransformer">Step 4 — Combine into a
+ColumnTransformer</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.compose import ColumnTransformer</code>.</li>
+<li>It takes a list of tuples:
+<code>(name, transformer, list_of_columns)</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-5-add-the-model-on-top">Step 5 — Add the model on top</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.linear_model import LogisticRegression</code>.</li>
+<li><code>LogisticRegression(max_iter=1000, random_state=42, multi_class='auto')</code>.</li>
+<li>Put it in a Pipeline with the preprocessor.</li>
+</ul></li>
+<li><strong>WHY no <code>class_weight='balanced'</code>?</strong> Our 5
+categories are already nearly balanced (~445 each). We do not need
+it.</li>
+</ul>
+<h3 id="step-6-train-and-evaluate">Step 6 — Train and evaluate</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>full_pipeline.fit(X_train, y_train)</code>.</li>
+<li><code>y_pred = full_pipeline.predict(X_test)</code>.</li>
+<li><code>from sklearn.metrics import accuracy_score, classification_report</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Accuracy around 0.80-0.90 with just these
+engineered features. (Module 4 will push this to 95%+ with TF-IDF on the
+body text.)</li>
+</ul>
+<h3 id="step-7-save-the-trained-pipeline">Step 7 — Save the trained
+pipeline</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>import joblib</code>.</li>
+<li><code>joblib.dump(full_pipeline, '/content/drive/MyDrive/bbc_news_lab/bbc_pipeline.joblib')</code>.</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-olivia-3">Phase C — Make ONE chart
+for Olivia</h2>
+<h3 id="olivias-chart-how-many-articles-do-we-route-correctly">Olivia’s
+chart — “How many articles do we route correctly?”</h3>
+<p>A confusion matrix as a heatmap.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr>
+<th></th>
+<th>Predicted Business</th>
+<th>Predicted Entertainment</th>
+<th>Predicted Politics</th>
+<th>Predicted Sport</th>
+<th>Predicted Tech</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Actually Business</strong></td>
+<td>high</td>
+<td>low</td>
+<td>low</td>
+<td>low</td>
+<td>low</td>
+</tr>
+<tr>
+<td><strong>Actually Entertainment</strong></td>
+<td>low</td>
+<td>high</td>
+<td>low</td>
+<td>low</td>
+<td>low</td>
+</tr>
+<tr>
+<td><strong>Actually Politics</strong></td>
+<td>some</td>
+<td>low</td>
+<td>high</td>
+<td>low</td>
+<td>low</td>
+</tr>
+<tr>
+<td><strong>Actually Sport</strong></td>
+<td>low</td>
+<td>low</td>
+<td>low</td>
+<td>high</td>
+<td>low</td>
+</tr>
+<tr>
+<td><strong>Actually Tech</strong></td>
+<td>low</td>
+<td>low</td>
+<td>low</td>
+<td>low</td>
+<td>high</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong> Use the <code>ConfusionMatrixDisplay</code>
+from Phase A. Add a title.</li>
+<li><strong>Title:</strong> “Of 445 articles per desk, our baseline
+model routes 80-90% to the right place”.</li>
+<li><strong>Takeaway for Olivia:</strong> “We are not at 95% yet. Module
+4 will add the TF-IDF features (counting EVERY word) and we will get
+there. But this proves the pipeline works end-to-end.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-5">Common mistakes in Class 5</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Build the pipeline AFTER you scaled the data manually</td>
+<td>Pipeline scales it twice. Numbers wrong.</td>
+</tr>
+<tr>
+<td>Forget <code>sparse_output=False</code> in OneHotEncoder</td>
+<td>Some downstream code breaks.</td>
+</tr>
+<tr>
+<td>Pass the text <code>category</code> column instead of
+<code>category_id</code></td>
+<td>Some models do not accept string labels.</td>
+</tr>
+<tr>
+<td>Forget <code>random_state</code></td>
+<td>Results change every run. Hard to debug.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-6">Self-check before Class 6</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Pipeline has preprocessor +
+model.</label></li>
+<li><label><input type="checkbox" />Preprocessor has numeric (and maybe
+categorical) transformers.</label></li>
+<li><label><input type="checkbox" /><code>handle_unknown='ignore'</code>
+set if used.</label></li>
+<li><label><input type="checkbox" />Confusion matrix + classification
+report charts.</label></li>
+<li><label><input type="checkbox" /><code>bbc_pipeline.joblib</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-6-end-to-end-lab-the-big-one">Class 6 — End-to-End Lab
+(THE BIG ONE)</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Olivia is in the meeting room.
+She wants the FINAL clean dataset on her desk in 90 minutes. This is the
+lab.</p>
+</blockquote>
+<h2 id="your-goal-5">Your goal</h2>
+<p>Take 5 folders of <code>.txt</code> files (2,225 articles). Produce
+ONE final <code>.parquet</code> file with the exact 17-column schema.
+Plus a 1-page findings report.</p>
+<h2 id="time">Time</h2>
+<p><strong>90 minutes</strong> of focused work.</p>
+<h2 id="inputs-5">Inputs</h2>
+<ul>
+<li>The 5 folders of <code>.txt</code> files in your Drive folder</li>
+</ul>
+<h2 id="outputs-5">Outputs</h2>
+<ul>
+<li><code>bbc_news_clean.parquet</code> (~2,200 rows × 17 columns) in
+Drive</li>
+<li><code>findings.md</code> (~1 page)</li>
+<li>Your full Colab notebook</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-10-minutes">Phase A — Explore the
+data first (10 minutes)</h2>
+<p>You will reuse charts from Classes 1-5. Pick 3 of them. Put them all
+on ONE PAGE of your notebook with markdown headers: 1. Article counts
+per category (the “5 nearly-balanced classes” chart) 2. Named entities
+by category (your most important chart) 3. Top features by Random Forest
+importance</p>
+<p>These 3 charts tell Olivia the whole story.</p>
+<hr />
+<h2 id="phase-b-build-the-final-dataset-70-minutes">Phase B — Build the
+final dataset (70 minutes)</h2>
+<h3 id="required-output-schema">Required output schema</h3>
+<p>Your <code>bbc_news_clean.parquet</code> MUST have these 17 columns,
+with these names and types:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>Column</th>
+<th>Type</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>article_id</code></td>
+<td>string</td>
+<td>engineered (folder + filename)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>category</code></td>
+<td>string</td>
+<td>TARGET (folder name)</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>article_length</code></td>
+<td>int</td>
+<td>engineered (characters in body)</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>n_sentences</code></td>
+<td>int</td>
+<td>engineered (count of . ! ?)</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>n_paragraphs</code></td>
+<td>int</td>
+<td>engineered (count of double newlines + 1)</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>avg_word_length</code></td>
+<td>float</td>
+<td>engineered (mean letters per word)</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>n_unique_words</code></td>
+<td>int</td>
+<td>engineered (size of word set)</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>lexical_diversity</code></td>
+<td>float</td>
+<td>engineered (<code>n_unique / n_words</code>)</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>n_named_entities_persons</code></td>
+<td>int</td>
+<td>engineered with spaCy (<code>PERSON</code>)</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>n_named_entities_locations</code></td>
+<td>int</td>
+<td>engineered with spaCy (<code>GPE</code> + <code>LOC</code>)</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>n_named_entities_organizations</code></td>
+<td>int</td>
+<td>engineered with spaCy (<code>ORG</code>)</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>n_caps_words</code></td>
+<td>int</td>
+<td>engineered (ALL-CAPS words, length &gt;= 2)</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>has_quote</code></td>
+<td>int (0/1)</td>
+<td>engineered (contains <code>"</code>)</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>first_word_length</code></td>
+<td>int</td>
+<td>engineered (length of first headline word)</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>headline_first_3_words</code></td>
+<td>string</td>
+<td>engineered (first 3 words of headline)</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>headline</code></td>
+<td>string</td>
+<td>engineered (first line of file)</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>body</code></td>
+<td>string</td>
+<td>engineered (rest of file — kept for Module 7!)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lab-phases-timed">Lab phases (timed)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Time</th>
+<th>What you do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Load</td>
+<td>10 min</td>
+<td>Walk through 5 folders. Read all 2,225 <code>.txt</code> files.
+Build DataFrame.</td>
+</tr>
+<tr>
+<td>2. Clean</td>
+<td>10 min</td>
+<td>Split headline / body. Strip whitespace. Fix encoding issues.</td>
+</tr>
+<tr>
+<td>3. Basic features</td>
+<td>15 min</td>
+<td><code>article_length</code>, <code>n_sentences</code>,
+<code>n_paragraphs</code>, <code>avg_word_length</code>,
+<code>n_unique_words</code>, <code>lexical_diversity</code>.</td>
+</tr>
+<tr>
+<td>4. spaCy entities</td>
+<td>20 min</td>
+<td>Run <code>nlp.pipe()</code> on all 2,225 articles. Count PERSON /
+GPE+LOC / ORG.</td>
+</tr>
+<tr>
+<td>5. Other features</td>
+<td>10 min</td>
+<td><code>n_caps_words</code>, <code>has_quote</code>,
+<code>first_word_length</code>,
+<code>headline_first_3_words</code>.</td>
+</tr>
+<tr>
+<td>6. Validate + save</td>
+<td>5 min</td>
+<td>Check schema. Check dtypes. Save <code>.parquet</code>.</td>
+</tr>
+<tr>
+<td>7. Findings</td>
+<td>10 min</td>
+<td>Write <code>findings.md</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total: 90 minutes.</strong></p>
+<hr />
+<h2 id="phase-c-findings-report-for-olivia-10-minutes">Phase C —
+Findings report for Olivia (10 minutes)</h2>
+<p>Write <code>findings.md</code> with these sections:</p>
+<h3 id="final-numbers">Final numbers</h3>
+<ul>
+<li>Final row count: ____</li>
+<li>Articles per category: business <strong><em>, entertainment
+</em></strong>, politics <strong><em>, sport </em></strong>, tech
+___</li>
+<li>Most common entity type overall: ____</li>
+</ul>
+<h3 id="top-3-insights">Top 3 insights</h3>
+<ol type="1">
+<li><hr /></li>
+<li><hr /></li>
+<li><hr /></li>
+</ol>
+<h3 id="one-question-to-investigate-in-module-4">One question to
+investigate in Module 4</h3>
+<ul>
+<li>_____ (Example: “Will adding TF-IDF on the body push accuracy past
+95%?”)</li>
+</ul>
+<h3 id="one-chart-that-summarizes-everything">One chart that summarizes
+everything</h3>
+<p>Embed your most important chart (named entities by category).</p>
+<hr />
+<h2 id="grading-rubric-100-points">Grading rubric (100 points)</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Item</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All 17 columns exist with the right names and dtypes</td>
+<td>25</td>
+</tr>
+<tr>
+<td>Cleaning decisions written in markdown</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Pipeline is reproducible (re-run from raw folders in ONE
+command)</td>
+<td>15</td>
+</tr>
+<tr>
+<td>spaCy named-entity counts work for all 3 types</td>
+<td>10</td>
+</tr>
+<tr>
+<td>All 2,225 articles loaded (no missing rows)</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>At least 3 exploratory + 1 explanatory chart per
+class</strong></td>
+<td><strong>15</strong></td>
+</tr>
+<tr>
+<td><code>findings.md</code> has insights, not just numbers</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Code is clean (comments, sensible variable names)</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<h2 id="submit">Submit</h2>
+<p>Upload to
+<code>module-3/class_6/submissions/&lt;YourTeamName&gt;/</code>: -
+<code>bbc_news_clean.parquet</code> - Your Colab notebook
+(<code>File &gt; Download &gt; Download .ipynb</code>) -
+<code>findings.md</code></p>
+<hr />
+<h1 id="tips-for-the-whole-module">Tips for the whole module</h1>
+<ol type="1">
+<li><strong>Do NOT copy-paste code from this guide.</strong> This guide
+gives you HINTS only. Write the code yourself. You will learn much
+faster.</li>
+<li><strong>Save your notebook to Drive often.</strong> Colab
+disconnects after 12 hours.</li>
+<li><strong>Save intermediate <code>.parquet</code> files to
+Drive</strong> (articles_step1, articles_step2, etc.). If something
+breaks, you do not redo everything.</li>
+<li><strong>Pair-program.</strong> One student types, one reads. Switch
+every 20 minutes.</li>
+<li><strong>Make a chart BEFORE you write cleaning code.</strong> You
+must SEE the problem before you can fix it.</li>
+<li><strong>Make a chart AFTER each step.</strong> Confirm your code did
+what you expected.</li>
+<li><strong>Ask the mentor early.</strong> If you are stuck for 20
+minutes, ask. Do not waste an afternoon.</li>
+<li><strong>Encouragement for first-time NLP teams:</strong> Text is new
+for almost everybody. Take it slow. The dataset is small, so every
+experiment runs fast. Try things. If something breaks, the worst case is
+you wait 30 seconds for a re-run, not 30 minutes.</li>
+<li><strong>Load spaCy ONCE.</strong> This is the most common slow-down
+in Class 3. Load <code>nlp = spacy.load(...)</code> in ONE cell. Reuse
+it everywhere else.</li>
+<li><strong>Print examples.</strong> When you build a new feature, print
+5 rows. “Is the first headline word really ‘Real’ for that Real Madrid
+article? Yes? Then the feature works.”</li>
+</ol>
+<p>Good luck.</p>
+</main>
+
+<footer class="scenario-footer">
+  <p><a href="../../#/module/3/class/6">&larr; Back to all 15 scenarios</a></p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,2437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>05_amazon_beauty_m3_lab</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --text: #e6e8ec;
+    --text-dim: #9aa0aa;
+    --accent: #7aa2f7;
+    --accent-hover: #a5c0ff;
+    --border: #2a2f3a;
+    --code-bg: #11141a;
+    --table-header: #232732;
+    --quote-bar: #7aa2f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(26, 29, 36, 0.92);
+  }
+  .topbar-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .back-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .back-link:hover { color: var(--accent-hover); }
+  .pdf-link {
+    background: var(--accent);
+    color: #0f1115;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pdf-link:hover { background: var(--accent-hover); }
+  .pdf-link svg { width: 14px; height: 14px; }
+
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 56px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  p { margin-bottom: 16px; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+  strong { color: #fff; font-weight: 600; }
+  em { color: var(--text); font-style: italic; }
+
+  ul, ol { margin-bottom: 18px; padding-left: 28px; }
+  li { margin-bottom: 6px; }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 36px 0;
+  }
+
+  blockquote {
+    border-left: 4px solid var(--quote-bar);
+    background: var(--card);
+    padding: 14px 22px;
+    margin: 18px 0;
+    color: var(--text);
+    border-radius: 0 8px 8px 0;
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  blockquote strong { color: var(--accent); }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    font-size: 0.88em;
+    color: #f0a3b5;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 18px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text);
+    font-size: 1em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.94rem;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  thead { background: var(--table-header); }
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+
+  /* Checkboxes in self-check lists */
+  input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+
+  /* Anchored sections for nav */
+  h2[id], h3[id] { scroll-margin-top: 80px; }
+
+  footer.scenario-footer {
+    max-width: 920px;
+    margin: 60px auto 40px;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+  footer.scenario-footer a {
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    main { padding: 24px 16px 60px; }
+    h1 { font-size: 1.7rem; }
+    h2 { font-size: 1.35rem; }
+    h3 { font-size: 1.1rem; }
+    .topbar { padding: 10px 16px; }
+    pre { font-size: 0.8rem; padding: 12px 14px; }
+    table { font-size: 0.85rem; }
+    th, td { padding: 9px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="../../#/module/3/class/6">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <span style="display:inline-block;transform:translateY(-1px)">&larr;</span> Back to all scenarios
+    </a>
+    <a class="pdf-link" href="05_amazon_beauty_m3_lab.pdf" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-4-4h3V4h2v8h3l-4 4zm-8 4v-2h16v2H4z"/></svg>
+      Download as PDF
+    </a>
+  </div>
+</div>
+
+<main>
+<h1 id="amazon-beauty-reviews-module-3-lab-guide">Amazon Beauty Reviews
+— Module 3 Lab Guide</h1>
+<p><strong>Scenario:</strong> Amazon Beauty product reviews. Predict if
+a review is “helpful”. <strong>Module:</strong> 3 (Data Preparation and
+Feature Engineering) <strong>Audience:</strong> Adult learners, A2
+English. New to AI. <strong>Tools:</strong> Google Colab (no install
+needed).</p>
+<hr />
+<h1 id="the-scenario-your-mission">The Scenario — Your Mission</h1>
+<h2 id="where-you-work">Where you work</h2>
+<p>You and your team are new data analysts at <strong>Amazon</strong>.
+You join the <strong>Customer Reviews Quality Team</strong>. This team
+takes care of the reviews under every product page.</p>
+<p>Amazon sells beauty products: shampoo, cream, lipstick, soap. Every
+product has a page. Under the page, there is a long list of reviews.
+Some products have <strong>hundreds of reviews</strong>.</p>
+<p>Every day: - Shoppers open a product page. - They want to read 3 or 4
+reviews before they decide to buy. - They do NOT have time to read 200
+reviews. - So Amazon must show them the <strong>best</strong> reviews
+FIRST.</p>
+<h2 id="the-problem">The problem</h2>
+<p>Not every review is good. Look at these examples:</p>
+<blockquote>
+<p>“This shampoo changed my hair. I have curly hair and it was always
+dry. After 2 weeks of using this product, my hair is soft and shiny. The
+smell is light, not too strong. I will buy again. 5 stars.”</p>
+</blockquote>
+<p>vs.</p>
+<blockquote>
+<p>“good”</p>
+</blockquote>
+<p>vs.</p>
+<blockquote>
+<p>“ITEM ARRIVED BROKEN!!! WORST COMPANY!!! NEVER AGAIN!!!”</p>
+</blockquote>
+<p>The first one is <strong>helpful</strong>. It tells the shopper
+everything. The second one is useless. The third one is angry, but does
+not say much about the product.</p>
+<p>Amazon has a button under each review: <strong>“Was this review
+helpful?”</strong> Other shoppers click “Yes” or “No”. The number of
+“Yes” clicks is called the <strong>vote</strong> count.</p>
+<p>The problem: - About <strong>85% of reviews have 0 votes.</strong>
+Nobody clicked the button. So we do not know. - Only <strong>~15% of
+reviews have 5 or more “Yes” votes.</strong> These are the proven
+helpful ones. - A new review starts at 0 votes. It is
+<strong>buried</strong> under old reviews. Nobody sees it. Nobody
+votes.</p>
+<p>This is a chicken-and-egg problem. New helpful reviews never get
+seen.</p>
+<h2 id="your-managers-request">Your manager’s request</h2>
+<p>Your manager, <strong>Daniel</strong> (Customer Reviews Quality Team
+Lead), tells you:</p>
+<blockquote>
+<p>“Each product has hundreds of reviews. Some help shoppers decide.
+Some are useless. Some are angry spam.</p>
+<p>Build me a model that <strong>ranks reviews</strong>. Surface the
+helpful ones at the top. Hide the spam at the bottom.</p>
+<p>We have a helpfulness vote count, but most reviews have 0 votes
+because they are buried. So we cannot use votes alone. We must
+<strong>predict</strong> which new reviews will become helpful, even
+before anyone votes.</p>
+<p>Then we will do TWO things: 1. Show the predicted-helpful reviews at
+the TOP of the product page. 2. Hide the predicted-spam reviews behind a
+‘show more’ link.</p>
+<p>If we do this right, shoppers spend less time reading junk. They
+decide faster. They buy more. Everyone wins.”</p>
+</blockquote>
+<h2 id="your-teams-job-for-the-next-2-weeks-module-3">Your team’s job
+for the next 2 weeks (Module 3)</h2>
+<p>Daniel cannot do this alone. The raw data is a <strong>big gzipped
+JSON file</strong> with 370,000 reviews. It needs a lot of cleaning.</p>
+<p>Your job in Module 3: &gt; <strong>Turn one messy JSON file into ONE
+clean parquet file. The clean file will be used to train the model in
+Module 4.</strong></p>
+<p>The clean file is called <code>amazon_beauty_clean.parquet</code>. It
+must have <strong>22 specific columns</strong> (we will see them in
+Class 6).</p>
+<h2 id="after-module-3">After Module 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Module</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Module 4</strong></td>
+<td>Train the prediction model. Daniel finally gets his
+“helpful-score”.</td>
+</tr>
+<tr>
+<td><strong>Module 5</strong></td>
+<td>Find groups of reviewers (super-reviewers vs one-time buyers vs
+angry posters).</td>
+</tr>
+<tr>
+<td><strong>Module 7</strong></td>
+<td>Read the review text. Find common topics: “smell”, “price”,
+“delivery”. Use NLP.</td>
+</tr>
+</tbody>
+</table>
+<p>You use the <strong>same Amazon Beauty dataset</strong> until the end
+of Module 7.</p>
+<hr />
+<h1 id="how-this-guide-works-read-this-first">How This Guide Works (Read
+This First!)</h1>
+<h2 id="we-do-not-give-you-the-full-code">We do NOT give you the full
+code</h2>
+<p>In this guide you will see two kinds of content:</p>
+<h3 id="what-why-expected-explained-in-words">1. WHAT / WHY / EXPECTED —
+explained in words</h3>
+<p>For every step you read: - <strong>WHAT</strong> you have to do (in
+normal language) - <strong>WHY</strong> you do it (the reason) -
+<strong>HINTS</strong> — the function names, the arguments to remember -
+<strong>EXPECTED</strong> — the result you should see if you did it
+right</p>
+<h3 id="sometimes-a-tiny-code-skeleton-with-blanks">2. Sometimes a tiny
+code skeleton with blanks</h3>
+<p>For the harder steps we give you a code skeleton with
+<code>___</code> blanks. <strong>You fill in the blanks.</strong></p>
+<h3 id="why-no-full-code">Why no full code?</h3>
+<p>Because you will NOT learn if you copy-paste. - In Module 4, the
+model only works if YOU understand each step. - In your future job,
+nobody will give you the code. - Writing the code yourself takes 10
+minutes more today, but saves 10 hours later.</p>
+<p><strong>Rule:</strong> If you finish a step in 30 seconds by
+copy-pasting from a teammate’s notebook, do it AGAIN by yourself.
+Different variable names, same logic.</p>
+<hr />
+<h1 id="visualizations-two-modes">Visualizations — Two Modes</h1>
+<p>In every class you will make charts. There are <strong>two
+reasons</strong> to make a chart:</p>
+<h2 id="exploratory-charts-for-you">1. Exploratory charts (for YOU)</h2>
+<p>Made BEFORE you clean the data. To understand what the data looks
+like. - Fast, ugly, no labels needed. - Examples:
+<code>df.hist()</code>,
+<code>df['column'].value_counts().plot.bar()</code>.</p>
+<blockquote>
+<p>Goal: <strong>“What does this data look like?”</strong></p>
+</blockquote>
+<h2 id="explanatory-charts-for-daniel">2. Explanatory charts (for
+DANIEL)</h2>
+<p>Made AFTER you understand. To EXPLAIN something to your manager. -
+Clean, labeled, one clear message. - Must have: title, x-label, y-label,
+source, and a 1-sentence takeaway.</p>
+<blockquote>
+<p>Goal: <strong>“Daniel, look at this. This is what is going on with
+our reviews.”</strong></p>
+</blockquote>
+<p>In every class you make BOTH kinds.</p>
+<h2 id="your-plotting-toolkit-you-learned-this-in-module-2-class-5">Your
+plotting toolkit (you learned this in Module 2 Class 5)</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Plot</th>
+<th>When to use it</th>
+<th>Function name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Histogram</td>
+<td>See the SHAPE of a numeric column</td>
+<td><code>plt.hist()</code> or <code>sns.histplot()</code></td>
+</tr>
+<tr>
+<td>Bar chart</td>
+<td>Count of each category</td>
+<td><code>df['col'].value_counts().plot.bar()</code></td>
+</tr>
+<tr>
+<td>Box plot</td>
+<td>See outliers in a numeric column</td>
+<td><code>sns.boxplot()</code></td>
+</tr>
+<tr>
+<td>Scatter plot</td>
+<td>See the relationship between 2 numbers</td>
+<td><code>plt.scatter()</code> or <code>sns.scatterplot()</code></td>
+</tr>
+<tr>
+<td>Heatmap</td>
+<td>See correlation between many columns</td>
+<td><code>sns.heatmap(df.corr())</code></td>
+</tr>
+<tr>
+<td>Line plot</td>
+<td>See change over time</td>
+<td><code>plt.plot()</code></td>
+</tr>
+</tbody>
+</table>
+<p>Before you start: <code>import matplotlib.pyplot as plt</code> and
+<code>import seaborn as sns</code>.</p>
+<hr />
+<h1 id="before-you-start-google-colab-setup">Before You Start — Google
+Colab Setup</h1>
+<p>You will work in <strong>Google Colab</strong>. That means: - You do
+NOT install Python. - You do NOT install pandas, scikit-learn, or
+anything. - You just open a notebook in your web browser.</p>
+<h2 id="step-1-open-a-new-colab-notebook">Step 1 — Open a new Colab
+notebook</h2>
+<ol type="1">
+<li>Go to https://colab.research.google.com</li>
+<li>Sign in with your Google account.</li>
+<li>Click <strong>“New notebook”</strong> (top left).</li>
+<li>Name it <code>amazon_beauty_module_3.ipynb</code>.</li>
+</ol>
+<h2 id="step-2-connect-to-google-drive">Step 2 — Connect to Google
+Drive</h2>
+<p>Colab files <strong>disappear</strong> when you close the browser. So
+you must save your work to <strong>Google Drive</strong>.</p>
+<p>In the first cell:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> google.colab <span class="im">import</span> drive</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>drive.mount(<span class="st">&#39;/content/drive&#39;</span>)</span></code></pre></div>
+<p>A pop-up asks for permission. Click “Allow”. After this, Drive is
+available at <code>/content/drive/MyDrive/</code>.</p>
+<h2 id="step-3-create-a-project-folder">Step 3 — Create a project
+folder</h2>
+<p>In a new cell:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&#39;/content/drive/MyDrive/amazon_beauty_lab&#39;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>cd <span class="op">/</span>content<span class="op">/</span>drive<span class="op">/</span>MyDrive<span class="op">/</span>amazon_beauty_lab</span></code></pre></div>
+<p>Your team will save ALL files in this folder.</p>
+<h2 id="step-4-get-the-data">Step 4 — Get the data</h2>
+<p>The dataset is the <strong>Amazon Customer Reviews — Beauty
+5-core</strong> from Stanford SNAP. - “5-core” means: every reviewer
+wrote at least 5 reviews, every product got at least 5 reviews. Good for
+ML. - Source page: https://nijianmo.github.io/amazon/index.html - The
+file is <strong>gzipped JSON</strong>. Each line is one review (JSON
+object). - License: academic / non-commercial use only.</p>
+<p><strong>Option A — Direct download (recommended):</strong></p>
+<p>In Colab, run:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>wget <span class="op">-</span>O all_beauty_5.json.gz https:<span class="op">//</span>snap.stanford.edu<span class="op">/</span>data<span class="op">/</span>amazon_v2<span class="op">/</span>categoryFilesSmall<span class="op">/</span>All_Beauty_5.json.gz</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ls <span class="op">-</span>la all_beauty_5.json.gz</span></code></pre></div>
+<p>You should see a file around <strong>30–50 MB</strong>. No Kaggle
+account needed.</p>
+<p><strong>Option B — Upload by hand:</strong></p>
+<ol type="1">
+<li>Download <code>All_Beauty_5.json.gz</code> on your laptop from the
+URL above.</li>
+<li>In Colab’s file panel (left sidebar), upload it.</li>
+<li>Move it to your Drive folder.</li>
+</ol>
+<h2 id="step-5-test-it">Step 5 — Test it</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_json(<span class="st">&#39;all_beauty_5.json.gz&#39;</span>, lines<span class="op">=</span><span class="va">True</span>, compression<span class="op">=</span><span class="st">&#39;gzip&#39;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.shape)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.columns.tolist())</span></code></pre></div>
+<ul>
+<li><code>lines=True</code> tells pandas: “each line is one JSON, not
+the whole file is one JSON”.</li>
+<li><code>compression='gzip'</code> tells pandas: “unzip on the
+fly”.</li>
+</ul>
+<p>Should print something like <code>(370000, 9)</code> and 9 column
+names like <code>overall</code>, <code>verified</code>,
+<code>reviewTime</code>, <code>reviewerID</code>, <code>asin</code>,
+<code>style</code>, <code>reviewerName</code>, <code>reviewText</code>,
+<code>summary</code>, <code>unixReviewTime</code>, <code>vote</code>,
+<code>image</code>. You are ready.</p>
+<blockquote>
+<p><strong>Memory tip:</strong> This file is big. If Colab runs out of
+RAM, take a <strong>sample</strong> of 100,000 rows:
+<code>df = df.sample(n=100000, random_state=42).reset_index(drop=True)</code>
+This makes everything faster and the lessons are the same.</p>
+</blockquote>
+<h2 id="colab-tips">Colab tips</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Save your notebook to Drive often</td>
+<td>Colab disconnects after 12 hours.</td>
+</tr>
+<tr>
+<td>Save intermediate <code>.parquet</code> files to Drive</td>
+<td>Files in <code>/content/</code> disappear when Colab
+disconnects.</td>
+</tr>
+<tr>
+<td>Share the notebook with teammates (Share button, top right)</td>
+<td>Editor access. Like Google Docs for code.</td>
+</tr>
+<tr>
+<td>Restart runtime if memory full</td>
+<td>Runtime &gt; Restart runtime.</td>
+</tr>
+<tr>
+<td>Use <code>df.sample(100000)</code> if RAM is tight</td>
+<td>The dataset is big. A sample teaches the same lesson.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="class-1-data-cleaning">Class 1 — Data Cleaning</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Daniel drops a 50 MB gzipped JSON
+file on your desk. It has 370,000 beauty product reviews. Some reviews
+are empty. Some have weird date formats. The <code>vote</code> column
+has many missing values. Your job today: load the data, fix it, save a
+clean version.</p>
+</blockquote>
+<h2 id="your-goal">Your goal</h2>
+<p>Load the gzipped JSON. Understand each column. Drop empty reviews.
+Fix the <code>vote</code> column. Save a clean parquet file.</p>
+<h2 id="inputs">Inputs</h2>
+<ul>
+<li><code>all_beauty_5.json.gz</code> (one big gzipped JSON file)</li>
+</ul>
+<h2 id="outputs">Outputs</h2>
+<ul>
+<li><code>reviews_step1.parquet</code> saved in your Drive folder</li>
+<li>3+ exploratory charts in your notebook</li>
+<li>1 explanatory chart for Daniel</li>
+<li>Notes in markdown about every decision you made</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-15-minutes">Phase A — Explore the
+data first (15 minutes)</h2>
+<p>Before you clean anything, <strong>LOOK</strong> at the data.</p>
+<h3
+id="exploratory-chart-1-distribution-of-overall-star-rating">Exploratory
+chart 1 — Distribution of <code>overall</code> (star rating)</h3>
+<ul>
+<li><strong>Question:</strong> “Are most reviews 5 stars? Or are they
+spread across 1–5?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>df['overall'].value_counts().sort_index().plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Amazon reviews are very skewed to 5
+stars. Most people only post when they LOVE the product. 1-star reviews
+are rare but loud.</li>
+</ul>
+<h3 id="exploratory-chart-2-missing-values-per-column">Exploratory chart
+2 — Missing values per column</h3>
+<ul>
+<li><strong>Question:</strong> “Which columns have the most missing
+data?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>df.isna().sum().sort_values(ascending=False)</code>.</li>
+<li>Plot it as a bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> <code>vote</code> and
+<code>image</code> are mostly missing. <code>reviewText</code> has some
+empty rows. <code>summary</code> is almost always there.</li>
+</ul>
+<h3
+id="exploratory-chart-3-distribution-of-vote-the-helpfulness-count">Exploratory
+chart 3 — Distribution of <code>vote</code> (the helpfulness count)</h3>
+<ul>
+<li><strong>Question:</strong> “How many reviews got 0 votes? 1 vote? 10
+votes? 100 votes?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>First fill missing <code>vote</code> with 0 (do this in Phase B Step
+4 anyway, do it here too as a copy).</li>
+<li>The <code>vote</code> column is stored as a string with commas (like
+<code>"1,234"</code>). Convert with
+<code>.str.replace(',', '').astype(float)</code>.</li>
+<li>Use a histogram with <code>bins=50</code>.</li>
+<li>Or use
+<code>df['vote'].clip(upper=20).value_counts().sort_index().plot.bar()</code>
+to see 0–20 only.</li>
+</ul></li>
+<li><strong>What you learn:</strong> A HUGE spike at 0. A long tail of
+“viral” reviews with 100+ votes. This is the imbalance we will deal with
+later.</li>
+</ul>
+<h3 id="exploratory-chart-4-reviews-per-year">Exploratory chart 4 —
+Reviews per year</h3>
+<ul>
+<li><strong>Question:</strong> “When were these reviews written? Did
+Amazon collect more reviews over time?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Convert <code>unixReviewTime</code> to datetime (you do this in
+Phase B Step 3 anyway, do it here too).</li>
+<li>Use <code>.dt.year</code>.</li>
+<li><code>value_counts().sort_index().plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Most reviews are from 2014–2018.
+Old reviews are rare.</li>
+</ul>
+<hr />
+<h2 id="phase-b-clean-the-reviews-table-45-minutes">Phase B — Clean the
+reviews table (45 minutes)</h2>
+<h3 id="step-1-load-the-gzipped-json">Step 1 — Load the gzipped
+JSON</h3>
+<ul>
+<li><strong>WHAT:</strong> Read the <code>.json.gz</code> file into a
+DataFrame.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>pd.read_json('all_beauty_5.json.gz', lines=True, compression='gzip')</code>.</li>
+<li><code>lines=True</code> is REQUIRED for this file (one JSON per
+line).</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> A DataFrame with ~370,000 rows × 9–12
+columns.</li>
+</ul>
+<h3 id="step-2-look-at-the-dataframe">Step 2 — Look at the
+DataFrame</h3>
+<ul>
+<li><strong>WHAT:</strong> Check <code>.shape</code>,
+<code>.info()</code>, <code>.head()</code>, and
+<code>.describe()</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Look at the <code>Dtype</code> column in <code>.info()</code>
+output.</li>
+<li><strong>Is <code>unixReviewTime</code> stored as integer?</strong>
+(Yes — it is a Unix timestamp = seconds since 1970.)</li>
+<li><strong>Is <code>vote</code> stored as text (object)?</strong> (Yes
+— and some values have commas.)</li>
+</ul></li>
+<li><strong>EXPECTED:</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>What it is</th>
+<th>Approx dtype</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>overall</code></td>
+<td>Star rating 1–5</td>
+<td>float</td>
+</tr>
+<tr>
+<td><code>verified</code></td>
+<td>True if purchase verified</td>
+<td>bool</td>
+</tr>
+<tr>
+<td><code>reviewTime</code></td>
+<td>Date as string “MM DD, YYYY”</td>
+<td>object</td>
+</tr>
+<tr>
+<td><code>reviewerID</code></td>
+<td>Reviewer ID</td>
+<td>object</td>
+</tr>
+<tr>
+<td><code>asin</code></td>
+<td>Product ID</td>
+<td>object</td>
+</tr>
+<tr>
+<td><code>reviewerName</code></td>
+<td>Reviewer name</td>
+<td>object</td>
+</tr>
+<tr>
+<td><code>reviewText</code></td>
+<td>The full review body</td>
+<td>object</td>
+</tr>
+<tr>
+<td><code>summary</code></td>
+<td>Review title</td>
+<td>object</td>
+</tr>
+<tr>
+<td><code>unixReviewTime</code></td>
+<td>Date as integer</td>
+<td>int</td>
+</tr>
+<tr>
+<td><code>vote</code></td>
+<td>Helpfulness votes</td>
+<td>object (with commas)</td>
+</tr>
+<tr>
+<td><code>style</code></td>
+<td>Optional product variant info</td>
+<td>object</td>
+</tr>
+<tr>
+<td><code>image</code></td>
+<td>URLs of uploaded images</td>
+<td>object</td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-3-convert-the-date-column">Step 3 — Convert the date
+column</h3>
+<ul>
+<li><strong>WHAT:</strong> Convert <code>unixReviewTime</code> to a real
+datetime.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>The function is <code>pd.to_datetime()</code>.</li>
+<li>Add the argument <code>unit='s'</code>. This tells pandas the
+integer is in seconds.</li>
+<li>Save the result in a new column:
+<code>df['review_date'] = pd.to_datetime(df['unixReviewTime'], unit=___)</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> If you only have an integer like
+<code>1391040000</code>, you cannot compute “how old is this review?”.
+After conversion you get a real date like <code>2014-01-30</code>.</li>
+<li><strong>EXPECTED:</strong> <code>df['review_date'].dtypes</code>
+shows <code>datetime64[ns]</code>. The min year is around 2000, max
+around 2018.</li>
+</ul>
+<h3 id="step-4-fix-the-vote-column">Step 4 — Fix the <code>vote</code>
+column</h3>
+<ul>
+<li><strong>WHAT:</strong> <code>vote</code> has 3 problems: it has
+commas in numbers, it is text not number, and most cells are
+missing.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Remove commas:
+<code>df['vote'] = df['vote'].str.replace(',', '')</code>.</li>
+<li>Convert to number: <code>.astype(float)</code>.</li>
+<li>Fill missing with 0: <code>.fillna(___)</code>.</li>
+<li>Combine into one chain.</li>
+</ul></li>
+<li><strong>WHY:</strong> Missing <code>vote</code> does NOT mean “no
+info”. It means “nobody clicked yet”. For our analysis that is the same
+as 0 votes.</li>
+<li><strong>EXPECTED:</strong>
+<code>df['vote'].isna().sum() == 0</code>. The mean is small (under 1).
+The max is large (hundreds).</li>
+</ul>
+<h3 id="step-5-drop-empty-review-texts">Step 5 — Drop empty review
+texts</h3>
+<ul>
+<li><strong>WHAT:</strong> Some rows have no <code>reviewText</code>. We
+cannot use them for NLP in Module 7.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>First: <code>df['reviewText'] = df['reviewText'].fillna('')</code>
+to make missing into empty string.</li>
+<li>Then: <code>df = df[df['reviewText'].str.strip() != '']</code>.</li>
+<li>Add <code>.copy()</code> at the end. Avoids a warning later.</li>
+</ul></li>
+<li><strong>WHY:</strong> A review with no text has no information. The
+shopper sees nothing.</li>
+<li><strong>EXPECTED:</strong> About <strong>350,000 rows</strong> left
+(about 95% kept). Write the exact number in markdown.</li>
+</ul>
+<h3 id="step-6-fill-missing-summaries">Step 6 — Fill missing
+summaries</h3>
+<ul>
+<li><strong>WHAT:</strong> Some rows have no <code>summary</code> (the
+title). Fill with empty string.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['summary'] = df['summary'].fillna('')</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Empty string is safer than missing. Later we
+will count summary length, and <code>len("")</code> is 0, but
+<code>len(None)</code> crashes.</li>
+</ul>
+<h3 id="step-7-convert-verified-to-int">Step 7 — Convert
+<code>verified</code> to int</h3>
+<ul>
+<li><strong>WHAT:</strong> <code>verified</code> is True/False. Models
+prefer 1/0.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['is_verified'] = df['verified'].astype(int)</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> “Verified purchase” is a STRONG signal. A
+verified review is more trusted by other shoppers.</li>
+</ul>
+<h3 id="step-8-write-down-what-you-did">Step 8 — Write down what you
+did</h3>
+<p>In a markdown cell, write: - Starting rows: ~370,000 - After
+drop-empty-text: ~350,000 - <code>vote</code> filled with 0 for missing
+- <code>verified</code> converted to 0/1 - <code>unixReviewTime</code>
+converted to datetime - WHY you removed each group.</p>
+<h3 id="step-9-save-to-drive">Step 9 — Save to Drive</h3>
+<ul>
+<li><strong>WHAT:</strong> Save the cleaned DataFrame as parquet, inside
+your Drive folder.</li>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/amazon_beauty_lab/reviews_step1.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-daniel-15-minutes">Phase C — Make ONE
+chart for Daniel (15 minutes)</h2>
+<p>He does not have time to read your code. He wants ONE picture.</p>
+<h3 id="daniels-chart-most-reviews-never-get-any-votes">Daniel’s chart —
+“Most reviews never get any votes”</h3>
+<p>A bar chart showing how many reviews fall into each “vote count”
+bucket:</p>
+<table>
+<thead>
+<tr>
+<th>Vote bucket</th>
+<th>Approximate count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 votes</td>
+<td>very big</td>
+</tr>
+<tr>
+<td>1–4 votes</td>
+<td>medium</td>
+</tr>
+<tr>
+<td>5–9 votes</td>
+<td>small</td>
+</tr>
+<tr>
+<td>10–49 votes</td>
+<td>very small</td>
+</tr>
+<tr>
+<td>50+ votes</td>
+<td>tiny</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>pd.cut()</code> with the bins above on the
+<code>vote</code> column.</li>
+<li><code>value_counts().sort_index().plot.bar()</code>.</li>
+<li>Title:
+<code>"Most reviews never get any votes — 85% are buried at 0"</code>.</li>
+<li>X-label: vote bucket.</li>
+<li>Y-label: number of reviews.</li>
+<li>Put the percentage on top of each bar.</li>
+</ul></li>
+<li><strong>Takeaway for Daniel:</strong> “We cannot use votes alone to
+find helpful reviews. Most reviews never get the chance. We must PREDICT
+helpfulness from the review text and meta-data.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-1">Common mistakes in Class 1</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Forget <code>lines=True</code> in <code>read_json</code></td>
+<td>Code crashes: “trailing data”.</td>
+</tr>
+<tr>
+<td>Forget <code>unit='s'</code> in <code>to_datetime</code></td>
+<td>Dates come out in year 1970.</td>
+</tr>
+<tr>
+<td>Forget to remove commas from <code>vote</code></td>
+<td><code>astype(float)</code> crashes on “1,234”.</td>
+</tr>
+<tr>
+<td>Drop rows with missing <code>vote</code> instead of filling with
+0</td>
+<td>You lose 85% of the data.</td>
+</tr>
+<tr>
+<td>Save to <code>/content/</code> instead of Drive</td>
+<td>File disappears when Colab disconnects.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-2">Self-check before Class 2</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />DataFrame loaded from
+<code>.json.gz</code> (around 370,000 rows).</label></li>
+<li><label><input type="checkbox" /><code>unixReviewTime</code>
+converted to datetime.</label></li>
+<li><label><input type="checkbox" /><code>vote</code> is numeric with no
+missing values.</label></li>
+<li><label><input type="checkbox" />Empty <code>reviewText</code> rows
+dropped.</label></li>
+<li><label><input type="checkbox" /><code>is_verified</code> is 0/1
+integer.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory charts in
+your notebook.</label></li>
+<li><label><input type="checkbox" />1 polished chart for
+Daniel.</label></li>
+<li><label><input type="checkbox" />You saved
+<code>reviews_step1.parquet</code> to your Drive folder.</label></li>
+<li><label><input type="checkbox" />You wrote down (in markdown) what
+you did and WHY.</label></li>
+</ul>
+<hr />
+<h1 id="class-2-encoding-and-scaling">Class 2 — Encoding and
+Scaling</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Daniel looks at your cleaned
+data. He is happy. But he says: “The model is a math model. It does not
+understand the word ‘verified’ as a concept, or know what ‘lipstick’
+means. Turn the categories into numbers. And the <code>vote</code>
+column has a huge tail — squash it.”</p>
+</blockquote>
+<h2 id="your-goal-1">Your goal</h2>
+<p>Turn TEXT/CATEGORY columns into numbers. Make wide numeric columns
+smaller and friendlier for the model.</p>
+<h2 id="inputs-1">Inputs</h2>
+<ul>
+<li><code>reviews_step1.parquet</code> from Class 1</li>
+</ul>
+<h2 id="outputs-1">Outputs</h2>
+<ul>
+<li><code>reviews_step2.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Daniel</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-distribution-of-vote">Exploratory chart 1 —
+Distribution of <code>vote</code></h3>
+<ul>
+<li><strong>Question:</strong> “Most votes are 0 or 1. A few reviews
+have 500+ votes. Is the distribution very skewed?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Histogram (<code>plt.hist()</code>) with <code>bins=50</code>.</li>
+<li>You will see a huge bar at 0 and almost nothing else.</li>
+</ul></li>
+<li><strong>What you learn:</strong> A typical “long-tail” distribution.
+We MUST log-transform.</li>
+</ul>
+<h3
+id="exploratory-chart-2-distribution-of-vote-after-np.log1p">Exploratory
+chart 2 — Distribution of <code>vote</code> AFTER
+<code>np.log1p</code></h3>
+<ul>
+<li><strong>Question:</strong> “Does log-transform make the shape more
+readable?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Make a NEW column:
+<code>vote_log = np.log1p(df['vote'])</code>.</li>
+<li>Histogram it.</li>
+<li>Compare to chart 1.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Now the shape has multiple peaks.
+Much friendlier for the model.</li>
+</ul>
+<h3 id="exploratory-chart-3-overall-star-rating-counts">Exploratory
+chart 3 — <code>overall</code> star rating counts</h3>
+<ul>
+<li><strong>Question:</strong> “How many 1-star, 2-star, 3-star, 4-star,
+5-star reviews?”</li>
+<li><strong>HINTS:</strong>
+<code>df['overall'].value_counts().sort_index().plot.bar()</code>.</li>
+<li><strong>What you learn:</strong> Around 60–70% are 5 stars. Star
+rating is very skewed.</li>
+</ul>
+<h3 id="exploratory-chart-4-is_verified-counts">Exploratory chart 4 —
+<code>is_verified</code> counts</h3>
+<ul>
+<li><strong>Question:</strong> “What % of reviews are from verified
+purchasers?”</li>
+<li><strong>HINTS:</strong>
+<code>df['is_verified'].value_counts(normalize=True).plot.bar()</code>.</li>
+<li><strong>What you learn:</strong> Around 85–90% are verified.
+Verified is the norm, unverified is rare.</li>
+</ul>
+<hr />
+<h2 id="phase-b-encode-and-scale">Phase B — Encode and scale</h2>
+<h3 id="step-1-decide-which-columns-are-categorical">Step 1 — Decide
+which columns are categorical</h3>
+<ul>
+<li><strong>WHAT:</strong> Look at the data again. Identify the columns
+that are categories.</li>
+<li><strong>HINTS:</strong> Make a short list. Candidates:
+<ul>
+<li><code>overall</code> (1–5 stars) — could be category OR number.</li>
+<li><code>is_verified</code> (already 0/1) — done.</li>
+<li>Year of review (we will create this in Step 3).</li>
+</ul></li>
+<li><strong>WRITE IN NOTEBOOK:</strong> Which columns are numeric, which
+are categorical? Why?</li>
+</ul>
+<h3 id="step-2-one-hot-encode-overall-optional">Step 2 — One-hot encode
+<code>overall</code> (optional)</h3>
+<ul>
+<li><strong>WHAT:</strong> Turn the 5 star levels into 5 new 0/1
+columns.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>pd.get_dummies(df, columns=['overall'], prefix='star')</code>.</li>
+<li>Result: <code>star_1</code>, <code>star_2</code>,
+<code>star_3</code>, <code>star_4</code>, <code>star_5</code>.</li>
+</ul></li>
+<li><strong>WHY one-hot here?</strong> Star ratings could be treated as
+numbers OR categories. As one-hot, the model can learn “1-star reviews
+are different from 5-star reviews” without assuming a smooth scale.</li>
+<li><strong>CHOICE:</strong> Some teams keep <code>overall</code> as a
+number. Some one-hot. Pick one and write WHY.</li>
+</ul>
+<h3 id="step-3-extract-date-features">Step 3 — Extract date
+features</h3>
+<ul>
+<li><strong>WHAT:</strong> From <code>review_date</code>, make new
+columns <code>year</code> and <code>month</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['year'] = df['review_date'].dt.year</code>.</li>
+<li><code>df['month'] = df['review_date'].dt.month</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> A review from 2010 may be on an old product.
+Recent reviews may be on trendy products. Year matters.</li>
+</ul>
+<h3 id="step-4-log-transform-vote">Step 4 — Log-transform
+<code>vote</code></h3>
+<ul>
+<li><strong>WHAT:</strong> The <code>vote</code> column has a very long
+tail. Apply <code>np.log1p()</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['vote_log'] = np.log1p(df['vote'])</code>.</li>
+</ul></li>
+<li><strong>WHY <code>log1p</code> and not <code>log</code>?</strong>
+<code>log(0)</code> is <code>-inf</code>.
+<code>log1p(x) = log(x + 1)</code> is safe for zeros. Since most votes
+are 0, this matters a lot.</li>
+<li><strong>WHY at all?</strong> The original <code>vote</code> ranges
+from 0 to ~1000. A model sees the 1000 as 1000x more important than 1.
+Log makes 0 stay 0, but 1000 becomes ~7. Same information, friendlier
+scale.</li>
+</ul>
+<h3 id="step-5-compute-review_age_days">Step 5 — Compute
+<code>review_age_days</code></h3>
+<ul>
+<li><strong>WHAT:</strong> How many days ago was this review
+written?</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Pick a reference date — e.g. the MAX date in the dataset:
+<code>ref = df['review_date'].max()</code>.</li>
+<li>Subtract:
+<code>df['review_age_days'] = (ref - df['review_date']).dt.days</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Older reviews had more time to collect votes.
+A review from 2010 with 5 votes is less impressive than a review from
+2018 with 5 votes.</li>
+</ul>
+<h3 id="step-6-scale-numeric-columns-preview-only">Step 6 — Scale
+numeric columns (preview only)</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>StandardScaler</code> to make every
+numeric column have mean = 0, std = 1.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.preprocessing import StandardScaler</code>.</li>
+<li><code>scaler = StandardScaler()</code>.</li>
+<li><code>scaler.fit_transform(df[numeric_cols])</code>.</li>
+</ul></li>
+<li><strong>WARNING:</strong> This is for inspection only. In Class 5,
+scaling goes INSIDE the Pipeline. Do NOT save the scaled version as your
+final file.</li>
+</ul>
+<h3 id="step-7-save">Step 7 — Save</h3>
+<ul>
+<li><strong>WHAT:</strong> Save to Drive.
+<code>df.to_parquet('/content/drive/MyDrive/amazon_beauty_lab/reviews_step2.parquet')</code>.</li>
+<li><strong>Save the UNSCALED version.</strong> Scaling will happen
+inside the Pipeline later.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-daniel">Phase C — Make ONE chart for
+Daniel</h2>
+<h3
+id="daniels-chart-verified-vs-unverified-do-they-get-the-same-votes">Daniel’s
+chart — “Verified vs unverified: do they get the same votes?”</h3>
+<p>A box plot of <code>vote_log</code> for verified vs unverified
+reviewers.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use
+<code>sns.boxplot(x='is_verified', y='vote_log', data=df)</code>.</li>
+<li>Or
+<code>df.groupby('is_verified')['vote_log'].mean().plot.bar()</code> for
+an average view.</li>
+</ul></li>
+<li><strong>Title:</strong> “Verified reviewers get more helpful
+votes.”</li>
+<li><strong>X-label:</strong> Verified (0 = no, 1 = yes).</li>
+<li><strong>Y-label:</strong> log(votes + 1).</li>
+<li><strong>Takeaway for Daniel:</strong> “Verified purchase is a strong
+signal. Other shoppers trust verified reviewers and click ‘helpful’ more
+often. We MUST keep this column.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-2">Common mistakes in Class 2</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scale BEFORE train/test split</td>
+<td><strong>Leakage.</strong> Scaler sees test data.</td>
+</tr>
+<tr>
+<td>Use <code>np.log</code> on zero votes</td>
+<td><code>np.log(0) = -inf</code>. Crash. Use
+<code>np.log1p</code>.</td>
+</tr>
+<tr>
+<td>One-hot encode <code>reviewerID</code></td>
+<td>50,000+ unique reviewers. Table explodes.</td>
+</tr>
+<tr>
+<td>Save the scaled version</td>
+<td>Class 5 will scale again inside the pipeline. Double scaling = wrong
+numbers.</td>
+</tr>
+<tr>
+<td>Treat <code>overall</code> as text “5” not number 5</td>
+<td>Model thinks “5” is a category, loses the order.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-3">Self-check before Class 3</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>vote_log</code>
+exists.</label></li>
+<li><label><input type="checkbox" /><code>year</code>,
+<code>month</code>, <code>review_age_days</code> exist.</label></li>
+<li><label><input type="checkbox" />You decided what to do with
+<code>overall</code> (one-hot or keep as number).</label></li>
+<li><label><input type="checkbox" />You did NOT one-hot encode
+<code>reviewerID</code> or <code>asin</code>.</label></li>
+<li><label><input type="checkbox" />At least 3 exploratory
+charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Daniel.</label></li>
+<li><label><input type="checkbox" /><code>reviews_step2.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-3-feature-engineering">Class 3 — Feature Engineering</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Daniel says: “The raw columns are
+not enough. The MOST useful columns are not there. We must MAKE them.
+For example: how long is the review text? Does it ask questions? Does it
+shout in capital letters? Does it mention ‘photo’ or ‘image’? These are
+the signals of helpful vs spam.”</p>
+</blockquote>
+<h2 id="your-goal-2">Your goal</h2>
+<p>Make NEW columns from the review TEXT. These will help the model
+predict helpfulness.</p>
+<h2 id="inputs-2">Inputs</h2>
+<ul>
+<li><code>reviews_step2.parquet</code></li>
+</ul>
+<h2 id="outputs-2">Outputs</h2>
+<ul>
+<li><code>reviews_step3.parquet</code> in Drive</li>
+<li>3+ exploratory charts</li>
+<li>1 explanatory chart for Daniel</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-1">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-is_helpful-distribution">Exploratory chart 1
+— <code>is_helpful</code> distribution</h3>
+<ul>
+<li>First make the <code>is_helpful</code> column (see Step 1
+below).</li>
+<li><strong>Question:</strong> “What % of reviews are helpful (vote
+&gt;= 5)?”</li>
+<li><strong>HINTS:</strong>
+<code>df['is_helpful'].value_counts(normalize=True).plot.bar()</code>.</li>
+<li><strong>What you learn:</strong> Around 10–15%. This is an
+<strong>imbalanced</strong> problem. We will deal with that in Class
+5.</li>
+</ul>
+<h3 id="exploratory-chart-2-review-length-distribution">Exploratory
+chart 2 — Review length distribution</h3>
+<ul>
+<li>After Step 2 (compute <code>review_length</code>), look at its
+distribution.</li>
+<li><strong>HINTS:</strong> Histogram with <code>bins=50</code>. Use
+<code>df['review_length'].clip(upper=2000)</code> to see the bulk.</li>
+<li><strong>What you learn:</strong> Most reviews are SHORT (under 200
+chars). A few are very long essays (5000+).</li>
+</ul>
+<h3 id="exploratory-chart-3-review-length-vs-is_helpful">Exploratory
+chart 3 — Review length vs <code>is_helpful</code></h3>
+<ul>
+<li><strong>Question:</strong> “Are longer reviews more likely to be
+helpful?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Group <code>review_length</code> into bins using
+<code>pd.cut(df['review_length'], bins=[0, 50, 200, 500, 1000, 5000, 50000])</code>.</li>
+<li>For each bin, compute
+<code>df.groupby(bin)['is_helpful'].mean()</code>.</li>
+<li>Bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> This is one of your MOST important
+features. Long reviews are usually more helpful.</li>
+</ul>
+<h3 id="exploratory-chart-4-is_verified-vs-is_helpful">Exploratory chart
+4 — <code>is_verified</code> vs <code>is_helpful</code></h3>
+<ul>
+<li><strong>Question:</strong> “Are verified reviews more likely to be
+helpful?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df.groupby('is_verified')['is_helpful'].mean().plot.bar()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Verified is a good predictor.
+Daniel will love this chart.</li>
+</ul>
+<hr />
+<h2 id="phase-b-engineer-the-features">Phase B — Engineer the
+features</h2>
+<h3 id="step-1-create-the-target-column-is_helpful">Step 1 — Create the
+target column <code>is_helpful</code></h3>
+<ul>
+<li><strong>WHAT:</strong> <code>is_helpful = 1</code> if
+<code>vote &gt;= 5</code>, else 0.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compare: <code>df['vote'] &gt;= 5</code>.</li>
+<li>The result is True/False. Convert to int with
+<code>.astype(int)</code>.</li>
+</ul></li>
+<li><strong>WHY threshold 5?</strong> Below 5 votes is too noisy (1
+friend can click “helpful” once). 5+ votes means real shoppers found it
+useful.</li>
+<li><strong>EXPECTED:</strong> About 10–15% of rows have
+<code>is_helpful = 1</code>. Confirm with
+<code>df['is_helpful'].mean()</code>.</li>
+</ul>
+<h3 id="step-2-length-features">Step 2 — Length features</h3>
+<table>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>review_length</code></td>
+<td><code>len(reviewText)</code> in characters</td>
+</tr>
+<tr>
+<td><code>summary_length</code></td>
+<td><code>len(summary)</code> in characters</td>
+</tr>
+<tr>
+<td><code>word_count</code></td>
+<td>Number of words in <code>reviewText</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>df['review_length'] = df['reviewText'].str.len()</code>.</li>
+<li><code>df['word_count'] = df['reviewText'].str.split().str.len()</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> A 5-word review like “this is good” cannot
+tell a shopper much. A 200-word review with details can.</li>
+</ul>
+<h3 id="step-3-punctuation-features">Step 3 — Punctuation features</h3>
+<table>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>n_questions</code></td>
+<td>Count of <code>?</code> in <code>reviewText</code></td>
+</tr>
+<tr>
+<td><code>n_exclamations</code></td>
+<td>Count of <code>!</code> in <code>reviewText</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use <code>.str.count()</code> with the character.</li>
+<li><code>df['n_questions'] = df['reviewText'].str.count(___)</code>.</li>
+</ul></li>
+<li><strong>WHY:</strong> Lots of <code>!!!</code> often means an
+emotional, angry, or low-quality review. Lots of <code>?</code> might
+mean a confused reviewer asking questions instead of giving info.</li>
+</ul>
+<h3 id="step-4-capital-letters-ratio-caps_ratio">Step 4 — Capital
+letters ratio <code>caps_ratio</code></h3>
+<ul>
+<li><strong>WHAT:</strong> Fraction of letters that are UPPERCASE. A
+spam review like “BEST PRODUCT EVER!!! BUY NOW!!!” has caps_ratio close
+to 1.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> caps_ratio(text):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(text) <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="fl">0.0</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    n_upper <span class="op">=</span> <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> c <span class="kw">in</span> text <span class="cf">if</span> c.___())   <span class="co"># YOU fill in</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    n_letters <span class="op">=</span> <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> c <span class="kw">in</span> text <span class="cf">if</span> c.___())</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n_letters <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="fl">0.0</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> n_upper <span class="op">/</span> n_letters</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;caps_ratio&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;reviewText&#39;</span>].<span class="bu">apply</span>(___)</span></code></pre></div></li>
+<li><p>Fill in: <code>isupper</code>, <code>isalpha</code>, and the
+function name in <code>apply</code>.</p></li>
+</ul></li>
+<li><strong>WHY:</strong> Shouting reviews look like spam. Shoppers
+downvote them. So caps_ratio predicts NOT-helpful.</li>
+</ul>
+<h3 id="step-5-keyword-features">Step 5 — Keyword features</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>New column</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>has_image_keyword</code></td>
+<td>1 if review mentions “photo”, “picture”, “image”, “pic”</td>
+</tr>
+<tr>
+<td><code>has_brand_mention</code></td>
+<td>1 if review mentions a known brand (e.g. “Loreal”, “Nivea”,
+“Maybelline”, “Dove”)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p>Lowercase first:
+<code>text = df['reviewText'].str.lower()</code>.</p></li>
+<li><p>Use <code>.str.contains('|'.join(keywords), regex=True)</code>
+then <code>.astype(int)</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>image_words <span class="op">=</span> [<span class="st">&#39;photo&#39;</span>, <span class="st">&#39;picture&#39;</span>, ___, ___]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;has_image_keyword&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;reviewText&#39;</span>].<span class="bu">str</span>.lower().<span class="bu">str</span>.contains(___).astype(<span class="bu">int</span>)</span></code></pre></div></li>
+<li><p>Build a small brand list for <code>has_brand_mention</code>. Even
+5–10 brands are enough.</p></li>
+</ul></li>
+<li><strong>WHY image keyword?</strong> Reviews that say “see my photo”
+often have uploaded photos. Photos are gold for shoppers. These reviews
+get more “helpful” clicks.</li>
+<li><strong>WHY brand mention?</strong> A review that names the brand is
+usually a thoughtful, comparative review.</li>
+</ul>
+<h3 id="step-6-sentiment-polarity-score-sentiment_polarity_score">Step 6
+— Sentiment polarity score <code>sentiment_polarity_score</code></h3>
+<ul>
+<li><strong>WHAT:</strong> A number from -1 (very negative) to +1 (very
+positive) for each review.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use the library <code>TextBlob</code>. In Colab:
+<ul>
+<li><code>!pip install textblob -q</code>.</li>
+<li><code>from textblob import TextBlob</code>.</li>
+</ul></li>
+<li>For each review: <code>TextBlob(text).sentiment.polarity</code>
+returns a number.</li>
+<li>Apply it:
+<code>df['sentiment_polarity_score'] = df['reviewText'].apply(lambda t: TextBlob(t).sentiment.polarity)</code>.</li>
+<li><strong>SLOW WARNING:</strong> This takes a few minutes. Be
+patient.</li>
+</ul></li>
+<li><strong>WHY:</strong> Very negative reviews AND very positive
+reviews tend to be more helpful than neutral “meh” reviews. The polarity
+matters.</li>
+</ul>
+<h3 id="step-7-save-1">Step 7 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<code>df.to_parquet('/content/drive/MyDrive/amazon_beauty_lab/reviews_step3.parquet')</code>.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-daniel-1">Phase C — Make ONE chart
+for Daniel</h2>
+<h3
+id="daniels-chart-long-reviews-are-3x-more-likely-to-be-helpful">Daniel’s
+chart — “Long reviews are 3x more likely to be helpful”</h3>
+<p>A bar chart: bin <code>review_length</code> into 5 buckets, show the
+% helpful in each bucket.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>bins = [0, 50, 200, 500, 1000, 10000]</code>.</li>
+<li><code>df['length_bucket'] = pd.cut(df['review_length'], bins=___)</code>.</li>
+<li><code>helpful_rate = df.groupby('length_bucket')['is_helpful'].mean() * 100</code>.</li>
+<li>Bar chart.</li>
+</ul></li>
+<li><strong>Title:</strong> “Helpful rate by review length — longer
+reviews win.”</li>
+<li><strong>X-label:</strong> Review length bucket (characters).</li>
+<li><strong>Y-label:</strong> % of reviews marked helpful.</li>
+<li><strong>Takeaway for Daniel:</strong> “If a reviewer writes more
+than 200 characters, the review is 3x more likely to be useful. We
+should remind reviewers to write longer reviews. We should also show
+longer reviews higher in the ranking.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-3">Common mistakes in Class 3</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Use <code>vote</code> as a feature for <code>is_helpful</code></td>
+<td><strong>Leakage.</strong> <code>is_helpful</code> IS derived from
+<code>vote</code>. The model will be 100% accurate but useless.</td>
+</tr>
+<tr>
+<td>Forget to lowercase before keyword search</td>
+<td>“Photo” and “photo” not matched the same.</td>
+</tr>
+<tr>
+<td>Use <code>len</code> on a column that has missing values</td>
+<td>Crash. Always <code>fillna('')</code> first.</td>
+</tr>
+<tr>
+<td>Skip the <code>if len(text) == 0</code> guard in
+<code>caps_ratio</code></td>
+<td>Division by zero.</td>
+</tr>
+<tr>
+<td>Sentiment too slow — give up</td>
+<td>Take a sample of 50,000 first to test. Then run on full data
+overnight.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-4">Self-check before Class 4</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>is_helpful</code> exists. Mean
+~10–15%.</label></li>
+<li><label><input type="checkbox" /><code>review_length</code>,
+<code>summary_length</code>, <code>word_count</code> exist.</label></li>
+<li><label><input type="checkbox" /><code>n_questions</code>,
+<code>n_exclamations</code>, <code>caps_ratio</code> exist.</label></li>
+<li><label><input type="checkbox" /><code>has_image_keyword</code>,
+<code>has_brand_mention</code> exist.</label></li>
+<li><label><input
+type="checkbox" /><code>sentiment_polarity_score</code>
+exists.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 explanatory chart.</label></li>
+<li><label><input type="checkbox" /><code>reviews_step3.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-4-feature-selection">Class 4 — Feature Selection</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Now you have ~25 columns. Daniel
+says: “Too many. Some say the same thing. Some are useless. I want 12–15
+GOOD columns. Pick them. And tell me WHY each one is in.”</p>
+</blockquote>
+<h2 id="your-goal-3">Your goal</h2>
+<p>Pick the best 12–15 columns. Drop the rest. Justify every choice.</p>
+<h2 id="inputs-3">Inputs</h2>
+<ul>
+<li><code>reviews_step3.parquet</code></li>
+</ul>
+<h2 id="outputs-3">Outputs</h2>
+<ul>
+<li><code>reviews_step4.parquet</code> in Drive (only the selected
+columns + <code>is_helpful</code>)</li>
+<li>3+ exploratory charts (correlation heatmap, mutual info bars,
+importance bars)</li>
+<li>A short markdown report explaining your choices</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-2">Phase A — Explore the data
+first</h2>
+<h3
+id="exploratory-chart-1-correlation-heatmap-of-numeric-columns">Exploratory
+chart 1 — Correlation heatmap of numeric columns</h3>
+<ul>
+<li><strong>Question:</strong> “Which columns say the same thing as each
+other?”</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute <code>df[numeric_cols].corr()</code>.</li>
+<li>Plot with <code>sns.heatmap()</code>.</li>
+<li>Use <code>annot=True</code> and <code>fmt='.2f'</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> <code>review_length</code> and
+<code>word_count</code> will have very high correlation (~0.95). Drop
+one. Maybe <code>vote_log</code> and <code>is_helpful</code> are
+correlated too — <strong>DANGER</strong> — that means leakage. Drop
+<code>vote_log</code> from the feature list!</li>
+</ul>
+<h3 id="exploratory-chart-2-mutual-information-bar-chart">Exploratory
+chart 2 — Mutual information bar chart</h3>
+<ul>
+<li>After you compute mutual info (Step 4 below), plot it.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Sort the values, then bar chart.</li>
+</ul></li>
+<li><strong>What you learn:</strong> Which columns predict
+<code>is_helpful</code> strongest. <code>review_length</code>,
+<code>is_verified</code>, <code>caps_ratio</code> should be at the
+top.</li>
+</ul>
+<h3
+id="exploratory-chart-3-random-forest-feature-importance">Exploratory
+chart 3 — Random Forest feature importance</h3>
+<ul>
+<li>After you train the RF (Step 5 below), plot the importances.</li>
+<li><strong>HINTS:</strong>
+<code>pd.Series(rf.feature_importances_, index=feature_names).sort_values().plot.barh()</code>.</li>
+<li><strong>What you learn:</strong> A second opinion on feature
+importance.</li>
+</ul>
+<hr />
+<h2 id="phase-b-select-features">Phase B — Select features</h2>
+<h3 id="step-1-drop-the-leakage-column-first">Step 1 — Drop the leakage
+column FIRST</h3>
+<ul>
+<li><strong>WHAT:</strong> <code>vote</code> and <code>vote_log</code>
+MUST NOT be used as features. <code>is_helpful</code> was made from
+<code>vote</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Build a list of “forbidden” columns:
+<code>['vote', 'vote_log']</code>.</li>
+<li>Drop them before doing anything else.</li>
+</ul></li>
+<li><strong>WHY:</strong> If you keep <code>vote</code> as a feature,
+the model can just check “is vote &gt;= 5?” and be 100% right on the
+training set. But it will FAIL on new reviews (which have 0 votes
+yet).</li>
+</ul>
+<h3 id="step-2-split-into-train-and-test-first">Step 2 — Split into
+train and test FIRST</h3>
+<ul>
+<li><strong>WHAT:</strong> Use <code>train_test_split</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.model_selection import train_test_split</code>.</li>
+<li><code>X = df.drop('is_helpful', axis=1); y = df['is_helpful']</code>.</li>
+<li>Pass: <code>test_size=0.2</code>, <code>random_state=42</code>,
+<code>stratify=___</code>.</li>
+<li>Fill in <code>stratify=y</code> so the imbalance ratio is
+preserved.</li>
+</ul></li>
+<li><strong>WHY:</strong> All next steps use TRAIN ONLY. Otherwise
+leakage.</li>
+</ul>
+<h3 id="step-3-remove-low-variance-columns">Step 3 — Remove low-variance
+columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop columns where almost all values are the
+same.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import VarianceThreshold</code>.</li>
+<li><code>VarianceThreshold(threshold=0.01)</code> then
+<code>.fit_transform(X_train[numeric_cols])</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Maybe <code>has_brand_mention</code>
+survives only if 5%+ of reviews mention a brand. If not, drop.</li>
+</ul>
+<h3 id="step-4-remove-highly-correlated-columns">Step 4 — Remove highly
+correlated columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Drop one of each pair where |corr| &gt;
+0.9.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Compute correlation matrix.</li>
+<li>Get the upper triangle with <code>np.triu(...)</code>.</li>
+<li>For each column, if any of its upper-triangle correlations is &gt;
+0.9, mark it for dropping.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> <code>review_length</code> and
+<code>word_count</code> overlap. Keep ONE.</li>
+</ul>
+<h3 id="step-5-rank-by-mutual-information">Step 5 — Rank by mutual
+information</h3>
+<ul>
+<li><strong>WHAT:</strong> Score each column by how much it tells you
+about <code>is_helpful</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.feature_selection import mutual_info_classif</code>.</li>
+<li><code>mi = mutual_info_classif(X_train_numeric, y_train)</code>.</li>
+<li>Put in a Series, sort.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> Top columns should be:
+<code>review_length</code>, <code>is_verified</code>,
+<code>review_age_days</code>, <code>caps_ratio</code>,
+<code>sentiment_polarity_score</code>.</li>
+</ul>
+<h3 id="step-6-random-forest-importance-second-opinion">Step 6 — Random
+Forest importance (second opinion)</h3>
+<ul>
+<li><strong>WHAT:</strong> Train a small RF, look at
+<code>feature_importances_</code>.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.ensemble import RandomForestClassifier</code>.</li>
+<li><code>RandomForestClassifier(n_estimators=50, max_depth=8, n_jobs=-1, class_weight='balanced')</code>.</li>
+<li><code>.fit(X_train, y_train)</code>.</li>
+<li>Look at <code>.feature_importances_</code>.</li>
+</ul></li>
+<li><strong>WHY <code>class_weight='balanced'</code>?</strong> Because
+only ~15% of reviews are helpful. Without balanced, the RF predicts “not
+helpful” for everyone.</li>
+</ul>
+<h3 id="step-7-pick-the-final-1215-columns">Step 7 — Pick the final
+12–15 columns</h3>
+<ul>
+<li><strong>WHAT:</strong> Combine the rankings. Pick columns that:
+<ul>
+<li>Are high in mutual info, AND</li>
+<li>Are high in RF importance, AND</li>
+<li>Were not dropped by variance/correlation pruning.</li>
+</ul></li>
+<li><strong>WRITE DOWN:</strong> In your notebook, list the columns.
+Explain in 1 sentence why each one is in.</li>
+</ul>
+<h3 id="step-8-save">Step 8 — Save</h3>
+<ul>
+<li><strong>HINTS:</strong> Keep only the selected columns +
+<code>is_helpful</code>. Save as <code>reviews_step4.parquet</code> to
+Drive.</li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-daniel-2">Phase C — Make ONE chart
+for Daniel</h2>
+<h3
+id="daniels-chart-these-are-the-10-columns-that-predict-helpfulness">Daniel’s
+chart — “These are the 10 columns that predict helpfulness”</h3>
+<p>A horizontal bar chart of your top 10 features and their importance
+score.</p>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li>Use the RF importance.</li>
+<li><code>sort_values()</code> then <code>.head(10)</code> then
+<code>.plot.barh()</code>.</li>
+</ul></li>
+<li><strong>Title:</strong> “Top 10 predictors of a helpful
+review.”</li>
+<li><strong>Y-axis:</strong> column names.</li>
+<li><strong>X-axis:</strong> Random Forest importance.</li>
+<li><strong>Takeaway for Daniel:</strong> “Review length, verified
+status, and review age explain 60% of helpfulness. We do not need fancy
+features. The simple ones win.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-4">Common mistakes in Class 4</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Keep <code>vote</code> or <code>vote_log</code> as a feature</td>
+<td>Catastrophic leakage. Model looks perfect, fails in production.</td>
+</tr>
+<tr>
+<td>Compute mutual info on the FULL data</td>
+<td>Leakage. Use train only.</td>
+</tr>
+<tr>
+<td>Drop a column without writing why</td>
+<td>Module 4 students will not understand.</td>
+</tr>
+<tr>
+<td>Keep 30+ columns</td>
+<td>Slow training. Overfitting risk.</td>
+</tr>
+<tr>
+<td>Forget <code>class_weight='balanced'</code> in RF</td>
+<td>RF says “not helpful” to everything. All importances broken.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-5">Self-check before Class 5</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>vote</code> and
+<code>vote_log</code> REMOVED from the features.</label></li>
+<li><label><input type="checkbox" />Train/test split done
+FIRST.</label></li>
+<li><label><input type="checkbox" />12–15 columns remain +
+<code>is_helpful</code>.</label></li>
+<li><label><input type="checkbox" />You wrote down WHY for each kept
+column.</label></li>
+<li><label><input type="checkbox" />3+ exploratory charts.</label></li>
+<li><label><input type="checkbox" />1 chart for Daniel.</label></li>
+<li><label><input type="checkbox" /><code>reviews_step4.parquet</code>
+saved to Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-5-pipelines">Class 5 — Pipelines</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Daniel says: “Your cleaning code
+is in 4 different notebooks. When a new review is posted tomorrow, you
+cannot run 4 notebooks. We need ONE object that takes a raw review and
+outputs a helpfulness score. End-to-end.”</p>
+</blockquote>
+<h2 id="your-goal-4">Your goal</h2>
+<p>Put EVERY cleaning step inside ONE Pipeline object. Production-ready
+code. Handle the class imbalance.</p>
+<h2 id="inputs-4">Inputs</h2>
+<ul>
+<li><code>reviews_step4.parquet</code> (selected columns)</li>
+</ul>
+<h2 id="outputs-4">Outputs</h2>
+<ul>
+<li><code>amazon_beauty_pipeline.joblib</code> saved in Drive</li>
+<li>1 confusion-matrix chart + 1 ROC curve chart</li>
+<li>A pipeline that takes RAW input and produces predictions</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-3">Phase A — Explore the data
+first</h2>
+<h3 id="exploratory-chart-1-confusion-matrix-after-training">Exploratory
+chart 1 — Confusion matrix (after training)</h3>
+<ul>
+<li>After Step 6, build a confusion matrix.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay</code>.</li>
+<li><code>cm = confusion_matrix(y_test, y_pred)</code>.</li>
+<li><code>ConfusionMatrixDisplay(cm, display_labels=['Not helpful', 'Helpful']).plot()</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> How many helpful reviews did we
+CATCH? How many did we MISS? How many false alarms?</li>
+</ul>
+<h3 id="exploratory-chart-2-roc-curve">Exploratory chart 2 — ROC
+curve</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.metrics import RocCurveDisplay</code>.</li>
+<li><code>RocCurveDisplay.from_estimator(pipeline, X_test, y_test)</code>.</li>
+</ul></li>
+<li><strong>What you learn:</strong> The trade-off between recall and
+false alarms. The AUC number.</li>
+</ul>
+<hr />
+<h2 id="phase-b-build-the-pipeline">Phase B — Build the pipeline</h2>
+<h3
+id="step-1-decide-which-columns-are-numeric-and-which-are-categorical">Step
+1 — Decide which columns are numeric and which are categorical</h3>
+<ul>
+<li><strong>HINTS:</strong> Make two lists.</li>
+<li><strong>EXAMPLE:</strong>
+<ul>
+<li>numeric: <code>review_length</code>, <code>summary_length</code>,
+<code>word_count</code>, <code>n_questions</code>,
+<code>n_exclamations</code>, <code>caps_ratio</code>,
+<code>sentiment_polarity_score</code>, <code>review_age_days</code>,
+<code>overall</code>.</li>
+<li>categorical: <code>month</code> (if you kept it), <code>year</code>
+(if you kept it).</li>
+<li>binary already 0/1: <code>is_verified</code>,
+<code>has_image_keyword</code>, <code>has_brand_mention</code>. Treat as
+numeric.</li>
+</ul></li>
+</ul>
+<h3 id="step-2-build-the-numeric-mini-pipeline">Step 2 — Build the
+numeric mini-pipeline</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer (fill missing) +
+scaler.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.pipeline import Pipeline</code>.</p></li>
+<li><p><code>from sklearn.impute import SimpleImputer</code>.</p></li>
+<li><p><code>from sklearn.preprocessing import StandardScaler</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>numeric_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;scaler&#39;</span>,  StandardScaler()),</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in the blank: best strategy for numeric?
+(<code>'median'</code>)</p></li>
+</ul></li>
+</ul>
+<h3 id="step-3-build-the-categorical-mini-pipeline">Step 3 — Build the
+categorical mini-pipeline</h3>
+<ul>
+<li><strong>WHAT:</strong> 2 steps: imputer + one-hot encoder.</li>
+<li><strong>HINTS:</strong>
+<ul>
+<li><p><code>from sklearn.preprocessing import OneHotEncoder</code>.</p></li>
+<li><p>Skeleton:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>categorical_transformer <span class="op">=</span> Pipeline(steps<span class="op">=</span>[</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;imputer&#39;</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">&#39;___&#39;</span>)),</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;onehot&#39;</span>,  OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">&#39;___&#39;</span>, sparse_output<span class="op">=</span>___)),</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div></li>
+<li><p>Fill in blanks. (Strategy <code>'most_frequent'</code>,
+handle_unknown <code>'ignore'</code>, sparse_output
+<code>False</code>.)</p></li>
+</ul></li>
+<li><strong>WHY <code>handle_unknown='ignore'</code>?</strong> In
+production, a new month or a new year may appear. We do not want the
+code to crash.</li>
+</ul>
+<h3 id="step-4-combine-into-a-columntransformer">Step 4 — Combine into a
+ColumnTransformer</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.compose import ColumnTransformer</code>.</li>
+<li>It takes a list of tuples:
+<code>(name, transformer, list_of_columns)</code>.</li>
+</ul></li>
+</ul>
+<h3 id="step-5-add-the-model-on-top-deal-with-imbalance">Step 5 — Add
+the model on top — DEAL WITH IMBALANCE</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>from sklearn.linear_model import LogisticRegression</code>.</li>
+<li><code>LogisticRegression(class_weight='balanced', max_iter=1000, random_state=42)</code>.</li>
+<li>Put it in a Pipeline with the preprocessor.</li>
+</ul></li>
+<li><strong>WHY <code>class_weight='balanced'</code>?</strong> Only ~15%
+of reviews are helpful. Without this, the model just predicts “not
+helpful” for everyone. It gets 85% accuracy but is useless. With
+<code>class_weight='balanced'</code>, scikit-learn gives extra weight to
+the rare “helpful” class. Now the model actually learns to find
+them.</li>
+<li><strong>ALTERNATIVE — SMOTE:</strong> Another way to fix imbalance
+is to OVERSAMPLE the rare class with synthetic data. Library:
+<code>imbalanced-learn</code>. <strong>Pick ONE method — not
+both.</strong> For this lab, use <code>class_weight='balanced'</code>.
+SMOTE is more advanced.</li>
+</ul>
+<h3 id="step-6-train-and-evaluate">Step 6 — Train and evaluate</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>full_pipeline.fit(X_train, y_train)</code>.</li>
+<li><code>y_pred = full_pipeline.predict(X_test)</code>.</li>
+<li><code>from sklearn.metrics import classification_report</code>.</li>
+</ul></li>
+<li><strong>EXPECTED:</strong> F1 on the helpful class around 0.30–0.45.
+Recall on helpful class around 0.55–0.70. (Module 4 improves this with
+better models.)</li>
+</ul>
+<h3 id="step-7-save-the-trained-pipeline">Step 7 — Save the trained
+pipeline</h3>
+<ul>
+<li><strong>HINTS:</strong>
+<ul>
+<li><code>import joblib</code>.</li>
+<li><code>joblib.dump(full_pipeline, '/content/drive/MyDrive/amazon_beauty_lab/amazon_beauty_pipeline.joblib')</code>.</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="phase-c-make-one-chart-for-daniel-3">Phase C — Make ONE chart
+for Daniel</h2>
+<h3 id="daniels-chart-how-many-helpful-reviews-did-we-catch">Daniel’s
+chart — “How many helpful reviews did we catch?”</h3>
+<p>A simple confusion matrix:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Predicted not helpful</th>
+<th>Predicted helpful</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Actually not helpful</strong></td>
+<td>true negatives</td>
+<td>false alarms</td>
+</tr>
+<tr>
+<td><strong>Actually helpful</strong></td>
+<td>missed helpful</td>
+<td>caught helpful</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>HINTS:</strong> Just print the confusion matrix with labels.
+Or use <code>seaborn.heatmap()</code> on it.</li>
+<li><strong>Title:</strong> “Of 100 helpful reviews, our baseline model
+catches ~60.”</li>
+<li><strong>Takeaway for Daniel:</strong> “Not perfect, but much better
+than zero. Without the model, we have no way to find helpful new
+reviews. Module 4 will push this higher with XGBoost and text
+features.”</li>
+</ul>
+<hr />
+<h2 id="common-mistakes-in-class-5">Common mistakes in Class 5</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What goes wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Build the pipeline AFTER you scaled the data manually</td>
+<td>Pipeline scales it twice. Numbers wrong.</td>
+</tr>
+<tr>
+<td>Forget <code>sparse_output=False</code> in OneHotEncoder</td>
+<td>Some downstream code breaks.</td>
+</tr>
+<tr>
+<td>Use <code>class_weight='balanced'</code> AND SMOTE together</td>
+<td>Over-correction. Pick one.</td>
+</tr>
+<tr>
+<td>Forget <code>random_state</code></td>
+<td>Results change every run. Hard to debug.</td>
+</tr>
+<tr>
+<td>Judge the model on accuracy alone</td>
+<td>85% accuracy means nothing on imbalanced data. Look at F1 and recall
+on the rare class.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="self-check-before-class-6">Self-check before Class 6</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Pipeline has preprocessor +
+model.</label></li>
+<li><label><input type="checkbox" />Preprocessor has numeric +
+categorical transformers.</label></li>
+<li><label><input type="checkbox" /><code>handle_unknown='ignore'</code>
+set.</label></li>
+<li><label><input type="checkbox" /><code>class_weight='balanced'</code>
+set.</label></li>
+<li><label><input type="checkbox" />Confusion matrix + ROC curve
+charts.</label></li>
+<li><label><input
+type="checkbox" /><code>amazon_beauty_pipeline.joblib</code> saved to
+Drive.</label></li>
+</ul>
+<hr />
+<h1 id="class-6-end-to-end-lab-the-big-one">Class 6 — End-to-End Lab
+(THE BIG ONE)</h1>
+<blockquote>
+<p><strong>Scenario reminder:</strong> Daniel is in the meeting room. He
+wants the FINAL clean dataset on his desk in 90 minutes. This is the
+lab.</p>
+</blockquote>
+<h2 id="your-goal-5">Your goal</h2>
+<p>Take the raw gzipped JSON file. Produce ONE final
+<code>.parquet</code> file with the exact 22-column schema. Plus a
+1-page findings report.</p>
+<h2 id="time">Time</h2>
+<p><strong>90 minutes</strong> of focused work.</p>
+<h2 id="inputs-5">Inputs</h2>
+<ul>
+<li><code>all_beauty_5.json.gz</code> in your Drive folder</li>
+</ul>
+<h2 id="outputs-5">Outputs</h2>
+<ul>
+<li><code>amazon_beauty_clean.parquet</code> (~350,000 rows × 22
+columns) in Drive</li>
+<li><code>findings.md</code> (~1 page)</li>
+<li>Your full Colab notebook</li>
+</ul>
+<hr />
+<h2 id="phase-a-explore-the-data-first-10-minutes">Phase A — Explore the
+data first (10 minutes)</h2>
+<p>You will reuse charts from Classes 1–5. Pick 3 of them. Put them all
+on ONE PAGE of your notebook with markdown headers: 1.
+<code>is_helpful</code> distribution (the ~15% imbalance problem) 2.
+Review length vs helpful rate (your most important chart) 3. Top 10 most
+important features (from the RF)</p>
+<p>These 3 charts tell Daniel the whole story.</p>
+<hr />
+<h2 id="phase-b-build-the-final-dataset-70-minutes">Phase B — Build the
+final dataset (70 minutes)</h2>
+<h3 id="required-output-schema">Required output schema</h3>
+<p>Your <code>amazon_beauty_clean.parquet</code> MUST have these 22
+columns, with these names and types:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>Column</th>
+<th>Type</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>reviewerID</code></td>
+<td>string</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>asin</code></td>
+<td>string</td>
+<td>raw (product id)</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>overall</code></td>
+<td>int 1-5</td>
+<td>raw (star rating)</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>is_verified</code></td>
+<td>int (0/1)</td>
+<td>from <code>verified</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>vote</code></td>
+<td>float</td>
+<td>raw, missing filled with 0</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>vote_log</code></td>
+<td>float</td>
+<td>engineered (log1p of vote) — kept for analysis only, NOT a
+feature</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>unixReviewTime</code></td>
+<td>int</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>review_date</code></td>
+<td>datetime</td>
+<td>engineered from <code>unixReviewTime</code></td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>year</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>month</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>review_age_days</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>review_length</code></td>
+<td>int</td>
+<td>engineered (len of reviewText)</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>summary_length</code></td>
+<td>int</td>
+<td>engineered (len of summary)</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>word_count</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>n_questions</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>n_exclamations</code></td>
+<td>int</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>caps_ratio</code></td>
+<td>float</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>has_image_keyword</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>has_brand_mention</code></td>
+<td>int (0/1)</td>
+<td>engineered</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>sentiment_polarity_score</code></td>
+<td>float</td>
+<td>engineered (TextBlob)</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>is_helpful</code></td>
+<td>int (0/1)</td>
+<td>TARGET (engineered from <code>vote &gt;= 5</code>)</td>
+</tr>
+<tr>
+<td>22</td>
+<td><code>reviewText</code></td>
+<td>string</td>
+<td>raw (kept for Module 7 NLP!)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Note: <code>summary</code> (review title) can also be kept as column
+23 if you have memory. Daniel will thank you in Module 7.</p>
+</blockquote>
+<h3 id="lab-phases-timed">Lab phases (timed)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Time</th>
+<th>What you do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Load</td>
+<td>10 min</td>
+<td>Load gzipped JSON. Confirm row count.</td>
+</tr>
+<tr>
+<td>2. Clean</td>
+<td>15 min</td>
+<td>Fix vote, fill missing, drop empty reviewText, convert dates.</td>
+</tr>
+<tr>
+<td>3. Date features</td>
+<td>10 min</td>
+<td><code>year</code>, <code>month</code>,
+<code>review_age_days</code>.</td>
+</tr>
+<tr>
+<td>4. Text features</td>
+<td>25 min</td>
+<td><code>review_length</code>, <code>summary_length</code>,
+<code>word_count</code>, <code>n_questions</code>,
+<code>n_exclamations</code>, <code>caps_ratio</code>,
+<code>has_image_keyword</code>, <code>has_brand_mention</code>,
+<code>sentiment_polarity_score</code>.</td>
+</tr>
+<tr>
+<td>5. Target + save</td>
+<td>10 min</td>
+<td>Compute <code>is_helpful</code>. Validate schema. Save
+<code>.parquet</code>.</td>
+</tr>
+<tr>
+<td>6. Findings</td>
+<td>10 min</td>
+<td>Write <code>findings.md</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total: 90 minutes.</strong></p>
+<blockquote>
+<p><strong>Memory warning:</strong> If Colab is slow, sample 100,000
+rows after Phase 1:
+<code>df = df.sample(n=100000, random_state=42).reset_index(drop=True)</code>.
+The lesson is the same.</p>
+</blockquote>
+<hr />
+<h2 id="phase-c-findings-report-for-daniel-10-minutes">Phase C —
+Findings report for Daniel (10 minutes)</h2>
+<p>Write <code>findings.md</code> with these sections:</p>
+<h3 id="final-numbers">Final numbers</h3>
+<ul>
+<li>Final row count: ____</li>
+<li><code>is_helpful</code> rate: ____% (should be 10–15%)</li>
+<li>Number of unique reviewers: ____</li>
+<li>Number of unique products (asin): ____</li>
+</ul>
+<h3 id="top-3-insights">Top 3 insights</h3>
+<ol type="1">
+<li>_____ (example: “Long reviews are 3x more helpful”)</li>
+<li>_____ (example: “Verified reviewers get more ‘helpful’ clicks”)</li>
+<li>_____ (example: “Reviews with high caps ratio are spam — never
+helpful”)</li>
+</ol>
+<h3 id="one-question-to-investigate-in-module-4">One question to
+investigate in Module 4</h3>
+<ul>
+<li>_____ (example: “Can XGBoost beat Logistic Regression on this
+imbalanced dataset?”)</li>
+</ul>
+<h3 id="one-chart-that-summarizes-everything">One chart that summarizes
+everything</h3>
+<p>Embed your most important chart (review length vs helpful rate).</p>
+<hr />
+<h2 id="grading-rubric-100-points">Grading rubric (100 points)</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Item</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All 22 columns exist with the right names and dtypes</td>
+<td>25</td>
+</tr>
+<tr>
+<td>Cleaning decisions written in markdown</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Pipeline is reproducible (re-run from raw JSON.gz in ONE
+command)</td>
+<td>15</td>
+</tr>
+<tr>
+<td><code>vote</code> and <code>vote_log</code> are NOT used as features
+for <code>is_helpful</code></td>
+<td>10</td>
+</tr>
+<tr>
+<td><code>is_helpful</code> rate is between 10–15%</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>At least 3 exploratory + 1 explanatory chart per
+class</strong></td>
+<td><strong>15</strong></td>
+</tr>
+<tr>
+<td><code>findings.md</code> has insights, not just numbers</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Code is clean (comments, sensible variable names)</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<h2 id="submit">Submit</h2>
+<p>Upload to
+<code>module-3/class_6/submissions/&lt;YourTeamName&gt;/</code>: -
+<code>amazon_beauty_clean.parquet</code> - Your Colab notebook
+(<code>File &gt; Download &gt; Download .ipynb</code>) -
+<code>findings.md</code></p>
+<hr />
+<h1 id="tips-for-the-whole-module">Tips for the whole module</h1>
+<ol type="1">
+<li><strong>Do NOT copy-paste code from this guide.</strong> This guide
+gives you HINTS only. Write the code yourself. You will learn much
+faster.</li>
+<li><strong>Save your notebook to Drive often.</strong> Colab
+disconnects after 12 hours.</li>
+<li><strong>Save intermediate <code>.parquet</code> files to
+Drive</strong> (reviews_step1, reviews_step2, etc.). If something
+breaks, you do not redo everything.</li>
+<li><strong>Pair-program.</strong> One student types, one reads. Switch
+every 20 minutes.</li>
+<li><strong>Make a chart BEFORE you write cleaning code.</strong> You
+must SEE the problem before you can fix it.</li>
+<li><strong>Make a chart AFTER each step.</strong> Confirm your code did
+what you expected.</li>
+<li><strong>NEVER use <code>vote</code> as a feature for
+<code>is_helpful</code>.</strong> This is the #1 mistake in this
+scenario. Always remove <code>vote</code> and <code>vote_log</code> from
+the feature list.</li>
+<li><strong>Watch your RAM.</strong> This dataset is bigger than Olist.
+If Colab dies, sample 100,000 rows and continue.</li>
+<li><strong>Ask the mentor early.</strong> If you are stuck for 20
+minutes, ask. Do not waste an afternoon.</li>
+</ol>
+<p>Good luck.</p>
+</main>
+
+<footer class="scenario-footer">
+  <p><a href="../../#/module/3/class/6">&larr; Back to all 15 scenarios</a></p>
+</footer>
+
+</body>
+</html>
