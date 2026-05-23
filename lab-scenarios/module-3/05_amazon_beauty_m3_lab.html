@@ -306,7 +306,8 @@ decide faster. They buy more. Everyone wins.”</p>
 <h2 id="your-teams-job-for-the-next-2-weeks-module-3">Your team’s job
 for the next 2 weeks (Module 3)</h2>
 <p>Daniel cannot do this alone. The raw data is a <strong>big gzipped
-JSON file</strong> with 370,000 reviews. It needs a lot of cleaning.</p>
+JSON file</strong> with more than 600,000 reviews. It needs a lot of
+cleaning.</p>
 <p>Your job in Module 3: &gt; <strong>Turn one messy JSON file into ONE
 clean parquet file. The clean file will be used to train the model in
 Module 4.</strong></p>
@@ -475,47 +476,78 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>cd <span class="op">/</span>content<span class="op">/</span>drive<span class="op">/</span>MyDrive<span class="op">/</span>amazon_beauty_lab</span></code></pre></div>
 <p>Your team will save ALL files in this folder.</p>
 <h2 id="step-4-get-the-data">Step 4 — Get the data</h2>
-<p>The dataset is the <strong>Amazon Customer Reviews — Beauty
-5-core</strong> from Stanford SNAP. - “5-core” means: every reviewer
-wrote at least 5 reviews, every product got at least 5 reviews. Good for
-ML. - Source page: https://nijianmo.github.io/amazon/index.html - The
-file is <strong>gzipped JSON</strong>. Each line is one review (JSON
+<p>The dataset is the <strong>Amazon Beauty product reviews</strong>
+from the <strong>McAuley Lab (UCSD), Amazon Reviews 2023</strong>. - It
+is the up-to-date version of the older Amazon review datasets. Good for
+ML. - Source page: https://amazon-reviews-2023.github.io/ - The file is
+<strong>gzipped JSON Lines</strong>. Each line is one review (JSON
 object). - License: academic / non-commercial use only.</p>
 <p><strong>Option A — Direct download (recommended):</strong></p>
 <p>In Colab, run:</p>
 <div class="sourceCode" id="cb3"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>wget <span class="op">-</span>O all_beauty_5.json.gz https:<span class="op">//</span>snap.stanford.edu<span class="op">/</span>data<span class="op">/</span>amazon_v2<span class="op">/</span>categoryFilesSmall<span class="op">/</span>All_Beauty_5.json.gz</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ls <span class="op">-</span>la all_beauty_5.json.gz</span></code></pre></div>
-<p>You should see a file around <strong>30–50 MB</strong>. No Kaggle
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>wget <span class="op">-</span>O all_beauty.jsonl.gz https:<span class="op">//</span>mcauleylab.ucsd.edu<span class="op">/</span>public_datasets<span class="op">/</span>data<span class="op">/</span>amazon_2023<span class="op">/</span>raw<span class="op">/</span>review_categories<span class="op">/</span>All_Beauty.jsonl.gz</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ls <span class="op">-</span>la all_beauty.jsonl.gz</span></code></pre></div>
+<p>You should see a file around <strong>90 MB</strong>. No Kaggle
 account needed.</p>
 <p><strong>Option B — Upload by hand:</strong></p>
 <ol type="1">
-<li>Download <code>All_Beauty_5.json.gz</code> on your laptop from the
+<li>Download <code>All_Beauty.jsonl.gz</code> on your laptop from the
 URL above.</li>
 <li>In Colab’s file panel (left sidebar), upload it.</li>
 <li>Move it to your Drive folder.</li>
 </ol>
-<h2 id="step-5-test-it">Step 5 — Test it</h2>
+<h2 id="step-5-load-it-and-rename-the-columns">Step 5 — Load it and
+rename the columns</h2>
+<p>The 2023 file uses NEW column names. We rename them to the simple
+names we use in this lab. <strong>Always run this rename right after you
+load the file.</strong></p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_json(<span class="st">&#39;all_beauty_5.json.gz&#39;</span>, lines<span class="op">=</span><span class="va">True</span>, compression<span class="op">=</span><span class="st">&#39;gzip&#39;</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.shape)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.columns.tolist())</span></code></pre></div>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_json(<span class="st">&#39;all_beauty.jsonl.gz&#39;</span>, lines<span class="op">=</span><span class="va">True</span>, compression<span class="op">=</span><span class="st">&#39;gzip&#39;</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># The 2023 file has new column names. Rename them to the names this lab uses.</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.rename(columns<span class="op">=</span>{</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;rating&#39;</span>: <span class="st">&#39;overall&#39;</span>,            <span class="co"># star rating 1-5</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;helpful_vote&#39;</span>: <span class="st">&#39;vote&#39;</span>,         <span class="co"># number of &quot;helpful&quot; votes (already a number)</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;text&#39;</span>: <span class="st">&#39;reviewText&#39;</span>,           <span class="co"># the full review body</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;title&#39;</span>: <span class="st">&#39;summary&#39;</span>,             <span class="co"># the short review title</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;verified_purchase&#39;</span>: <span class="st">&#39;verified&#39;</span>,<span class="co"># True if the purchase was verified</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;user_id&#39;</span>: <span class="st">&#39;reviewerID&#39;</span>,        <span class="co"># who wrote the review</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># The &#39;timestamp&#39; column is in epoch MILLISECONDS. Turn it into a real date.</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;review_date&#39;</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">&#39;timestamp&#39;</span>], unit<span class="op">=</span><span class="st">&#39;ms&#39;</span>)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.shape)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.columns.tolist())</span></code></pre></div>
 <ul>
 <li><code>lines=True</code> tells pandas: “each line is one JSON, not
 the whole file is one JSON”.</li>
 <li><code>compression='gzip'</code> tells pandas: “unzip on the
 fly”.</li>
 </ul>
-<p>Should print something like <code>(370000, 9)</code> and 9 column
-names like <code>overall</code>, <code>verified</code>,
-<code>reviewTime</code>, <code>reviewerID</code>, <code>asin</code>,
-<code>style</code>, <code>reviewerName</code>, <code>reviewText</code>,
-<code>summary</code>, <code>unixReviewTime</code>, <code>vote</code>,
-<code>image</code>. You are ready.</p>
+<p>After the rename, your DataFrame has these columns:
+<code>overall</code>, <code>verified</code>, <code>review_date</code>,
+<code>reviewerID</code>, <code>asin</code>, <code>parent_asin</code>,
+<code>reviewText</code>, <code>summary</code>, <code>vote</code>,
+<code>timestamp</code>, <code>images</code>. You are ready.</p>
+<blockquote>
+<p><strong>Note on <code>vote</code>:</strong> In this 2023 data the
+<code>vote</code> column is <strong>already a number</strong> (0, 1, 2,
+…). There are no commas and no missing values. This is simpler than
+older versions. You will still confirm this in Phase B.</p>
+</blockquote>
+<blockquote>
+<p><strong>Note on size:</strong> This file has more than
+<strong>600,000 reviews</strong> (it is the full set, not a “5-core”
+subset). That is why it is bigger than the screenshots in older
+guides.</p>
+</blockquote>
 <blockquote>
 <p><strong>Memory tip:</strong> This file is big. If Colab runs out of
-RAM, take a <strong>sample</strong> of 100,000 rows:
+RAM, take a <strong>sample</strong> of 100,000 rows (do this right after
+the rename):
 <code>df = df.sample(n=100000, random_state=42).reset_index(drop=True)</code>
 This makes everything faster and the lessons are the same.</p>
 </blockquote>
@@ -558,18 +590,19 @@ disconnects.</td>
 <hr />
 <h1 id="class-1-data-cleaning">Class 1 — Data Cleaning</h1>
 <blockquote>
-<p><strong>Scenario reminder:</strong> Daniel drops a 50 MB gzipped JSON
-file on your desk. It has 370,000 beauty product reviews. Some reviews
-are empty. Some have weird date formats. The <code>vote</code> column
-has many missing values. Your job today: load the data, fix it, save a
-clean version.</p>
+<p><strong>Scenario reminder:</strong> Daniel drops a ~90 MB gzipped
+JSON file on your desk. It has more than 600,000 beauty product reviews.
+Some reviews are empty. The dates are stored as numbers. Your job today:
+load the data, rename the columns, drop empty reviews, save a clean
+version.</p>
 </blockquote>
 <h2 id="your-goal">Your goal</h2>
-<p>Load the gzipped JSON. Understand each column. Drop empty reviews.
-Fix the <code>vote</code> column. Save a clean parquet file.</p>
+<p>Load the gzipped JSON. Rename the columns. Understand each column.
+Drop empty reviews. Save a clean parquet file.</p>
 <h2 id="inputs">Inputs</h2>
 <ul>
-<li><code>all_beauty_5.json.gz</code> (one big gzipped JSON file)</li>
+<li><code>all_beauty.jsonl.gz</code> (one big gzipped JSON Lines
+file)</li>
 </ul>
 <h2 id="outputs">Outputs</h2>
 <ul>
@@ -607,9 +640,10 @@ data?”</li>
 <li>Use <code>df.isna().sum().sort_values(ascending=False)</code>.</li>
 <li>Plot it as a bar chart.</li>
 </ul></li>
-<li><strong>What you learn:</strong> <code>vote</code> and
-<code>image</code> are mostly missing. <code>reviewText</code> has some
-empty rows. <code>summary</code> is almost always there.</li>
+<li><strong>What you learn:</strong> <code>images</code> is mostly
+empty. <code>reviewText</code> has some empty rows. <code>summary</code>
+is almost always there. (In this 2023 data, <code>vote</code> is NOT
+missing — it is 0 when nobody voted.)</li>
 </ul>
 <h3
 id="exploratory-chart-3-distribution-of-vote-the-helpfulness-count">Exploratory
@@ -619,11 +653,9 @@ chart 3 — Distribution of <code>vote</code> (the helpfulness count)</h3>
 votes? 100 votes?”</li>
 <li><strong>HINTS:</strong>
 <ul>
-<li>First fill missing <code>vote</code> with 0 (do this in Phase B Step
-4 anyway, do it here too as a copy).</li>
-<li>The <code>vote</code> column is stored as a string with commas (like
-<code>"1,234"</code>). Convert with
-<code>.str.replace(',', '').astype(float)</code>.</li>
+<li>The <code>vote</code> column is <strong>already a number</strong>
+(0, 1, 2, …). No commas, no missing values. You can use it
+directly.</li>
 <li>Use a histogram with <code>bins=50</code>.</li>
 <li>Or use
 <code>df['vote'].clip(upper=20).value_counts().sort_index().plot.bar()</code>
@@ -640,30 +672,32 @@ Reviews per year</h3>
 Amazon collect more reviews over time?”</li>
 <li><strong>HINTS:</strong>
 <ul>
-<li>Convert <code>unixReviewTime</code> to datetime (you do this in
-Phase B Step 3 anyway, do it here too).</li>
+<li>Use the <code>review_date</code> column you made in Setup Step 5 (it
+is already a real date).</li>
 <li>Use <code>.dt.year</code>.</li>
 <li><code>value_counts().sort_index().plot.bar()</code>.</li>
 </ul></li>
-<li><strong>What you learn:</strong> Most reviews are from 2014–2018.
-Old reviews are rare.</li>
+<li><strong>What you learn:</strong> Most reviews are recent. Very old
+reviews are rare.</li>
 </ul>
 <hr />
 <h2 id="phase-b-clean-the-reviews-table-45-minutes">Phase B — Clean the
 reviews table (45 minutes)</h2>
-<h3 id="step-1-load-the-gzipped-json">Step 1 — Load the gzipped
-JSON</h3>
+<h3 id="step-1-load-the-gzipped-json-and-rename-columns">Step 1 — Load
+the gzipped JSON and rename columns</h3>
 <ul>
-<li><strong>WHAT:</strong> Read the <code>.json.gz</code> file into a
-DataFrame.</li>
+<li><strong>WHAT:</strong> Read the <code>.jsonl.gz</code> file into a
+DataFrame, then rename the 2023 columns (same as Setup Step 5).</li>
 <li><strong>HINTS:</strong>
 <ul>
-<li><code>pd.read_json('all_beauty_5.json.gz', lines=True, compression='gzip')</code>.</li>
+<li><code>pd.read_json('all_beauty.jsonl.gz', lines=True, compression='gzip')</code>.</li>
 <li><code>lines=True</code> is REQUIRED for this file (one JSON per
 line).</li>
+<li>Then run the <code>df.rename(...)</code> block from Setup Step 5,
+and make <code>review_date</code> from <code>timestamp</code>.</li>
 </ul></li>
-<li><strong>EXPECTED:</strong> A DataFrame with ~370,000 rows × 9–12
-columns.</li>
+<li><strong>EXPECTED:</strong> A DataFrame with more than 600,000 rows ×
+~11 columns.</li>
 </ul>
 <h3 id="step-2-look-at-the-dataframe">Step 2 — Look at the
 DataFrame</h3>
@@ -675,12 +709,12 @@ DataFrame</h3>
 <ul>
 <li>Look at the <code>Dtype</code> column in <code>.info()</code>
 output.</li>
-<li><strong>Is <code>unixReviewTime</code> stored as integer?</strong>
-(Yes — it is a Unix timestamp = seconds since 1970.)</li>
-<li><strong>Is <code>vote</code> stored as text (object)?</strong> (Yes
-— and some values have commas.)</li>
+<li><strong>Is <code>timestamp</code> stored as a big integer?</strong>
+(Yes — it is epoch milliseconds since 1970.)</li>
+<li><strong>Is <code>vote</code> stored as a number?</strong> (Yes — it
+is already an integer in this data.)</li>
 </ul></li>
-<li><strong>EXPECTED:</strong></li>
+<li><strong>EXPECTED (after the rename):</strong></li>
 </ul>
 <table>
 <thead>
@@ -702,9 +736,9 @@ output.</li>
 <td>bool</td>
 </tr>
 <tr>
-<td><code>reviewTime</code></td>
-<td>Date as string “MM DD, YYYY”</td>
-<td>object</td>
+<td><code>review_date</code></td>
+<td>Real date (made from <code>timestamp</code>)</td>
+<td>datetime64</td>
 </tr>
 <tr>
 <td><code>reviewerID</code></td>
@@ -717,8 +751,8 @@ output.</li>
 <td>object</td>
 </tr>
 <tr>
-<td><code>reviewerName</code></td>
-<td>Reviewer name</td>
+<td><code>parent_asin</code></td>
+<td>Parent product ID</td>
 <td>object</td>
 </tr>
 <tr>
@@ -732,64 +766,59 @@ output.</li>
 <td>object</td>
 </tr>
 <tr>
-<td><code>unixReviewTime</code></td>
-<td>Date as integer</td>
+<td><code>timestamp</code></td>
+<td>Date as integer (epoch ms)</td>
 <td>int</td>
 </tr>
 <tr>
 <td><code>vote</code></td>
 <td>Helpfulness votes</td>
-<td>object (with commas)</td>
+<td>int</td>
 </tr>
 <tr>
-<td><code>style</code></td>
-<td>Optional product variant info</td>
-<td>object</td>
-</tr>
-<tr>
-<td><code>image</code></td>
-<td>URLs of uploaded images</td>
+<td><code>images</code></td>
+<td>List of uploaded images</td>
 <td>object</td>
 </tr>
 </tbody>
 </table>
-<h3 id="step-3-convert-the-date-column">Step 3 — Convert the date
+<h3 id="step-3-confirm-the-date-column">Step 3 — Confirm the date
 column</h3>
 <ul>
-<li><strong>WHAT:</strong> Convert <code>unixReviewTime</code> to a real
-datetime.</li>
+<li><strong>WHAT:</strong> You already made <code>review_date</code> in
+Setup Step 5 from <code>timestamp</code>.</li>
 <li><strong>HINTS:</strong>
 <ul>
-<li>The function is <code>pd.to_datetime()</code>.</li>
-<li>Add the argument <code>unit='s'</code>. This tells pandas the
-integer is in seconds.</li>
-<li>Save the result in a new column:
-<code>df['review_date'] = pd.to_datetime(df['unixReviewTime'], unit=___)</code>.</li>
+<li>The conversion was:
+<code>df['review_date'] = pd.to_datetime(df['timestamp'], unit='ms')</code>.</li>
+<li><code>unit='ms'</code> tells pandas the integer is in milliseconds
+(NOT seconds).</li>
+<li>Confirm it worked:
+<code>print(df['review_date'].min(), df['review_date'].max())</code>.</li>
 </ul></li>
-<li><strong>WHY:</strong> If you only have an integer like
-<code>1391040000</code>, you cannot compute “how old is this review?”.
-After conversion you get a real date like <code>2014-01-30</code>.</li>
+<li><strong>WHY:</strong> If you only have a big integer like
+<code>1588687728923</code>, you cannot compute “how old is this
+review?”. After conversion you get a real date.</li>
 <li><strong>EXPECTED:</strong> <code>df['review_date'].dtypes</code>
-shows <code>datetime64[ns]</code>. The min year is around 2000, max
-around 2018.</li>
+shows <code>datetime64[ns]</code>.</li>
 </ul>
-<h3 id="step-4-fix-the-vote-column">Step 4 — Fix the <code>vote</code>
-column</h3>
+<h3 id="step-4-check-the-vote-column">Step 4 — Check the
+<code>vote</code> column</h3>
 <ul>
-<li><strong>WHAT:</strong> <code>vote</code> has 3 problems: it has
-commas in numbers, it is text not number, and most cells are
-missing.</li>
+<li><strong>WHAT:</strong> In older datasets <code>vote</code> was messy
+text. In this 2023 data it is <strong>already a clean integer</strong>,
+so there is almost nothing to fix.</li>
 <li><strong>HINTS:</strong>
 <ul>
-<li>Remove commas:
-<code>df['vote'] = df['vote'].str.replace(',', '')</code>.</li>
-<li>Convert to number: <code>.astype(float)</code>.</li>
-<li>Fill missing with 0: <code>.fillna(___)</code>.</li>
-<li>Combine into one chain.</li>
+<li>Confirm it is numeric: <code>print(df['vote'].dtype)</code>.</li>
+<li>Confirm there are no missing values:
+<code>print(df['vote'].isna().sum())</code> (should be 0).</li>
+<li>If you want to be safe, you can still run:
+<code>df['vote'] = df['vote'].fillna(0).astype(int)</code>.</li>
 </ul></li>
-<li><strong>WHY:</strong> Missing <code>vote</code> does NOT mean “no
-info”. It means “nobody clicked yet”. For our analysis that is the same
-as 0 votes.</li>
+<li><strong>WHY:</strong> A clean <code>vote</code> column is the
+helpfulness signal Daniel cares about. 0 means “nobody clicked
+yet”.</li>
 <li><strong>EXPECTED:</strong>
 <code>df['vote'].isna().sum() == 0</code>. The mean is small (under 1).
 The max is large (hundreds).</li>
@@ -808,8 +837,8 @@ to make missing into empty string.</li>
 </ul></li>
 <li><strong>WHY:</strong> A review with no text has no information. The
 shopper sees nothing.</li>
-<li><strong>EXPECTED:</strong> About <strong>350,000 rows</strong> left
-(about 95% kept). Write the exact number in markdown.</li>
+<li><strong>EXPECTED:</strong> Most rows are kept (about 95%). Write the
+exact number you get in markdown.</li>
 </ul>
 <h3 id="step-6-fill-missing-summaries">Step 6 — Fill missing
 summaries</h3>
@@ -838,10 +867,12 @@ verified review is more trusted by other shoppers.</li>
 </ul>
 <h3 id="step-8-write-down-what-you-did">Step 8 — Write down what you
 did</h3>
-<p>In a markdown cell, write: - Starting rows: ~370,000 - After
-drop-empty-text: ~350,000 - <code>vote</code> filled with 0 for missing
-- <code>verified</code> converted to 0/1 - <code>unixReviewTime</code>
-converted to datetime - WHY you removed each group.</p>
+<p>In a markdown cell, write: - Starting rows: (the number you saw —
+more than 600,000) - After drop-empty-text: (the number you got) -
+<code>vote</code> confirmed numeric, missing filled with 0 -
+<code>verified</code> converted to 0/1 - <code>timestamp</code>
+converted to datetime (<code>review_date</code>) - WHY you removed each
+group.</p>
 <h3 id="step-9-save-to-drive">Step 9 — Save to Drive</h3>
 <ul>
 <li><strong>WHAT:</strong> Save the cleaned DataFrame as parquet, inside
@@ -943,9 +974,13 @@ helpfulness from the review text and meta-data.”</li>
 <h2 id="self-check-before-class-2">Self-check before Class 2</h2>
 <ul class="task-list">
 <li><label><input type="checkbox" />DataFrame loaded from
-<code>.json.gz</code> (around 370,000 rows).</label></li>
-<li><label><input type="checkbox" /><code>unixReviewTime</code>
-converted to datetime.</label></li>
+<code>.jsonl.gz</code> (more than 600,000 rows).</label></li>
+<li><label><input type="checkbox" />Columns renamed to the lab names
+(<code>overall</code>, <code>vote</code>, <code>reviewText</code>,
+<code>summary</code>, <code>verified</code>,
+<code>reviewerID</code>).</label></li>
+<li><label><input type="checkbox" /><code>timestamp</code> converted to
+datetime (<code>review_date</code>).</label></li>
 <li><label><input type="checkbox" /><code>vote</code> is numeric with no
 missing values.</label></li>
 <li><label><input type="checkbox" />Empty <code>reviewText</code> rows
@@ -2077,12 +2112,12 @@ lab.</p>
 <p><strong>90 minutes</strong> of focused work.</p>
 <h2 id="inputs-5">Inputs</h2>
 <ul>
-<li><code>all_beauty_5.json.gz</code> in your Drive folder</li>
+<li><code>all_beauty.jsonl.gz</code> in your Drive folder</li>
 </ul>
 <h2 id="outputs-5">Outputs</h2>
 <ul>
-<li><code>amazon_beauty_clean.parquet</code> (~350,000 rows × 22
-columns) in Drive</li>
+<li><code>amazon_beauty_clean.parquet</code> (most of the 600,000+ rows
+× 22 columns) in Drive</li>
 <li><code>findings.md</code> (~1 page)</li>
 <li>Your full Colab notebook</li>
 </ul>
@@ -2156,15 +2191,15 @@ feature</td>
 </tr>
 <tr>
 <td>7</td>
-<td><code>unixReviewTime</code></td>
+<td><code>timestamp</code></td>
 <td>int</td>
-<td>raw</td>
+<td>raw (epoch milliseconds)</td>
 </tr>
 <tr>
 <td>8</td>
 <td><code>review_date</code></td>
 <td>datetime</td>
-<td>engineered from <code>unixReviewTime</code></td>
+<td>engineered from <code>timestamp</code></td>
 </tr>
 <tr>
 <td>9</td>

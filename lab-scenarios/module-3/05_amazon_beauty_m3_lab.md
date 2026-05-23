@@ -64,7 +64,7 @@ Your manager, **Daniel** (Customer Reviews Quality Team Lead), tells you:
 
 ## Your team's job for the next 2 weeks (Module 3)
 
-Daniel cannot do this alone. The raw data is a **big gzipped JSON file** with 370,000 reviews. It needs a lot of cleaning.
+Daniel cannot do this alone. The raw data is a **big gzipped JSON file** with more than 600,000 reviews. It needs a lot of cleaning.
 
 Your job in Module 3:
 > **Turn one messy JSON file into ONE clean parquet file. The clean file will be used to train the model in Module 4.**
@@ -189,10 +189,10 @@ Your team will save ALL files in this folder.
 
 ## Step 4 — Get the data
 
-The dataset is the **Amazon Customer Reviews — Beauty 5-core** from Stanford SNAP.
-- "5-core" means: every reviewer wrote at least 5 reviews, every product got at least 5 reviews. Good for ML.
-- Source page: https://nijianmo.github.io/amazon/index.html
-- The file is **gzipped JSON**. Each line is one review (JSON object).
+The dataset is the **Amazon Beauty product reviews** from the **McAuley Lab (UCSD), Amazon Reviews 2023**.
+- It is the up-to-date version of the older Amazon review datasets. Good for ML.
+- Source page: https://amazon-reviews-2023.github.io/
+- The file is **gzipped JSON Lines**. Each line is one review (JSON object).
 - License: academic / non-commercial use only.
 
 **Option A — Direct download (recommended):**
@@ -200,23 +200,41 @@ The dataset is the **Amazon Customer Reviews — Beauty 5-core** from Stanford S
 In Colab, run:
 
 ```python
-!wget -O all_beauty_5.json.gz https://snap.stanford.edu/data/amazon_v2/categoryFilesSmall/All_Beauty_5.json.gz
-!ls -la all_beauty_5.json.gz
+!wget -O all_beauty.jsonl.gz https://mcauleylab.ucsd.edu/public_datasets/data/amazon_2023/raw/review_categories/All_Beauty.jsonl.gz
+!ls -la all_beauty.jsonl.gz
 ```
 
-You should see a file around **30–50 MB**. No Kaggle account needed.
+You should see a file around **90 MB**. No Kaggle account needed.
 
 **Option B — Upload by hand:**
 
-1. Download `All_Beauty_5.json.gz` on your laptop from the URL above.
+1. Download `All_Beauty.jsonl.gz` on your laptop from the URL above.
 2. In Colab's file panel (left sidebar), upload it.
 3. Move it to your Drive folder.
 
-## Step 5 — Test it
+## Step 5 — Load it and rename the columns
+
+The 2023 file uses NEW column names. We rename them to the simple names we use in this lab.
+**Always run this rename right after you load the file.**
 
 ```python
 import pandas as pd
-df = pd.read_json('all_beauty_5.json.gz', lines=True, compression='gzip')
+
+df = pd.read_json('all_beauty.jsonl.gz', lines=True, compression='gzip')
+
+# The 2023 file has new column names. Rename them to the names this lab uses.
+df = df.rename(columns={
+    'rating': 'overall',            # star rating 1-5
+    'helpful_vote': 'vote',         # number of "helpful" votes (already a number)
+    'text': 'reviewText',           # the full review body
+    'title': 'summary',             # the short review title
+    'verified_purchase': 'verified',# True if the purchase was verified
+    'user_id': 'reviewerID',        # who wrote the review
+})
+
+# The 'timestamp' column is in epoch MILLISECONDS. Turn it into a real date.
+df['review_date'] = pd.to_datetime(df['timestamp'], unit='ms')
+
 print(df.shape)
 print(df.columns.tolist())
 ```
@@ -224,9 +242,13 @@ print(df.columns.tolist())
 - `lines=True` tells pandas: "each line is one JSON, not the whole file is one JSON".
 - `compression='gzip'` tells pandas: "unzip on the fly".
 
-Should print something like `(370000, 9)` and 9 column names like `overall`, `verified`, `reviewTime`, `reviewerID`, `asin`, `style`, `reviewerName`, `reviewText`, `summary`, `unixReviewTime`, `vote`, `image`. You are ready.
+After the rename, your DataFrame has these columns: `overall`, `verified`, `review_date`, `reviewerID`, `asin`, `parent_asin`, `reviewText`, `summary`, `vote`, `timestamp`, `images`. You are ready.
 
-> **Memory tip:** This file is big. If Colab runs out of RAM, take a **sample** of 100,000 rows:
+> **Note on `vote`:** In this 2023 data the `vote` column is **already a number** (0, 1, 2, ...). There are no commas and no missing values. This is simpler than older versions. You will still confirm this in Phase B.
+
+> **Note on size:** This file has more than **600,000 reviews** (it is the full set, not a "5-core" subset). That is why it is bigger than the screenshots in older guides.
+
+> **Memory tip:** This file is big. If Colab runs out of RAM, take a **sample** of 100,000 rows (do this right after the rename):
 > `df = df.sample(n=100000, random_state=42).reset_index(drop=True)`
 > This makes everything faster and the lessons are the same.
 
@@ -244,13 +266,13 @@ Should print something like `(370000, 9)` and 9 column names like `overall`, `ve
 
 # Class 1 — Data Cleaning
 
-> **Scenario reminder:** Daniel drops a 50 MB gzipped JSON file on your desk. It has 370,000 beauty product reviews. Some reviews are empty. Some have weird date formats. The `vote` column has many missing values. Your job today: load the data, fix it, save a clean version.
+> **Scenario reminder:** Daniel drops a ~90 MB gzipped JSON file on your desk. It has more than 600,000 beauty product reviews. Some reviews are empty. The dates are stored as numbers. Your job today: load the data, rename the columns, drop empty reviews, save a clean version.
 
 ## Your goal
-Load the gzipped JSON. Understand each column. Drop empty reviews. Fix the `vote` column. Save a clean parquet file.
+Load the gzipped JSON. Rename the columns. Understand each column. Drop empty reviews. Save a clean parquet file.
 
 ## Inputs
-- `all_beauty_5.json.gz` (one big gzipped JSON file)
+- `all_beauty.jsonl.gz` (one big gzipped JSON Lines file)
 
 ## Outputs
 - `reviews_step1.parquet` saved in your Drive folder
@@ -277,14 +299,13 @@ Before you clean anything, **LOOK** at the data.
 - **HINTS:**
   - Use `df.isna().sum().sort_values(ascending=False)`.
   - Plot it as a bar chart.
-- **What you learn:** `vote` and `image` are mostly missing. `reviewText` has some empty rows. `summary` is almost always there.
+- **What you learn:** `images` is mostly empty. `reviewText` has some empty rows. `summary` is almost always there. (In this 2023 data, `vote` is NOT missing — it is 0 when nobody voted.)
 
 ### Exploratory chart 3 — Distribution of `vote` (the helpfulness count)
 
 - **Question:** "How many reviews got 0 votes? 1 vote? 10 votes? 100 votes?"
 - **HINTS:**
-  - First fill missing `vote` with 0 (do this in Phase B Step 4 anyway, do it here too as a copy).
-  - The `vote` column is stored as a string with commas (like `"1,234"`). Convert with `.str.replace(',', '').astype(float)`.
+  - The `vote` column is **already a number** (0, 1, 2, ...). No commas, no missing values. You can use it directly.
   - Use a histogram with `bins=50`.
   - Or use `df['vote'].clip(upper=20).value_counts().sort_index().plot.bar()` to see 0–20 only.
 - **What you learn:** A HUGE spike at 0. A long tail of "viral" reviews with 100+ votes. This is the imbalance we will deal with later.
@@ -293,63 +314,62 @@ Before you clean anything, **LOOK** at the data.
 
 - **Question:** "When were these reviews written? Did Amazon collect more reviews over time?"
 - **HINTS:**
-  - Convert `unixReviewTime` to datetime (you do this in Phase B Step 3 anyway, do it here too).
+  - Use the `review_date` column you made in Setup Step 5 (it is already a real date).
   - Use `.dt.year`.
   - `value_counts().sort_index().plot.bar()`.
-- **What you learn:** Most reviews are from 2014–2018. Old reviews are rare.
+- **What you learn:** Most reviews are recent. Very old reviews are rare.
 
 ---
 
 ## Phase B — Clean the reviews table (45 minutes)
 
-### Step 1 — Load the gzipped JSON
-- **WHAT:** Read the `.json.gz` file into a DataFrame.
+### Step 1 — Load the gzipped JSON and rename columns
+- **WHAT:** Read the `.jsonl.gz` file into a DataFrame, then rename the 2023 columns (same as Setup Step 5).
 - **HINTS:**
-  - `pd.read_json('all_beauty_5.json.gz', lines=True, compression='gzip')`.
+  - `pd.read_json('all_beauty.jsonl.gz', lines=True, compression='gzip')`.
   - `lines=True` is REQUIRED for this file (one JSON per line).
-- **EXPECTED:** A DataFrame with ~370,000 rows × 9–12 columns.
+  - Then run the `df.rename(...)` block from Setup Step 5, and make `review_date` from `timestamp`.
+- **EXPECTED:** A DataFrame with more than 600,000 rows × ~11 columns.
 
 ### Step 2 — Look at the DataFrame
 - **WHAT:** Check `.shape`, `.info()`, `.head()`, and `.describe()`.
 - **HINTS:**
   - Look at the `Dtype` column in `.info()` output.
-  - **Is `unixReviewTime` stored as integer?** (Yes — it is a Unix timestamp = seconds since 1970.)
-  - **Is `vote` stored as text (object)?** (Yes — and some values have commas.)
-- **EXPECTED:**
+  - **Is `timestamp` stored as a big integer?** (Yes — it is epoch milliseconds since 1970.)
+  - **Is `vote` stored as a number?** (Yes — it is already an integer in this data.)
+- **EXPECTED (after the rename):**
 
 | Column | What it is | Approx dtype |
 | --- | --- | --- |
 | `overall` | Star rating 1–5 | float |
 | `verified` | True if purchase verified | bool |
-| `reviewTime` | Date as string "MM DD, YYYY" | object |
+| `review_date` | Real date (made from `timestamp`) | datetime64 |
 | `reviewerID` | Reviewer ID | object |
 | `asin` | Product ID | object |
-| `reviewerName` | Reviewer name | object |
+| `parent_asin` | Parent product ID | object |
 | `reviewText` | The full review body | object |
 | `summary` | Review title | object |
-| `unixReviewTime` | Date as integer | int |
-| `vote` | Helpfulness votes | object (with commas) |
-| `style` | Optional product variant info | object |
-| `image` | URLs of uploaded images | object |
+| `timestamp` | Date as integer (epoch ms) | int |
+| `vote` | Helpfulness votes | int |
+| `images` | List of uploaded images | object |
 
-### Step 3 — Convert the date column
+### Step 3 — Confirm the date column
 
-- **WHAT:** Convert `unixReviewTime` to a real datetime.
+- **WHAT:** You already made `review_date` in Setup Step 5 from `timestamp`.
 - **HINTS:**
-  - The function is `pd.to_datetime()`.
-  - Add the argument `unit='s'`. This tells pandas the integer is in seconds.
-  - Save the result in a new column: `df['review_date'] = pd.to_datetime(df['unixReviewTime'], unit=___)`.
-- **WHY:** If you only have an integer like `1391040000`, you cannot compute "how old is this review?". After conversion you get a real date like `2014-01-30`.
-- **EXPECTED:** `df['review_date'].dtypes` shows `datetime64[ns]`. The min year is around 2000, max around 2018.
+  - The conversion was: `df['review_date'] = pd.to_datetime(df['timestamp'], unit='ms')`.
+  - `unit='ms'` tells pandas the integer is in milliseconds (NOT seconds).
+  - Confirm it worked: `print(df['review_date'].min(), df['review_date'].max())`.
+- **WHY:** If you only have a big integer like `1588687728923`, you cannot compute "how old is this review?". After conversion you get a real date.
+- **EXPECTED:** `df['review_date'].dtypes` shows `datetime64[ns]`.
 
-### Step 4 — Fix the `vote` column
-- **WHAT:** `vote` has 3 problems: it has commas in numbers, it is text not number, and most cells are missing.
+### Step 4 — Check the `vote` column
+- **WHAT:** In older datasets `vote` was messy text. In this 2023 data it is **already a clean integer**, so there is almost nothing to fix.
 - **HINTS:**
-  - Remove commas: `df['vote'] = df['vote'].str.replace(',', '')`.
-  - Convert to number: `.astype(float)`.
-  - Fill missing with 0: `.fillna(___)`.
-  - Combine into one chain.
-- **WHY:** Missing `vote` does NOT mean "no info". It means "nobody clicked yet". For our analysis that is the same as 0 votes.
+  - Confirm it is numeric: `print(df['vote'].dtype)`.
+  - Confirm there are no missing values: `print(df['vote'].isna().sum())` (should be 0).
+  - If you want to be safe, you can still run: `df['vote'] = df['vote'].fillna(0).astype(int)`.
+- **WHY:** A clean `vote` column is the helpfulness signal Daniel cares about. 0 means "nobody clicked yet".
 - **EXPECTED:** `df['vote'].isna().sum() == 0`. The mean is small (under 1). The max is large (hundreds).
 
 ### Step 5 — Drop empty review texts
@@ -359,7 +379,7 @@ Before you clean anything, **LOOK** at the data.
   - Then: `df = df[df['reviewText'].str.strip() != '']`.
   - Add `.copy()` at the end. Avoids a warning later.
 - **WHY:** A review with no text has no information. The shopper sees nothing.
-- **EXPECTED:** About **350,000 rows** left (about 95% kept). Write the exact number in markdown.
+- **EXPECTED:** Most rows are kept (about 95%). Write the exact number you get in markdown.
 
 ### Step 6 — Fill missing summaries
 - **WHAT:** Some rows have no `summary` (the title). Fill with empty string.
@@ -376,11 +396,11 @@ Before you clean anything, **LOOK** at the data.
 ### Step 8 — Write down what you did
 
 In a markdown cell, write:
-- Starting rows: ~370,000
-- After drop-empty-text: ~350,000
-- `vote` filled with 0 for missing
+- Starting rows: (the number you saw — more than 600,000)
+- After drop-empty-text: (the number you got)
+- `vote` confirmed numeric, missing filled with 0
 - `verified` converted to 0/1
-- `unixReviewTime` converted to datetime
+- `timestamp` converted to datetime (`review_date`)
 - WHY you removed each group.
 
 ### Step 9 — Save to Drive
@@ -428,8 +448,9 @@ A bar chart showing how many reviews fall into each "vote count" bucket:
 
 ## Self-check before Class 2
 
-- [ ] DataFrame loaded from `.json.gz` (around 370,000 rows).
-- [ ] `unixReviewTime` converted to datetime.
+- [ ] DataFrame loaded from `.jsonl.gz` (more than 600,000 rows).
+- [ ] Columns renamed to the lab names (`overall`, `vote`, `reviewText`, `summary`, `verified`, `reviewerID`).
+- [ ] `timestamp` converted to datetime (`review_date`).
 - [ ] `vote` is numeric with no missing values.
 - [ ] Empty `reviewText` rows dropped.
 - [ ] `is_verified` is 0/1 integer.
@@ -1056,10 +1077,10 @@ Take the raw gzipped JSON file. Produce ONE final `.parquet` file with the exact
 **90 minutes** of focused work.
 
 ## Inputs
-- `all_beauty_5.json.gz` in your Drive folder
+- `all_beauty.jsonl.gz` in your Drive folder
 
 ## Outputs
-- `amazon_beauty_clean.parquet` (~350,000 rows × 22 columns) in Drive
+- `amazon_beauty_clean.parquet` (most of the 600,000+ rows × 22 columns) in Drive
 - `findings.md` (~1 page)
 - Your full Colab notebook
 
@@ -1090,8 +1111,8 @@ Your `amazon_beauty_clean.parquet` MUST have these 22 columns, with these names 
 | 4 | `is_verified` | int (0/1) | from `verified` |
 | 5 | `vote` | float | raw, missing filled with 0 |
 | 6 | `vote_log` | float | engineered (log1p of vote) — kept for analysis only, NOT a feature |
-| 7 | `unixReviewTime` | int | raw |
-| 8 | `review_date` | datetime | engineered from `unixReviewTime` |
+| 7 | `timestamp` | int | raw (epoch milliseconds) |
+| 8 | `review_date` | datetime | engineered from `timestamp` |
 | 9 | `year` | int | engineered |
 | 10 | `month` | int | engineered |
 | 11 | `review_age_days` | int | engineered |
